@@ -43,9 +43,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Always check if user is authenticated on mount via session/cookie
-    refreshCurrentUser().finally(() => setIsLoading(false));
-  }, [refreshCurrentUser]);
+    let active = true;
+    (async () => {
+      try {
+        const me = await accountsApi.getMe();
+        if (active) setUser(me);
+      } catch {
+        if (active) setUser(null);
+      } finally {
+        if (active) setIsLoading(false);
+      }
+    })();
+    return () => { active = false; };
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await authApi.login(email, password);

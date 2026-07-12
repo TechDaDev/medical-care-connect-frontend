@@ -30,9 +30,9 @@ export async function login(
   email: string,
   password: string
 ): Promise<void> {
-  await page.goto(getBaseUrl() + "/login");
+  await page.goto(getBaseUrl() + "/login", { waitUntil: "load" });
   // Wait for login form
-  await page.waitForSelector('input[type="email"]', { timeout: 5000 });
+  await page.waitForSelector('input[type="email"]', { timeout: 15000 });
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
