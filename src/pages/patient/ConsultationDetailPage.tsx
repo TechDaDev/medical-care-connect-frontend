@@ -2,17 +2,15 @@ import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
-import { messagesApi } from "../../api/messages";
 import { t } from "../../utils/i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
-import { Spinner } from "../../components/common/Spinner";
-import { ErrorState } from "../../components/common/ErrorState";
+
 import { Modal } from "../../components/common/Modal";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
 import { useAuth } from "../../auth";
-import { ConsultationStatus, UserRole } from "../../types";
+import { UserRole } from "../../types";
 
 const statusLabels: Record<string, string> = {
   draft: "Draft",
@@ -39,7 +37,7 @@ export function ConsultationDetailPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
-  const { data: consultation, isLoading, error } = useQuery({
+  const { data: consultation } = useQuery({
     queryKey: ["consultation", consultationId],
     queryFn: () => consultationsApi.getById(consultationId!),
     enabled: !!consultationId,
@@ -54,24 +52,10 @@ export function ConsultationDetailPage() {
     },
   });
 
-  const isDoctor = user?.role === UserRole.DOCTOR;
   const isPatient = user?.role === UserRole.PATIENT;
+  const isDoctor = user?.role === UserRole.DOCTOR;
 
-  if (isLoading) return <Spinner />;
-  if (error) return <ErrorState />;
   if (!consultation) return null;
-
-  const canCancel =
-    consultation.status !== ConsultationStatus.COMPLETED &&
-    consultation.status !== ConsultationStatus.CANCELLED;
-
-  const canAccept = isDoctor && consultation.status === ConsultationStatus.SUBMITTED;
-  const canStartIntake =
-    isPatient && consultation.status === ConsultationStatus.ACCEPTED;
-  const hasRecord =
-    consultation.status === ConsultationStatus.INTAKE_COMPLETED ||
-    consultation.status === ConsultationStatus.DOCTOR_REVIEW ||
-    consultation.status === ConsultationStatus.COMPLETED;
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -95,9 +79,9 @@ export function ConsultationDetailPage() {
               <p className="font-medium text-gray-900">
                 Dr. {consultation.doctor.user.full_name}
               </p>
-              {consultation.doctor.specialty && (
+              {consultation.doctor.specialty_name && (
                 <p className="text-sm text-gray-500">
-                  {consultation.doctor.specialty.name}
+                  {consultation.doctor.specialty_name}
                 </p>
               )}
             </div>
@@ -146,21 +130,21 @@ export function ConsultationDetailPage() {
         </div>
       </Card>
 
-      {/* Actions */}
+      {/* Actions — based on backend action flags */}
       <div className="flex flex-wrap gap-3">
-        {canStartIntake && (
+        {consultation.actions?.can_start_intake && (
           <Link to={`/app/patient/consultations/${consultationId}/intake`}>
             <Button>{t("intake.start")}</Button>
           </Link>
         )}
 
-        {hasRecord && isPatient && (
-          <Link to={``}>
+        {consultation.actions?.can_view_record && consultation.has_medical_record && (
+          <Link to={`/app/medical-records/${consultation.id}`}>
             <Button variant="secondary">{t("intake.viewRecord")}</Button>
           </Link>
         )}
 
-        {canAccept && (
+        {consultation.actions?.can_accept && isDoctor && (
           <Button
             onClick={async () => {
               await consultationsApi.accept(consultationId!);
@@ -173,11 +157,13 @@ export function ConsultationDetailPage() {
           </Button>
         )}
 
-        <Link to={`/app/${isPatient ? "patient" : "doctor"}/messages/${consultationId}`}>
-          <Button variant="secondary">{t("message.title")}</Button>
-        </Link>
+        {consultation.actions?.can_message && (
+          <Link to={`/app/${isPatient ? "patient" : "doctor"}/messages/${consultationId}`}>
+            <Button variant="secondary">{t("message.title")}</Button>
+          </Link>
+        )}
 
-        {canCancel && (
+        {consultation.actions?.can_cancel && (
           <Button variant="danger" onClick={() => setCancelOpen(true)}>
             {t("consultation.cancel")}
           </Button>

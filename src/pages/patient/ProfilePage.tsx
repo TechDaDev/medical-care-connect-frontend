@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../../auth";
-import { accountsApi } from "../../api/auth";
 import { t } from "../../utils/i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";

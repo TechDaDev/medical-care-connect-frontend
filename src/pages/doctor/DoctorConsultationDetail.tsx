@@ -11,7 +11,6 @@ import { Textarea } from "../../components/common/Textarea";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
-import { Alert } from "../../components/common/Alert";
 
 export function DoctorConsultationDetail() {
   const { consultationId } = useParams<{ consultationId: string }>();
@@ -95,7 +94,7 @@ export function DoctorConsultationDetail() {
       </Card>
 
       <div className="flex flex-wrap gap-3 mb-6">
-        {consultation.status === "submitted" && (
+        {consultation.actions?.can_accept && (
           <Button
             loading={acceptMutation.isPending}
             onClick={() => acceptMutation.mutate()}
@@ -103,51 +102,59 @@ export function DoctorConsultationDetail() {
             {t("consultation.accept")}
           </Button>
         )}
-        <Link to={`/app/doctor/messages/${consultationId}`}>
-          <Button variant="secondary">{t("message.title")}</Button>
-        </Link>
-      </div>
-
-      {/* Internal Notes */}
-      <div className="border-t border-gray-200 pt-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">
-          Internal Notes — not visible to patient
-        </h2>
-
-        {internalNotes && internalNotes.length > 0 && (
-          <div className="space-y-2 mb-4">
-            {internalNotes.map((note) => (
-              <div
-                key={note.id}
-                className="bg-yellow-50 border border-yellow-200 rounded-lg p-3"
-              >
-                <p className="text-sm text-yellow-900">{note.content}</p>
-                <p className="text-xs text-yellow-700 mt-1">
-                  {note.author_name} —{" "}
-                  {new Date(note.created_at).toLocaleString()}
-                </p>
-              </div>
-            ))}
-          </div>
+        {consultation.actions?.can_message && (
+          <Link to={`/app/doctor/messages/${consultationId}`}>
+            <Button variant="secondary">{t("message.title")}</Button>
+          </Link>
         )}
-
-        <div className="flex gap-2">
-          <Textarea
-            placeholder="Add internal note..."
-            value={noteContent}
-            onChange={(e) => setNoteContent(e.target.value)}
-            className="flex-1"
-            rows={2}
-          />
-          <Button
-            onClick={() => noteMutation.mutate()}
-            loading={noteMutation.isPending}
-            disabled={!noteContent.trim()}
-          >
-            {t("common.save")}
-          </Button>
-        </div>
+        {consultation.actions?.can_view_record && consultation.has_medical_record && (
+          <Link to={`/app/medical-records/${consultation.id}`}>
+            <Button variant="secondary">{t("record.title")}</Button>
+          </Link>
+        )}
       </div>
+
+      {consultation.actions?.can_add_internal_note && (
+        <div className="border-t border-gray-200 pt-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Internal Notes — not visible to patient
+          </h2>
+
+          {internalNotes && internalNotes.length > 0 && (
+            <div className="space-y-2 mb-4">
+              {internalNotes.map((note) => (
+                <div
+                  key={note.id}
+                  className="bg-yellow-50 border border-yellow-200 rounded-lg p-3"
+                >
+                  <p className="text-sm text-yellow-900">{note.content}</p>
+                  <p className="text-xs text-yellow-700 mt-1">
+                    {note.author_name} —{" "}
+                    {new Date(note.created_at).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Textarea
+              placeholder="Add internal note..."
+              value={noteContent}
+              onChange={(e) => setNoteContent(e.target.value)}
+              className="flex-1"
+              rows={2}
+            />
+            <Button
+              onClick={() => noteMutation.mutate()}
+              loading={noteMutation.isPending}
+              disabled={!noteContent.trim()}
+            >
+              {t("common.save")}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

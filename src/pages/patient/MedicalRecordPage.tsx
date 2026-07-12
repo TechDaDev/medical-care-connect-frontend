@@ -41,7 +41,7 @@ export function MedicalRecordPage() {
     enabled: !!recordId,
   });
 
-  const { data: consultation } = useQuery({
+  useQuery({
     queryKey: ["consultation", record?.consultation],
     queryFn: () => consultationsApi.getById(record!.consultation),
     enabled: !!record?.consultation,

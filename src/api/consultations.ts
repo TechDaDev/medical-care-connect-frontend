@@ -3,7 +3,7 @@ import { Consultation, PaginatedResponse } from "../types";
 
 export const consultationsApi = {
   list: async (params?: { page?: number; status?: string }) => {
-    const { data } = await client.get<PaginatedResponse<Consultation>>(
+    const { data } = await client.get<Consultation[] | PaginatedResponse<Consultation>>(
       "/consultations/",
       { params }
     );
@@ -16,9 +16,11 @@ export const consultationsApi = {
   },
 
   create: async (payload: {
-    doctor_id: string;
-    chief_complaint: string;
-    patient_note?: string;
+    doctor: string;
+    specialty: string;
+    priority?: string;
+    description?: string;
+    chief_complaint?: string;
   }) => {
     const { data } = await client.post<Consultation>(
       "/consultations/",

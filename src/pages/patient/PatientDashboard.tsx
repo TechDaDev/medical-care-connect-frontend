@@ -1,82 +1,51 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { consultationsApi } from "../../api/consultations";
-import { messagesApi } from "../../api/messages";
-import { notificationsApi } from "../../api/notifications";
+import { accountsApi } from "../../api/auth";
 import { t } from "../../utils/i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Spinner } from "../../components/common/Spinner";
-import { useAuth } from "../../auth";
+import { RefreshButton } from "../../components/common/RefreshButton";
+import { ErrorState } from "../../components/common/ErrorState";
+import { getErrorMessage } from "../../utils/errors";
 
 export function PatientDashboard() {
-  const { user } = useAuth();
-
-  const { data: consultations } = useQuery({
-    queryKey: ["patient-consultations"],
-    queryFn: () => consultationsApi.list(),
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["patient-dashboard"],
+    queryFn: () => accountsApi.getPatientDashboard(),
   });
 
-  const { data: unreadCounts } = useQuery({
-    queryKey: ["unread-counts"],
-    queryFn: messagesApi.allUnreadCounts,
-  });
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
+  if (!data) return null;
 
-  const { data: notifCount } = useQuery({
-    queryKey: ["notif-unread-count"],
-    queryFn: notificationsApi.unreadCount,
-  });
-
-  const activeCount =
-    consultations?.results.filter((c) =>
-      ["submitted", "accepted", "intake_in_progress", "doctor_review"].includes(c.status)
-    ).length || 0;
-
-  const awaitingAction =
-    consultations?.results.filter((c) =>
-      ["awaiting_patient_response", "follow_up_required"].includes(c.status)
-    ).length || 0;
-
-  const totalUnread =
-    unreadCounts?.reduce((sum, c) => sum + c.unread_count, 0) || 0;
+  const { consultations, unread_messages, unread_notifications, recent_consultations } = data;
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">
-        {t("nav.dashboard")}
-      </h1>
-      <p className="text-gray-500 mb-6">
-        {t("common.loading")}
-      </p>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">
+          {t("nav.dashboard")}
+        </h1>
+        <RefreshButton onClick={() => refetch()} />
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <Card>
-          <p className="text-sm text-gray-500">
-            {t("consultation.title")}
-          </p>
-          <p className="text-2xl font-bold text-gray-900">{activeCount}</p>
+          <p className="text-sm text-gray-500">{t("consultation.active")}</p>
+          <p className="text-2xl font-bold text-gray-900">{consultations.active}</p>
         </Card>
         <Card>
-          <p className="text-sm text-gray-500">
-            {t("consultation.title")}
-          </p>
-          <p className="text-2xl font-bold text-yellow-600">
-            {awaitingAction}
-          </p>
+          <p className="text-sm text-gray-500">{t("consultation.awaitingYou")}</p>
+          <p className="text-2xl font-bold text-yellow-600">{consultations.awaiting_patient}</p>
         </Card>
         <Card>
-          <p className="text-sm text-gray-500">
-            {t("message.title")}
-          </p>
-          <p className="text-2xl font-bold text-blue-600">{totalUnread}</p>
+          <p className="text-sm text-gray-500">{t("message.unread")}</p>
+          <p className="text-2xl font-bold text-blue-600">{unread_messages}</p>
         </Card>
         <Card>
-          <p className="text-sm text-gray-500">
-            {t("notification.title")}
-          </p>
-          <p className="text-2xl font-bold text-purple-600">
-            {notifCount?.unread_count || 0}
-          </p>
+          <p className="text-sm text-gray-500">{t("notification.unread")}</p>
+          <p className="text-2xl font-bold text-purple-600">{unread_notifications}</p>
         </Card>
       </div>
 
@@ -85,19 +54,17 @@ export function PatientDashboard() {
           <Button>{t("nav.findDoctor")}</Button>
         </Link>
         <Link to="/app/patient/consultations">
-          <Button variant="secondary">
-            {t("nav.consultations")}
-          </Button>
+          <Button variant="secondary">{t("nav.consultations")}</Button>
         </Link>
       </div>
 
-      {consultations && consultations.results.length > 0 && (
+      {recent_consultations.length > 0 && (
         <div>
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {t("consultation.title")}
+            {t("consultation.recent")}
           </h2>
           <div className="space-y-3">
-            {consultations.results.slice(0, 5).map((c) => (
+            {recent_consultations.map((c) => (
               <Link
                 key={c.id}
                 to={`/app/patient/consultations/${c.id}`}
@@ -107,10 +74,10 @@ export function PatientDashboard() {
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="font-medium text-gray-900">
-                        {c.doctor?.user.full_name || "Doctor"}
+                        {c.doctor_name || "Doctor"}
                       </p>
                       <p className="text-sm text-gray-500">
-                        {c.status}
+                        {c.specialty_name} &middot; {c.status.replace(/_/g, " ")}
                       </p>
                     </div>
                     <p className="text-sm text-gray-400">

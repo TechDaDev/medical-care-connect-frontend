@@ -1,5 +1,5 @@
 import client from "./client";
-import { DoctorPublicProfile, PaginatedResponse, Specialty } from "../types";
+import { DoctorPublicProfile, PaginatedResponse, Specialty, DoctorProfile, DoctorDashboardData } from "../types";
 
 export const doctorsApi = {
   list: async (params?: {
@@ -9,6 +9,7 @@ export const doctorsApi = {
     language?: string;
     ordering?: string;
     page?: number;
+    page_size?: number;
   }) => {
     const { data } = await client.get<PaginatedResponse<DoctorPublicProfile>>(
       "/doctors/",
@@ -19,6 +20,28 @@ export const doctorsApi = {
 
   getById: async (id: string) => {
     const { data } = await client.get<DoctorPublicProfile>(`/doctors/${id}/`);
+    return data;
+  },
+
+  getProfile: async () => {
+    const { data } = await client.get<DoctorProfile>("/doctors/me/");
+    return data;
+  },
+
+  updateProfile: async (payload: Partial<DoctorProfile>) => {
+    const { data } = await client.patch<DoctorProfile>("/doctors/me/", payload);
+    return data;
+  },
+
+  getDashboard: async () => {
+    const { data } = await client.get<DoctorDashboardData>("/doctors/me/dashboard/");
+    return data;
+  },
+
+  toggleAccepting: async (accepting: boolean) => {
+    const { data } = await client.patch<DoctorProfile>("/doctors/me/", {
+      is_accepting_consultations: accepting,
+    });
     return data;
   },
 };

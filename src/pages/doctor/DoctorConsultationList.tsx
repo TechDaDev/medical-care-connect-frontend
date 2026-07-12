@@ -22,12 +22,12 @@ export function DoctorConsultationList() {
 
       {isLoading && <Spinner />}
       {error && <ErrorState onRetry={() => refetch()} />}
-      {data && data.results.length === 0 && (
+      {data && (Array.isArray(data) ? data : data.results).length === 0 && (
         <EmptyState message={t("consultation.noResults")} />
       )}
       {data && (
         <div className="space-y-3">
-          {data.results.map((c) => (
+          {(Array.isArray(data) ? data : data.results).map((c: any) => (
             <Link key={c.id} to={`/app/doctor/consultations/${c.id}`}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-start justify-between">

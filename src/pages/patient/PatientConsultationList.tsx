@@ -41,12 +41,12 @@ export function PatientConsultationList() {
 
       {isLoading && <Spinner />}
       {error && <ErrorState onRetry={() => refetch()} />}
-      {data && data.results.length === 0 && (
+      {data && (Array.isArray(data) ? data : data.results).length === 0 && (
         <EmptyState message={t("consultation.noResults")} />
       )}
       {data && (
         <div className="space-y-3">
-          {data.results.map((c) => (
+          {(Array.isArray(data) ? data : data.results).map((c: any) => (
             <Link
               key={c.id}
               to={`/app/patient/consultations/${c.id}`}

@@ -1,5 +1,5 @@
 import client from "./client";
-import { LoginResponse, RegisterResponse, User } from "../types";
+import { LoginResponse, RegisterResponse, User, PatientProfile, PatientDashboardData } from "../types";
 
 export const authApi = {
   login: async (email: string, password: string) => {
@@ -50,12 +50,17 @@ export const accountsApi = {
   },
 
   getPatientProfile: async () => {
-    const { data } = await client.get("/patients/me/");
+    const { data } = await client.get<PatientProfile>("/patients/me/");
     return data;
   },
 
   updatePatientProfile: async (payload: Record<string, unknown>) => {
-    const { data } = await client.patch("/patients/me/", payload);
+    const { data } = await client.patch<PatientProfile>("/patients/me/", payload);
+    return data;
+  },
+
+  getPatientDashboard: async () => {
+    const { data } = await client.get<PatientDashboardData>("/patients/me/dashboard/");
     return data;
   },
 

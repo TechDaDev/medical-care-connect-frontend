@@ -29,16 +29,16 @@ export function DoctorDetailPage() {
     <div className="max-w-3xl mx-auto">
       <Card>
         <div className="flex items-start gap-4 mb-6">
-          <AvatarFallback name={doctor.user.full_name} size="lg" />
+          <AvatarFallback name={doctor.full_name} size="lg" />
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {doctor.user.full_name}
+              {doctor.full_name}
             </h1>
             {doctor.professional_title && (
               <p className="text-gray-600">{doctor.professional_title}</p>
             )}
-            {doctor.specialty && (
-              <Badge variant="info">{doctor.specialty.name}</Badge>
+            {doctor.specialty_name && (
+              <Badge variant="info">{doctor.specialty_name}</Badge>
             )}
           </div>
         </div>
@@ -64,13 +64,13 @@ export function DoctorDetailPage() {
               <span className="font-medium">{doctor.languages.join(", ")}</span>
             </div>
           )}
-          {doctor.estimated_response_time && (
+          {doctor.estimated_response_minutes && (
             <div>
               <span className="text-gray-500">
                 {t("doctor.responseTime")}:
               </span>{" "}
               <span className="font-medium">
-                {doctor.estimated_response_time}
+                {doctor.estimated_response_minutes} min
               </span>
             </div>
           )}

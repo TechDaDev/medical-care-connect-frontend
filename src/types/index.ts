@@ -7,7 +7,9 @@ export interface User {
   phone_number: string;
   role: UserRole;
   is_active: boolean;
+  is_staff?: boolean;
   date_joined: string;
+  updated_at?: string;
 }
 
 export enum UserRole {
@@ -19,45 +21,60 @@ export enum UserRole {
 
 export interface PatientProfile {
   id: string;
-  user: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  phone_number?: string;
   date_of_birth: string | null;
   gender: string;
   preferred_language: string;
   address: string;
-  emergency_contact: string;
-  blood_type: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  blood_type: string | null;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface DoctorProfile {
   id: string;
-  user: string;
-  specialty: Specialty | null;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  phone_number?: string;
+  specialty: string;
+  specialty_name: string;
   professional_title: string;
+  license_number?: string;
   qualifications: string;
   biography: string;
   years_of_experience: number;
   consultation_fee: string;
   languages: string[];
-  estimated_response_time: string;
   is_approved: boolean;
   is_accepting_consultations: boolean;
+  estimated_response_minutes: number;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface DoctorPublicProfile {
   id: string;
-  user: {
-    id: string;
-    full_name: string;
-  };
-  specialty: Specialty | null;
+  full_name: string;
+  specialty: string;
+  specialty_name: string;
   professional_title: string;
   qualifications: string;
   biography: string;
   years_of_experience: number;
   consultation_fee: string;
   languages: string[];
-  estimated_response_time: string;
   is_accepting_consultations: boolean;
+  estimated_response_minutes: number;
+  created_at?: string;
 }
 
 export interface Specialty {
@@ -65,6 +82,21 @@ export interface Specialty {
   name: string;
   slug: string;
   description: string;
+  is_active?: boolean;
+  display_order?: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ConsultationActions {
+  can_accept: boolean;
+  can_cancel: boolean;
+  can_message: boolean;
+  can_start_intake: boolean;
+  can_view_record: boolean;
+  can_add_internal_note: boolean;
+  can_transfer: boolean;
+  can_change_priority: boolean;
 }
 
 export interface Consultation {
@@ -76,15 +108,22 @@ export interface Consultation {
   doctor: {
     id: string;
     user: { id: string; full_name: string };
-    specialty: Specialty | null;
+    specialty_name?: string;
   } | null;
-  specialty: Specialty | null;
+  specialty: {
+    id: string;
+    name: string;
+    slug?: string;
+  } | null;
   status: ConsultationStatus;
   priority: string;
   description: string;
   chief_complaint?: string;
   patient_note?: string;
-  cancellation_reason: string;
+  cancellation_reason?: string;
+  actions?: ConsultationActions;
+  has_intake_session?: boolean;
+  has_medical_record?: boolean;
   submitted_at: string | null;
   accepted_at: string | null;
   cancelled_at: string | null;
@@ -203,6 +242,8 @@ export interface PaginatedResponse<T> {
 
 export interface ApiError {
   detail?: string;
+  code?: string;
+  fields?: Record<string, string[]>;
   [key: string]: unknown;
 }
 
@@ -216,6 +257,44 @@ export interface RegisterResponse {
   access: string;
   refresh: string;
   user: User;
+}
+
+export interface PatientDashboardData {
+  consultations: {
+    total: number;
+    active: number;
+    awaiting_patient: number;
+    awaiting_doctor: number;
+    completed: number;
+  };
+  unread_messages: number;
+  unread_notifications: number;
+  recent_consultations: Array<{
+    id: string;
+    status: string;
+    doctor_name: string;
+    specialty_name: string;
+    created_at: string;
+    updated_at: string;
+  }>;
+}
+
+export interface DoctorDashboardData {
+  consultations: {
+    total_active: number;
+    submitted: number;
+    accepted: number;
+    intake_completed: number;
+    doctor_review: number;
+    awaiting_patient: number;
+    awaiting_doctor: number;
+  };
+  unread_messages: number;
+  unread_notifications: number;
+  profile: {
+    is_approved: boolean;
+    is_accepting_consultations: boolean;
+  };
 }
 
 export interface UnreadCount {

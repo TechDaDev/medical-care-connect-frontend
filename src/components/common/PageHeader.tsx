@@ -1,4 +1,4 @@
-import { t } from "../../utils/i18n";
+
 
 interface Props {
   title: string;

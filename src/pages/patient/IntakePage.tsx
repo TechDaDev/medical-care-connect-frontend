@@ -19,7 +19,7 @@ export function IntakePage() {
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const { data: consultation } = useQuery({
+  useQuery({
     queryKey: ["consultation", consultationId],
     queryFn: () => consultationsApi.getById(consultationId!),
     enabled: !!consultationId,

@@ -9,13 +9,12 @@ import {
   Bell,
   User,
   LogOut,
-  ChevronRight,
+
 } from "lucide-react";
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
 import { clsx } from "../../utils/clsx";
 import { t, setLanguage, getLanguage, type Lang } from "../../utils/i18n";
-import { Badge } from "../common/Badge";
 import { AvatarFallback } from "../common/AvatarFallback";
 
 interface NavItem {
@@ -41,6 +40,8 @@ const doctorNav: NavItem[] = [
 
 const staffNav: NavItem[] = [
   { label: t("nav.dashboard"), path: "/app/staff", icon: <LayoutDashboard className="h-5 w-5" /> },
+  { label: t("nav.staffConsultations"), path: "/app/staff/consultations", icon: <MessageSquare className="h-5 w-5" /> },
+  { label: t("nav.doctorWorkload"), path: "/app/staff/doctors", icon: <Stethoscope className="h-5 w-5" /> },
   { label: t("nav.notifications"), path: "/app/notifications", icon: <Bell className="h-5 w-5" /> },
   { label: t("nav.profile"), path: "/app/profile", icon: <User className="h-5 w-5" /> },
 ];
@@ -65,7 +66,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
     setLanguage(next);
   };
 
-  const roleLabel = user?.role ? t(`role.${user.role}`) : "";
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex" dir={getLanguage() === "ar" ? "rtl" : "ltr"}>
@@ -131,7 +132,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3 ml-auto">
             <select
               value={langSwitch}
-              onChange={(e) => toggleLang()}
+              onChange={() => toggleLang()}
               className="text-sm border rounded px-2 py-1"
             >
               <option value="en">EN</option>
