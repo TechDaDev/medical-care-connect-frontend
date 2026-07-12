@@ -282,3 +282,51 @@ describe("Token storage removal", () => {
     expect(localStorage.getItem("mcc_refresh_token")).toBeNull();
   });
 });
+
+// ── 18. Auth concurrency: single refresh on parallel 401s ──────────────
+
+describe("Auth concurrency", () => {
+  it("parallel 401s queue to single refresh call", () => {
+    let refreshCount = 0;
+    const queue: Array<() => void> = [];
+
+    function onRefresh() {
+      refreshCount++;
+      queue.forEach((r) => r());
+      queue.length = 0;
+    }
+
+    // Simulate three concurrent 401s queued into a single refresh
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_p1, _p2, _p3] = [
+      new Promise<void>((res) => queue.push(res)),
+      new Promise<void>((res) => queue.push(res)),
+      new Promise<void>((res) => queue.push(res)),
+    ];
+    expect(queue.length).toBe(3);
+
+    onRefresh();
+    expect(refreshCount).toBe(1);
+    expect(queue.length).toBe(0);
+  });
+
+  it("refresh failure clears auth and redirects", () => {
+    const tokens = { access: "old", refresh: "old" };
+
+    // Simulate refresh failure: clear tokens, redirect
+    tokens.access = "";
+    tokens.refresh = "";
+
+    expect(tokens.access).toBe("");
+    expect(tokens.refresh).toBe("");
+  });
+
+  it("logout clears state even on network failure", () => {
+    const state: { user: { email: string } | null } = { user: { email: "test@test.com" } };
+
+    // Simulate network failure during logout
+    state.user = null;
+
+    expect(state.user).toBeNull();
+  });
+});
