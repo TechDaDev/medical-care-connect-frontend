@@ -8,7 +8,6 @@ import {
 } from "react";
 import { User } from "../types";
 import { authApi, accountsApi } from "../api/auth";
-import { tokenStorage } from "./tokenStorage";
 
 interface AuthContextType {
   user: User | null;
@@ -39,24 +38,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const me = await accountsApi.getMe();
       setUser(me);
     } catch {
-      tokenStorage.clear();
       setUser(null);
     }
   }, []);
 
   useEffect(() => {
-    const access = tokenStorage.getAccess();
-    if (!access) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setIsLoading(false);
-      return;
-    }
+    // Always check if user is authenticated on mount via session/cookie
     refreshCurrentUser().finally(() => setIsLoading(false));
   }, [refreshCurrentUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await authApi.login(email, password);
-    tokenStorage.setTokens(res.access, res.refresh);
     setUser(res.user);
   }, []);
 
@@ -70,20 +62,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       password_confirm: string;
     }) => {
       const res = await authApi.registerPatient(data);
-      tokenStorage.setTokens(res.access, res.refresh);
       setUser(res.user);
     },
     []
   );
 
   const logout = useCallback(async () => {
-    const refresh = tokenStorage.getRefresh();
     try {
-      if (refresh) await authApi.logout(refresh);
+      await authApi.logout();
     } catch {
       // ignore logout errors
     }
-    tokenStorage.clear();
     setUser(null);
   }, []);
 

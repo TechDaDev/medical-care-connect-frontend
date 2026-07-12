@@ -1,9 +1,17 @@
 import client from "./client";
-import { LoginResponse, RegisterResponse, User, PatientProfile, PatientDashboardData } from "../types";
+import { User, PatientProfile, PatientDashboardData } from "../types";
+
+export interface LoginResponseData {
+  user: User;
+}
+
+export interface RegisterResponseData {
+  user: User;
+}
 
 export const authApi = {
   login: async (email: string, password: string) => {
-    const { data } = await client.post<LoginResponse>("/auth/login/", {
+    const { data } = await client.post<LoginResponseData>("/auth/login/", {
       email,
       password,
     });
@@ -18,22 +26,23 @@ export const authApi = {
     password: string;
     password_confirm: string;
   }) => {
-    const { data } = await client.post<RegisterResponse>(
+    const { data } = await client.post<RegisterResponseData>(
       "/auth/register/patient/",
       payload
     );
     return data;
   },
 
-  logout: async (refreshToken: string) => {
-    await client.post("/auth/logout/", { refresh: refreshToken });
+  logout: async () => {
+    await client.post("/auth/logout/");
   },
 
-  refresh: async (refreshToken: string) => {
-    const { data } = await client.post<{ access: string }>(
-      "/auth/token/refresh/",
-      { refresh: refreshToken }
-    );
+  refresh: async () => {
+    await client.post("/auth/token/refresh/");
+  },
+
+  getCsrfToken: async () => {
+    const { data } = await client.get<{ csrfToken: string }>("/auth/csrf/");
     return data;
   },
 };

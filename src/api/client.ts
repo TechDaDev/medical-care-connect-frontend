@@ -1,5 +1,4 @@
 import axios from "axios";
-import { tokenStorage } from "../auth/tokenStorage";
 import { ApiRequestError } from "../utils/errors";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
@@ -8,21 +7,42 @@ const client = axios.create({
   baseURL: API_BASE,
   timeout: 30000,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true, // sends HTTP-only cookies
 });
 
-let isRefreshing = false;
-let refreshQueue: Array<{
-  resolve: (token: string) => void;
-  reject: (err: unknown) => void;
-}> = [];
+// ── CSRF token injection ───────────────────────────────────────────────────
+
+function getCsrfToken(): string | null {
+  const match = document.cookie.match(/(?:^|;\s*)mcc_csrftoken=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
 
 client.interceptors.request.use((config) => {
-  const token = tokenStorage.getAccess();
+  // CSRF token for state-changing methods
+  if (config.method && !/^get$/i.test(config.method)) {
+    const csrf = getCsrfToken();
+    if (csrf) {
+      config.headers["X-CSRFToken"] = csrf;
+    }
+  }
+
+  // Legacy Bearer header fallback for older tokens
+  // TODO: remove once migration to HTTP-only cookies is complete
+  const accessKey = "mcc_access_token";
+  const token = localStorage.getItem(accessKey);
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+// ── Response interceptor ────────────────────────────────────────────────────
+
+let isRefreshing = false;
+let refreshQueue: Array<{
+  resolve: () => void;
+  reject: (err: unknown) => void;
+}> = [];
 
 client.interceptors.response.use(
   (response) => response,
@@ -33,42 +53,32 @@ client.interceptors.response.use(
       error.response?.status === 401 &&
       !originalRequest._retry &&
       !originalRequest.url?.includes("/auth/login") &&
-      !originalRequest.url?.includes("/auth/register")
+      !originalRequest.url?.includes("/auth/register") &&
+      !originalRequest.url?.includes("/auth/token/refresh")
     ) {
       originalRequest._retry = true;
 
       if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          refreshQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return client(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
+        return new Promise<void>((resolve, reject) => {
+          refreshQueue.push({ resolve: () => resolve(), reject });
+        }).then(() => {
+          return client(originalRequest);
+        }).catch((err) => Promise.reject(err));
       }
 
       isRefreshing = true;
 
-      const refreshToken = tokenStorage.getRefresh();
-      if (!refreshToken) {
-        tokenStorage.clear();
-        isRefreshing = false;
-        window.location.href = "/login";
-        return Promise.reject(error);
-      }
-
       try {
-        const { data } = await axios.post(`${API_BASE}/auth/token/refresh/`, {
-          refresh: refreshToken,
+        // Backend reads refresh token from HTTP-only cookie
+        await axios.post(`${API_BASE}/auth/token/refresh/`, {}, {
+          withCredentials: true,
         });
-        tokenStorage.setAccess(data.access);
-        refreshQueue.forEach((q) => q.resolve(data.access));
+        refreshQueue.forEach((q) => q.resolve());
         refreshQueue = [];
-        originalRequest.headers.Authorization = `Bearer ${data.access}`;
         return client(originalRequest);
       } catch {
-        tokenStorage.clear();
+        localStorage.removeItem("mcc_access_token");
+        localStorage.removeItem("mcc_refresh_token");
         refreshQueue.forEach((q) => q.reject(error));
         refreshQueue = [];
         window.location.href = "/login";
