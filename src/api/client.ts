@@ -26,13 +26,6 @@ client.interceptors.request.use((config) => {
     }
   }
 
-  // Legacy Bearer header fallback for older tokens
-  // TODO: remove once migration to HTTP-only cookies is complete
-  const accessKey = "mcc_access_token";
-  const token = localStorage.getItem(accessKey);
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
   return config;
 });
 
@@ -77,8 +70,6 @@ client.interceptors.response.use(
         refreshQueue = [];
         return client(originalRequest);
       } catch {
-        localStorage.removeItem("mcc_access_token");
-        localStorage.removeItem("mcc_refresh_token");
         refreshQueue.forEach((q) => q.reject(error));
         refreshQueue = [];
         window.location.href = "/login";
