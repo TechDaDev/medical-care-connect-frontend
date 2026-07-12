@@ -31,6 +31,8 @@ test.describe("Authentication", () => {
   test("patient cannot access staff route", async ({ page }) => {
     const creds = getPatientCreds();
     await login(page, creds.email, creds.password);
+    // Wait for login redirect to complete before navigating
+    await page.waitForURL(/\/app\/patient/, { timeout: 10000 });
     // Try navigating to staff dashboard
     await page.goto(getBaseUrl() + "/app/staff");
     // Should be redirected away

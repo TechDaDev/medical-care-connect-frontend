@@ -72,7 +72,10 @@ client.interceptors.response.use(
       } catch {
         refreshQueue.forEach((q) => q.reject(error));
         refreshQueue = [];
-        window.location.href = "/login";
+        // Only redirect to login if not already there (avoid reload loop)
+        if (!window.location.pathname.startsWith("/login")) {
+          window.location.href = "/login";
+        }
         return Promise.reject(error);
       } finally {
         isRefreshing = false;

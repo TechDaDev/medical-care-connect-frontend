@@ -30,10 +30,9 @@ export function LoginPage() {
   const onSubmit = async (data: FormData) => {
     setError("");
     try {
-      await login(data.email, data.password);
-      const stored = localStorage.getItem("mcc_user_role") || "patient";
-      if (stored === "doctor") navigate("/app/doctor");
-      else if (stored === "coordinator" || stored === "administrator") navigate("/app/staff");
+      const user = await login(data.email, data.password);
+      if (user.role === "doctor") navigate("/app/doctor");
+      else if (user.role === "coordinator" || user.role === "administrator") navigate("/app/staff");
       else navigate("/app/patient");
     } catch (err) {
       setError(
