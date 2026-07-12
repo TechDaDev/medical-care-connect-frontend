@@ -57,12 +57,46 @@ python manage.py runserver
 | `/app/patient/consultations/:id` | Patient/Doctor | Consultation detail |
 | `/app/patient/consultations/:id/intake` | Patient | AI medical intake |
 | `/app/patient/messages/:id` | Patient/Doctor | Messaging |
+| `/app/patient/medical-records/:id` | Patient | Medical record view |
 | `/app/doctor` | Doctor | Dashboard |
 | `/app/doctor/consultations` | Doctor | Consultation list |
 | `/app/doctor/consultations/:id` | Doctor | Consultation + internal notes |
+| `/app/doctor/messages/:id` | Doctor | Messaging |
+| `/app/staff` | Staff | Dashboard |
+| `/app/staff/consultations` | Staff | Consultation list with filters |
+| `/app/staff/consultations/:id` | Staff | Consultation detail + transfer/priority |
+| `/app/staff/doctors` | Staff | Doctor workload |
 | `/app/notifications` | All auth | Notifications |
 | `/app/profile` | All auth | Profile |
-| `/app/staff` | Staff | Placeholder dashboard |
+| `/app/medical-records/:id` | All auth | Flat redirect route |
+
+
+## Role-Based `/app` Redirect
+
+The `/app` root checks the authenticated user's role:
+
+- `patient` → `/app/patient`
+- `doctor` → `/app/doctor`
+- `coordinator` or `administrator` → `/app/staff`
+
+Role-restricted routes enforce access via `RequireRole`. Unauthorized access redirects to `/unauthorized`.
+
+## Consultation Creation
+
+`POST /api/consultations/`
+
+```json
+{
+  "doctor": "uuid",         // required — DoctorProfile ID
+  "specialty": "uuid",      // optional — defaults to null
+  "priority": "medium",     // optional — low|medium|high|urgent
+  "description": "..."      // optional — free text
+}
+```
+
+The backend sets `patient`, `status=submitted`, and `submitted_at` server-side.
+Do not send `patient`, `status`, `doctor_id`, `chief_complaint`, or `patient_note`.
+These are not accepted by the backend.
 
 ## Authentication
 
@@ -98,10 +132,12 @@ npm run preview      # Preview production build
 
 ## Known Limitations
 
-- No WebSockets — messaging uses polling
+- No WebSockets — messaging uses HTTP polling
 - No file uploads
 - No payments
 - No appointments/scheduling
 - No video consultations
-- No full staff dashboard
 - No E2E tests
+- Consultation `description` field maps from what was previously called `chief_complaint` in frontend types
+- All normalised errors follow `{detail, code, fields}` format from backend
+- JWT localStorage (not httpOnly cookie) — CSRF risk accepted for local dev

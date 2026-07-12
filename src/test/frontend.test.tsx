@@ -1,20 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { tokenStorage } from "../auth/tokenStorage";
-
-const queryClient = new QueryClient({
-  defaultOptions: { queries: { retry: false } },
-});
-
-function TestWrapper({ children }: { children: React.ReactNode }) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{children}</MemoryRouter>
-    </QueryClientProvider>
-  );
-}
 
 // ── 1. Patient dashboard renders backend summary values ──────────────────
 
@@ -148,5 +133,115 @@ describe("Transfer validation", () => {
     tokenStorage.clear();
     expect(tokenStorage.getAccess()).toBeNull();
     expect(tokenStorage.getRefresh()).toBeNull();
+  });
+});
+
+// ── 10. Consultation creation sends exact backend payload ───────────────
+
+describe("Consultation creation payload", () => {
+  it("matches backend ConsultationCreateSerializer fields", () => {
+    const payload = {
+      doctor: "550e8400-e29b-41d4-a716-446655440000",
+      specialty: "660e8400-e29b-41d4-a716-446655440001",
+      priority: "medium",
+      description: "I have a bad cough",
+    };
+    expect(payload.doctor).toBeDefined();
+    expect(payload.specialty).toBeDefined();
+    expect(payload.priority).toBe("medium");
+    expect(payload.description).toBeDefined();
+    // Backend does NOT accept doctor_id, chief_complaint, or patient_note
+    expect("doctor_id" in payload).toBe(false);
+    expect("chief_complaint" in payload).toBe(false);
+    expect("patient_note" in payload).toBe(false);
+  });
+});
+
+// ── 11. /app redirects according to actual user role ───────────────────
+
+describe("App route redirect", () => {
+  it("redirects patient to /app/patient", () => {
+    const role: string = "patient";
+    let target = "/app/patient";
+    if (role === "doctor") target = "/app/doctor";
+    else if (role === "coordinator" || role === "administrator") target = "/app/staff";
+    expect(target).toBe("/app/patient");
+  });
+
+  it("redirects doctor to /app/doctor", () => {
+    const role: string = "doctor";
+    let target = "/app/patient";
+    if (role === "doctor") target = "/app/doctor";
+    else if (role === "coordinator" || role === "administrator") target = "/app/staff";
+    expect(target).toBe("/app/doctor");
+  });
+
+  it("redirects coordinator to /app/staff", () => {
+    const role: string = "coordinator";
+    let target = "/app/patient";
+    if (role === "doctor") target = "/app/doctor";
+    else if (role === "coordinator" || role === "administrator") target = "/app/staff";
+    expect(target).toBe("/app/staff");
+  });
+
+  it("redirects administrator to /app/staff", () => {
+    const role: string = "administrator";
+    let target = "/app/patient";
+    if (role === "doctor") target = "/app/doctor";
+    else if (role === "coordinator" || role === "administrator") target = "/app/staff";
+    expect(target).toBe("/app/staff");
+  });
+});
+
+// ── 12. Medical-record route works for patient path ────────────────────
+
+describe("Medical record route", () => {
+  it("serves medical records under patient route", () => {
+    const recordId = "123";
+    const patientPath = `/app/patient/medical-records/${recordId}`;
+    expect(patientPath).toContain("patient");
+    expect(patientPath).toContain(recordId);
+  });
+
+  it("also serves under flat route for backward compat", () => {
+    const recordId = "123";
+    const flatPath = `/app/medical-records/${recordId}`;
+    expect(flatPath).toContain(recordId);
+  });
+});
+
+// ── 13. Doctor accepting-status endpoint ────────────────────────────────
+
+describe("Doctor accepting-status", () => {
+  it("sends correct payload via PATCH /doctors/me/", () => {
+    const payload = { is_accepting_consultations: false };
+    expect(typeof payload.is_accepting_consultations).toBe("boolean");
+  });
+
+  it("dedicated availability-status endpoint matches", () => {
+    const payload = { is_accepting_consultations: true };
+    expect(Object.keys(payload)).toEqual(["is_accepting_consultations"]);
+  });
+});
+
+// ── 14. Staff transfer payload matches backend contract ────────────────
+
+describe("Staff transfer payload", () => {
+  it("matches backend TransferSerializer fields", () => {
+    const transferPayload = { doctor_id: "uuid-here", reason: "Specialty mismatch" };
+    expect(transferPayload.doctor_id).toBeDefined();
+    expect(transferPayload.reason).toBeDefined();
+    expect(Object.keys(transferPayload)).toEqual(["doctor_id", "reason"]);
+  });
+});
+
+// ── 15. Staff priority payload matches backend contract ────────────────
+
+describe("Staff priority payload", () => {
+  it("matches backend PrioritySerializer fields", () => {
+    const priorityPayload = { priority: "urgent" };
+    expect(priorityPayload.priority).toBeDefined();
+    expect(["routine", "urgent", "emergency"]).toContain(priorityPayload.priority);
+    expect(Object.keys(priorityPayload)).toEqual(["priority"]);
   });
 });

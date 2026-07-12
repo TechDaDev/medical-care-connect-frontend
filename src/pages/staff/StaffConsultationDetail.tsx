@@ -126,12 +126,12 @@ export function StaffConsultationDetail() {
             </dl>
           </Card>
 
-          {data.chief_complaint && (
+          {data.description && (
             <Card>
               <h3 className="text-sm font-semibold text-gray-500 mb-2">
                 {t("consultation.chiefComplaint")}
               </h3>
-              <p className="text-gray-900">{data.chief_complaint}</p>
+              <p className="text-gray-900">{data.description}</p>
             </Card>
           )}
         </div>

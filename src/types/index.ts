@@ -118,8 +118,6 @@ export interface Consultation {
   status: ConsultationStatus;
   priority: string;
   description: string;
-  chief_complaint?: string;
-  patient_note?: string;
   cancellation_reason?: string;
   actions?: ConsultationActions;
   has_intake_session?: boolean;

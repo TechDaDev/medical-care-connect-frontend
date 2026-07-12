@@ -1,10 +1,26 @@
 /* eslint-disable react-refresh/only-export-components */
 import { lazy } from "react";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
-import { RequireAuth, RequireRole } from "../auth";
+import { RequireAuth, RequireRole, useAuth } from "../auth";
 import { UserRole } from "../types";
 import { AppLayout } from "../components/layout/AppLayout";
 import { LazyLoad } from "../components/common/LazyLoad";
+
+function RoleBasedRedirect() {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  switch (user.role) {
+    case UserRole.PATIENT:
+      return <Navigate to="/app/patient" replace />;
+    case UserRole.DOCTOR:
+      return <Navigate to="/app/doctor" replace />;
+    case UserRole.COORDINATOR:
+    case UserRole.ADMINISTRATOR:
+      return <Navigate to="/app/staff" replace />;
+    default:
+      return <Navigate to="/app/patient" replace />;
+  }
+}
 
 const LandingPage = lazy(() => import("../pages/public/LandingPage").then(m => ({ default: m.LandingPage })));
 const DoctorListPage = lazy(() => import("../pages/public/DoctorListPage").then(m => ({ default: m.DoctorListPage })));
@@ -41,7 +57,7 @@ export const router = createBrowserRouter([
     path: "/app",
     element: <RequireAuth><AppLayout><Outlet /></AppLayout></RequireAuth>,
     children: [
-      { index: true, element: <Navigate to="/app/patient" replace /> },
+      { index: true, element: <RoleBasedRedirect /> },
       { path: "profile", element: <LazyLoad><ProfilePage /></LazyLoad> },
       { path: "notifications", element: <LazyLoad><NotificationsPage /></LazyLoad> },
       {
@@ -54,6 +70,7 @@ export const router = createBrowserRouter([
           { path: "consultations/:consultationId", element: <ConsultationDetailPage /> },
           { path: "consultations/:consultationId/intake", element: <IntakePage /> },
           { path: "messages/:consultationId", element: <MessagingPage /> },
+          { path: "medical-records/:recordId", element: <MedicalRecordPage /> },
         ],
       },
       {

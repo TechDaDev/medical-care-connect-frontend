@@ -134,6 +134,7 @@
   "consultation.urgent": "عاجل",
   "consultation.total": "المجموع",
   "consultation.submitted": "مقدم",
+  "consultation.noDescription": "لا يوجد وصف",
   "consultation.accepted": "مقبول",
   "consultation.cancelled": "ملغي",
   "consultation.patient": "المريض",

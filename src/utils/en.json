@@ -134,6 +134,7 @@
   "consultation.urgent": "Urgent",
   "consultation.total": "Total",
   "consultation.submitted": "Submitted",
+  "consultation.noDescription": "No description provided",
   "consultation.accepted": "Accepted",
   "consultation.cancelled": "Cancelled",
   "consultation.patient": "Patient",

@@ -17,10 +17,9 @@ export const consultationsApi = {
 
   create: async (payload: {
     doctor: string;
-    specialty: string;
+    specialty?: string;
     priority?: string;
     description?: string;
-    chief_complaint?: string;
   }) => {
     const { data } = await client.post<Consultation>(
       "/consultations/",

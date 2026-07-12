@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
+import type { Consultation } from "../../types";
 import { t } from "../../utils/i18n";
 import { PageHeader } from "../../components/common/PageHeader";
 import { Card } from "../../components/common/Card";
@@ -27,7 +28,7 @@ export function DoctorConsultationList() {
       )}
       {data && (
         <div className="space-y-3">
-          {(Array.isArray(data) ? data : data.results).map((c: any) => (
+          {(Array.isArray(data) ? data : data.results).map((c: Consultation) => (
             <Link key={c.id} to={`/app/doctor/consultations/${c.id}`}>
               <Card className="hover:shadow-md transition-shadow cursor-pointer">
                 <div className="flex items-start justify-between">

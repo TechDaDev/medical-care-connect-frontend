@@ -108,19 +108,9 @@ export function ConsultationDetailPage() {
               {t("consultation.chiefComplaint")}:
             </span>{" "}
             <span className="text-gray-900">
-              {consultation.chief_complaint || consultation.description}
+              {consultation.description || t("consultation.noDescription")}
             </span>
           </div>
-          {consultation.patient_note && (
-            <div>
-              <span className="text-gray-500">
-                {t("consultation.patientNote")}:
-              </span>{" "}
-              <span className="text-gray-900">
-                {consultation.patient_note}
-              </span>
-            </div>
-          )}
           {consultation.submitted_at && (
             <p className="text-gray-400 text-xs">
               Submitted:{" "}
