@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
+import { attachmentsApi } from "../../api/attachments";
 import { t } from "../../utils/i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
+import { AttachmentList } from "../../components/attachments/AttachmentList";
 
 import { Modal } from "../../components/common/Modal";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
@@ -188,6 +190,75 @@ export function ConsultationDetailPage() {
           </Button>
         </div>
       </Modal>
+
+      {/* ── Attachments ─────────────────────────────────────────── */}
+      {consultationId && (
+        <div className="mt-8">
+          <ConsultationAttachments
+            consultationId={consultationId}
+            isPatient={isPatient}
+            isDoctor={isDoctor}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ConsultationAttachments({ consultationId, isPatient, isDoctor }: { consultationId: string; isPatient: boolean; isDoctor: boolean }) {
+  const queryClient = useQueryClient();
+  const [error, setError] = useState("");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["attachments", consultationId],
+    queryFn: () => attachmentsApi.list(consultationId),
+  });
+
+  const triggerDownload = useCallback(async (id: string) => {
+    try {
+      const { blob, filename } = await attachmentsApi.download(id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError(t("attachment.error.not_available"));
+    }
+  }, []);
+
+  const handleDelete = useCallback(async (id: string) => {
+    if (!confirm(t("attachment.deleteConfirm"))) return;
+    try {
+      await attachmentsApi.delete(id);
+      queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
+    } catch {
+      setError(t("attachment.error.permission"));
+    }
+  }, [consultationId, queryClient]);
+
+  const handleUpload = useCallback(async (file: File, category: string, description: string, signal: AbortSignal) => {
+    await attachmentsApi.upload(consultationId, file, category, description, undefined, signal);
+    queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
+  }, [consultationId, queryClient]);
+
+  return (
+    <div>
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">
+        {t("attachment.title")}
+      </h2>
+      {error && (
+        <p className="text-sm text-red-600 mb-2">{error}</p>
+      )}
+      <AttachmentList
+        attachments={data?.results || []}
+        loading={isLoading}
+        onUpload={handleUpload}
+        onDownload={triggerDownload}
+        onDelete={handleDelete}
+        showUpload={isPatient || isDoctor}
+      />
     </div>
   );
 }

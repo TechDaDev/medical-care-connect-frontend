@@ -60,16 +60,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       ? doctorNav
       : staffNav;
 
-  const toggleLang = () => {
-    const order: Lang[] = ["ar", "en", "ckb"];
-    const idx = order.indexOf(langSwitch);
-    const next = order[(idx + 1) % order.length];
-    setLangSwitch(next);
-    setLanguage(next);
-  };
-
-  const langLabel: Record<Lang, string> = { ar: "العربية", en: "English", ckb: "کوردی" };
-
   return (
     <div className="min-h-screen bg-gray-50 flex" dir={getLanguage() === "en" ? "ltr" : "rtl"}>
       {/* Sidebar */}
