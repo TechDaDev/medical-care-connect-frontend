@@ -4,13 +4,11 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    # Gzip
     gzip on;
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml text/javascript image/svg+xml;
     gzip_min_length 256;
     gzip_vary on;
 
-    # Security headers
     add_header X-Frame-Options "DENY" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-XSS-Protection "0" always;
@@ -20,17 +18,15 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
-    # API proxy — same origin so cookies work with SameSite=Lax
     location /api/ {
-        proxy_pass http://API_BACKEND_PLACEHOLDER/api/;
+        proxy_pass ${BACKEND_URL}/api/;
         proxy_http_version 1.1;
-        proxy_set_header Host $host;
+        proxy_set_header Host mccbackend-production.up.railway.app;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Static assets caching
     location ~* \.(?:ico|css|js|svg|woff2?)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";

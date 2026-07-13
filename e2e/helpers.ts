@@ -6,22 +6,22 @@ export function getBaseUrl(): string {
 
 export function getPatientCreds() {
   return {
-    email: process.env.E2E_PATIENT_EMAIL || "patient@mcc.dev",
-    password: process.env.E2E_PATIENT_PASSWORD || "testpass123",
+    email: process.env.E2E_PATIENT_EMAIL || "john.doe@mcc.dev",
+    password: process.env.E2E_PATIENT_PASSWORD || "Development123!",
   };
 }
 
 export function getDoctorCreds() {
   return {
-    email: process.env.E2E_DOCTOR_EMAIL || "doctor@mcc.dev",
-    password: process.env.E2E_DOCTOR_PASSWORD || "testpass123",
+    email: process.env.E2E_DOCTOR_EMAIL || "dr.ali@mcc.dev",
+    password: process.env.E2E_DOCTOR_PASSWORD || "Development123!",
   };
 }
 
 export function getCoordinatorCreds() {
   return {
     email: process.env.E2E_COORDINATOR_EMAIL || "coordinator@mcc.dev",
-    password: process.env.E2E_COORDINATOR_PASSWORD || "testpass123",
+    password: process.env.E2E_COORDINATOR_PASSWORD || "Development123!",
   };
 }
 

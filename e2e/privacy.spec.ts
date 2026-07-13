@@ -27,10 +27,12 @@ test.describe("Phase 8C — Privacy", () => {
   test("Patient requests deletion and sees retention warning", async ({ page }) => {
     const creds = getPatientCreds();
     await login(page, creds.email, creds.password);
+    await expect(page).toHaveURL(/\/app\/(patient|dashboard)/, { timeout: 10000 });
     await page.goto(getBaseUrl() + "/app/privacy/deletion");
     await expect(page.locator("body")).toBeVisible({ timeout: 5000 });
+    await page.waitForTimeout(1000);
 
-    const warning = page.locator("text=retained").or(page.locator("text=محفوظة")).or(page.locator("text=دەپارێزرێت")).first();
+    const warning = page.locator("text=retained").or(page.locator("text=تُحتفظ")).or(page.locator("text=بپارێزرێت")).first();
     await expect(warning).toBeVisible({ timeout: 3000 });
   });
 
