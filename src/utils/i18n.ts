@@ -1,4 +1,5 @@
 import en from "./en.json";
+import ar_base from "./ar.json";
 import ar from "../locales/ar.json";
 import ckb from "../locales/ckb.json";
 import en_extra from "../locales/en.json";
@@ -12,7 +13,7 @@ if (stored && !["ar", "en", "ckb"].includes(stored)) stored = null;
 let currentLang: Lang = stored || "ar";
 
 const dictionaries: Record<string, Record<string, string>> = {
-  ar,
+  ar: { ...ar_base, ...ar },
   en: { ...en, ...en_extra },
   ckb,
 };
