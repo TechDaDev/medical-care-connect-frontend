@@ -88,6 +88,8 @@
   "consultation.emergency_escalated": "مُرفوعة للطوارئ",
   "consultation.attachFiles": "إرفاق ملفات",
   "consultation.uploadFile": "رفع ملف",
+  "consultation.internalNotes": "ملاحظات داخلية — غير مرئية للمريض",
+  "consultation.addInternalNote": "أضف ملاحظة داخلية...",
 
   "consultation.priority_low": "منخفضة",
   "consultation.priority_medium": "متوسطة",
@@ -111,6 +113,7 @@
   "message.input": "اكتب رسالة...",
   "message.send": "إرسال",
   "message.noMessages": "لا توجد رسائل",
+  "message.charCount": "{count} أحرف",
 
   "notification.title": "الإشعارات",
   "notification.noNotifications": "لا توجد إشعارات",
@@ -246,5 +249,6 @@
   "attachment.upload_new": "رفع مرفق جديد",
   "attachment.upload_notification": "تم رفع ملفك بنجاح",
   "attachment.category_all": "الكل",
-  "attachment.filter_category": "تصفية حسب النوع"
+  "attachment.filter_category": "تصفية حسب النوع",
+  "attachment.staffDeleteReason": "الرجاء إدخال سبب الحذف:"
 }

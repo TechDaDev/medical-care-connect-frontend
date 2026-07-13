@@ -88,6 +88,8 @@
   "consultation.emergency_escalated": "بەرزکراوە بۆ حاڵەتی فریاگوزاری",
   "consultation.attachFiles": "پەڕگەکان هاوپێچ بکە",
   "consultation.uploadFile": "پەڕگە باربکە",
+  "consultation.internalNotes": "تێبینییە ناوخۆییەکان — بۆ نەخۆش نابینرێت",
+  "consultation.addInternalNote": "تێبینییەکی ناوخۆیی زیادبکە...",
 
   "consultation.priority_low": "نزم",
   "consultation.priority_medium": "مامناوەند",
@@ -247,5 +249,6 @@
   "attachment.upload_new": "پێوەکراوێکی نوێ باربکە",
   "attachment.upload_notification": "پەڕگەکەت سەرکەوتووانە بارکرا",
   "attachment.category_all": "هەموو",
-  "attachment.filter_category": "پاڵاوتنی بەپێی جۆر"
+  "attachment.filter_category": "پاڵاوتنی بەپێی جۆر",
+  "attachment.staffDeleteReason": "تکایە هۆکاری سڕینەوە بنووسە:"
 }

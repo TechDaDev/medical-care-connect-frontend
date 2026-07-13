@@ -12,6 +12,9 @@ import { TransferModal } from "./TransferModal";
 import { PriorityControl } from "./PriorityControl";
 import { getErrorMessage } from "../../utils/errors";
 import { Link } from "react-router-dom";
+import { AttachmentList } from "../../components/attachments/AttachmentList";
+import { attachmentsApi } from "../../api/attachments";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function StaffConsultationDetail() {
   const { consultationId } = useParams<{ consultationId: string }>();
@@ -174,6 +177,13 @@ export function StaffConsultationDetail() {
         </div>
       </div>
 
+      {/* ── Attachments ─────────────────────────────────────── */}
+      {consultationId && (
+        <StaffAttachmentsSection
+          consultationId={consultationId}
+        />
+      )}
+
       {showTransfer && consultationId && (
         <TransferModal
           consultationId={consultationId}
@@ -196,6 +206,63 @@ export function StaffConsultationDetail() {
           }}
         />
       )}
+    </div>
+  );
+}
+
+function StaffAttachmentsSection({ consultationId }: { consultationId: string }) {
+  const queryClient = useQueryClient();
+  const [error, setError] = useState("");
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["attachments", consultationId],
+    queryFn: () => attachmentsApi.list(consultationId),
+  });
+
+  const triggerDownload = async (id: string) => {
+    try {
+      const { blob, filename } = await attachmentsApi.download(id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError(t("attachment.error.not_available"));
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const reason = prompt(t("attachment.staffDeleteReason"));
+    if (!reason || !reason.trim()) return;
+    try {
+      await attachmentsApi.delete(id);
+      queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
+    } catch {
+      setError(t("attachment.error.permission"));
+    }
+  };
+
+  const handleUpload = async (file: File, category: string, description: string, signal: AbortSignal) => {
+    await attachmentsApi.upload(consultationId, file, category, description, undefined, signal);
+    queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
+  };
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("attachment.title")}</h2>
+      {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+      <AttachmentList
+        attachments={data?.results || []}
+        loading={isLoading}
+        onUpload={handleUpload}
+        onDownload={triggerDownload}
+        onDelete={handleDelete}
+        showUpload={true}
+      />
     </div>
   );
 }

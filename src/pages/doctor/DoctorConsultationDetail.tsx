@@ -11,6 +11,8 @@ import { Textarea } from "../../components/common/Textarea";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
+import { AttachmentList } from "../../components/attachments/AttachmentList";
+import { attachmentsApi } from "../../api/attachments";
 
 export function DoctorConsultationDetail() {
   const { consultationId } = useParams<{ consultationId: string }>();
@@ -107,7 +109,7 @@ export function DoctorConsultationDetail() {
       {consultation.actions?.can_add_internal_note && (
         <div className="border-t border-gray-200 pt-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Internal Notes — not visible to patient
+            {t("consultation.internalNotes")}
           </h2>
 
           {internalNotes && internalNotes.length > 0 && (
@@ -129,7 +131,7 @@ export function DoctorConsultationDetail() {
 
           <div className="flex gap-2">
             <Textarea
-              placeholder="Add internal note..."
+              placeholder={t("consultation.addInternalNote")}
               value={noteContent}
               onChange={(e) => setNoteContent(e.target.value)}
               className="flex-1"
@@ -145,6 +147,68 @@ export function DoctorConsultationDetail() {
           </div>
         </div>
       )}
+
+      {/* ── Attachments ─────────────────────────────────────── */}
+      {consultationId && (
+        <ConsultationAttachmentsSection
+          consultationId={consultationId}
+          isDoctor={true}
+        />
+      )}
+    </div>
+  );
+}
+
+function ConsultationAttachmentsSection({ consultationId, isDoctor }: { consultationId: string; isDoctor: boolean }) {
+  const queryClient = useQueryClient();
+  const [error, setError] = useState("");
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["attachments", consultationId],
+    queryFn: () => attachmentsApi.list(consultationId),
+  });
+
+  const triggerDownload = async (id: string) => {
+    try {
+      const { blob, filename } = await attachmentsApi.download(id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      setError(t("attachment.error.not_available"));
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm(t("attachment.deleteConfirm"))) return;
+    try {
+      await attachmentsApi.delete(id);
+      queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
+    } catch {
+      setError(t("attachment.error.permission"));
+    }
+  };
+
+  const handleUpload = async (file: File, category: string, description: string, signal: AbortSignal) => {
+    await attachmentsApi.upload(consultationId, file, category, description, undefined, signal);
+    queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
+  };
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-lg font-semibold text-gray-900 mb-4">{t("attachment.title")}</h2>
+      {error && <p className="text-sm text-red-600 mb-2">{error}</p>}
+      <AttachmentList
+        attachments={data?.results || []}
+        loading={isLoading}
+        onUpload={handleUpload}
+        onDownload={triggerDownload}
+        onDelete={handleDelete}
+        showUpload={true}
+      />
     </div>
   );
 }

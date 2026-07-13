@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import arLocale from "../locales/ar.json";
+import enLocale from "../locales/en.json";
+import ckbLocale from "../locales/ckb.json";
 
 // ── 1. Patient dashboard renders backend summary values ──────────────────
 
@@ -328,5 +331,57 @@ describe("Auth concurrency", () => {
     state.user = null;
 
     expect(state.user).toBeNull();
+  });
+});
+
+// ── 26. Locale key parity: ar, en, ckb share identical keys ───────────
+
+describe("Locale key parity", () => {
+  function flattenKeys(obj: Record<string, unknown>, prefix = ""): string[] {
+    return Object.entries(obj).flatMap(([key, value]) => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      if (typeof value === "object" && value !== null && !Array.isArray(value)) {
+        return flattenKeys(value as Record<string, unknown>, fullKey);
+      }
+      return fullKey;
+    });
+  }
+
+  // Flatten imported locales
+  const ar = flattenKeys(arLocale as Record<string, unknown>);
+  const en = flattenKeys(enLocale as Record<string, unknown>);
+  const ckb = flattenKeys(ckbLocale as Record<string, unknown>);
+
+  it("ar and en have same keys", () => {
+    const onlyInAr = ar.filter((k) => !en.includes(k));
+    const onlyInEn = en.filter((k) => !ar.includes(k));
+    if (onlyInAr.length > 0) console.warn("Keys in ar but not en:", onlyInAr);
+    if (onlyInEn.length > 0) console.warn("Keys in en but not ar:", onlyInEn);
+    expect(onlyInAr).toEqual([]);
+    expect(onlyInEn).toEqual([]);
+  });
+
+  it("ar and ckb have same keys", () => {
+    const onlyInAr = ar.filter((k) => !ckb.includes(k));
+    const onlyInCkb = ckb.filter((k) => !ar.includes(k));
+    if (onlyInAr.length > 0) console.warn("Keys in ar but not ckb:", onlyInAr);
+    if (onlyInCkb.length > 0) console.warn("Keys in ckb but not ar:", onlyInCkb);
+    expect(onlyInAr).toEqual([]);
+    expect(onlyInCkb).toEqual([]);
+  });
+
+  it("en and ckb have same keys", () => {
+    const onlyInEn = en.filter((k) => !ckb.includes(k));
+    const onlyInCkb = ckb.filter((k) => !en.includes(k));
+    if (onlyInEn.length > 0) console.warn("Keys in en but not ckb:", onlyInEn);
+    if (onlyInCkb.length > 0) console.warn("Keys in ckb but not en:", onlyInCkb);
+    expect(onlyInEn).toEqual([]);
+    expect(onlyInCkb).toEqual([]);
+  });
+
+  it("all locales have at least 75 keys", () => {
+    expect(ar.length).toBeGreaterThanOrEqual(75);
+    expect(en.length).toBeGreaterThanOrEqual(75);
+    expect(ckb.length).toBeGreaterThanOrEqual(75);
   });
 });
