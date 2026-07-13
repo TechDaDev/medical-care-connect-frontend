@@ -61,15 +61,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       : staffNav;
 
   const toggleLang = () => {
-    const next: Lang = langSwitch === "en" ? "ar" : "en";
+    const order: Lang[] = ["ar", "en", "ckb"];
+    const idx = order.indexOf(langSwitch);
+    const next = order[(idx + 1) % order.length];
     setLangSwitch(next);
     setLanguage(next);
   };
 
-
+  const langLabel: Record<Lang, string> = { ar: "العربية", en: "English", ckb: "کوردی" };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir={getLanguage() === "ar" ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-gray-50 flex" dir={getLanguage() === "en" ? "ltr" : "rtl"}>
       {/* Sidebar */}
       <aside
         className={clsx(
@@ -132,11 +134,16 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-3 ml-auto">
             <select
               value={langSwitch}
-              onChange={() => toggleLang()}
+              onChange={(e) => {
+                const v = e.target.value as Lang;
+                setLangSwitch(v);
+                setLanguage(v);
+              }}
               className="text-sm border rounded px-2 py-1"
             >
-              <option value="en">EN</option>
-              <option value="ar">AR</option>
+              <option value="ar">العربية</option>
+              <option value="en">English</option>
+              <option value="ckb">کوردی</option>
             </select>
             {user && (
               <div className="flex items-center gap-2">
