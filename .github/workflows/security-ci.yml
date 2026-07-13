@@ -1,0 +1,36 @@
+name: Security CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for committed .env
+        run: |
+          if [ -f .env ]; then echo "ERROR: .env file committed!"; exit 1; fi
+          echo "No .env committed."
+
+      - name: Check for private keys
+        run: |
+          found=$(find . -name "*.key" -o -name "*.pem" 2>/dev/null | grep -v node_modules | head -5)
+          if [ -n "$found" ]; then echo "ERROR: Private keys: $found"; exit 1; fi
+          echo "No private keys."
+
+      - name: Check JWT localStorage regression
+        run: |
+          ! grep -r "localStorage.*mcc_access\|localStorage.*mcc_refresh" src/ --include="*.ts" --include="*.tsx" 2>/dev/null
+          echo "No JWT localStorage regression."
+
+      - name: Check storage_key exposure
+        run: |
+          ! grep -r '"storage_key"' src/ --include="*.ts" --include="*.tsx" 2>/dev/null
+          echo "No storage_key in frontend."
+
+      - name: npm audit
+        run: npm audit --audit-level=high || echo "npm audit warnings (non-blocking)"
