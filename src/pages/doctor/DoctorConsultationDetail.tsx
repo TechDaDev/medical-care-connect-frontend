@@ -152,14 +152,14 @@ export function DoctorConsultationDetail() {
       {consultationId && (
         <ConsultationAttachmentsSection
           consultationId={consultationId}
-          isDoctor={true}
+
         />
       )}
     </div>
   );
 }
 
-function ConsultationAttachmentsSection({ consultationId, isDoctor }: { consultationId: string; isDoctor: boolean }) {
+function ConsultationAttachmentsSection({ consultationId }: { consultationId: string }) {
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
 

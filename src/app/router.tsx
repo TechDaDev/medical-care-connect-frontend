@@ -45,6 +45,10 @@ const StaffDashboard = lazy(() => import("../pages/doctor/StaffDashboard").then(
 const StaffConsultationList = lazy(() => import("../pages/staff/StaffConsultationList").then(m => ({ default: m.StaffConsultationList })));
 const StaffConsultationDetail = lazy(() => import("../pages/staff/StaffConsultationDetail").then(m => ({ default: m.StaffConsultationDetail })));
 const DoctorWorkloadPage = lazy(() => import("../pages/staff/DoctorWorkloadPage").then(m => ({ default: m.DoctorWorkloadPage })));
+const OperationsStatusPage = lazy(() => import("../pages/staff/OperationsStatusPage").then(m => ({ default: m.OperationsStatusPage })));
+const PrivacyPage = lazy(() => import("../pages/privacy/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
+const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPage").then(m => ({ default: m.PrivacyExportsPage })));
+const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
 
 export const router = createBrowserRouter([
   { path: "/", element: <LazyLoad><LandingPage /></LazyLoad> },
@@ -60,6 +64,9 @@ export const router = createBrowserRouter([
       { index: true, element: <RoleBasedRedirect /> },
       { path: "profile", element: <LazyLoad><ProfilePage /></LazyLoad> },
       { path: "notifications", element: <LazyLoad><NotificationsPage /></LazyLoad> },
+      { path: "privacy", element: <LazyLoad><PrivacyPage /></LazyLoad> },
+      { path: "privacy/exports", element: <LazyLoad><PrivacyExportsPage /></LazyLoad> },
+      { path: "privacy/deletion", element: <LazyLoad><PrivacyDeletionPage /></LazyLoad> },
       {
         path: "patient",
         element: <RequireRole roles={[UserRole.PATIENT]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
@@ -91,6 +98,7 @@ export const router = createBrowserRouter([
           { path: "consultations", element: <StaffConsultationList /> },
           { path: "consultations/:consultationId", element: <StaffConsultationDetail /> },
           { path: "doctors", element: <DoctorWorkloadPage /> },
+          { path: "operations", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><OperationsStatusPage /></RequireRole> },
         ],
       },
       {

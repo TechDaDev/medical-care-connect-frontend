@@ -213,8 +213,6 @@ export function StaffConsultationDetail() {
 function StaffAttachmentsSection({ consultationId }: { consultationId: string }) {
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
-  const [deleteReason, setDeleteReason] = useState("");
-  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["attachments", consultationId],

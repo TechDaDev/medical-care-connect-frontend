@@ -30,10 +30,23 @@ npm run test:e2e
 
 ```
 e2e/
-  auth.spec.ts        — login, logout, role-based access
-  consultation.spec.ts — create and view consultations
-  .env                — credentials (gitignored)
+  auth.spec.ts              — login, logout, role-based access
+  consultation.spec.ts       — create and view consultations
+  privacy.spec.ts            — data export, deactivation, deletion request
+  operations.spec.ts         — admin operations dashboard and metrics
+  .env                       — credentials (gitignored)
 ```
+
+### Phase 8C Tests
+
+| Test File | Coverage |
+|-----------|----------|
+| `privacy.spec.ts` | Request data export, verify status transitions, attempt download |
+| `privacy.spec.ts` | Deactivate account, verify login blocked, admin reactivation? |
+| `privacy.spec.ts` | Submit deletion request, cancel pending request |
+| `operations.spec.ts` | Admin views status page, verifies components reported |
+| `operations.spec.ts` | Admin views metrics, verifies counts displayed |
+| `operations.spec.ts` | Non-admin access to admin operations returns 403 |
 
 ## Artifacts
 

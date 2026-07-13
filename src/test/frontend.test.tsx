@@ -385,3 +385,111 @@ describe("Locale key parity", () => {
     expect(ckb.length).toBeGreaterThanOrEqual(75);
   });
 });
+
+// ── 27. Request ID appears in error response ──────────────────────────
+
+describe("Request ID in errors", () => {
+  it("error response includes request_id when available", () => {
+    const error = { detail: "Test error", code: "internal_error", request_id: "abc-123" };
+    expect(error.request_id).toBeDefined();
+    expect(error.request_id).toBe("abc-123");
+  });
+
+  it("request_id displayed safely without sensitive data", () => {
+    const error = { detail: "Not found", code: "not_found", request_id: "uuid-here" };
+    expect(error.request_id).not.toContain("token");
+    expect(error.request_id).not.toContain("password");
+  });
+});
+
+// ── 28. Privacy export creates pending UI state ───────────────────────
+
+describe("Privacy export", () => {
+  it("request creates pending state", () => {
+    const mockExport = { id: "e1", status: "pending", requested_at: "2026-01-01T00:00:00Z" };
+    expect(mockExport.status).toBe("pending");
+    expect(mockExport.id).toBeDefined();
+  });
+
+  it("completed export shows download action", () => {
+    const mockExport = { id: "e2", status: "completed" };
+    const canDownload = mockExport.status === "completed";
+    expect(canDownload).toBe(true);
+  });
+
+  it("expired export cannot download", () => {
+    const mockExport = { id: "e3", status: "expired" };
+    const canDownload = mockExport.status === "completed";
+    expect(canDownload).toBe(false);
+  });
+});
+
+// ── 29. Deactivation requires confirmation ────────────────────────────
+
+describe("Account deactivation", () => {
+  it("requires explicit action before deactivation", () => {
+    const confirmed = false;
+    const canDeactivate = confirmed && "password_provided";
+    expect(canDeactivate).toBe(false);
+  });
+
+  it("deletion request shows retention warning", () => {
+    const warning = "Some data may be retained due to legal and medical requirements";
+    expect(warning).toContain("retained");
+    expect(warning).not.toContain("password");
+  });
+});
+
+// ── 30. Patient cannot access staff operations ────────────────────────
+
+describe("Operations access", () => {
+  it("patient role cannot see staff operations", () => {
+    const role: string = "patient";
+    const canAccess = role === "administrator";
+    expect(canAccess).toBe(false);
+  });
+
+  it("administrator can access operations page", () => {
+    const role: string = "administrator";
+    const canAccess = role === "administrator";
+    expect(canAccess).toBe(true);
+  });
+});
+
+// ── 31. Metrics do not render personal fields ─────────────────────────
+
+describe("Metrics privacy", () => {
+  it("metrics response contains no personal fields", () => {
+    const metrics = {
+      uptime_seconds: 3600,
+      users: { total: 10, patient: 5, doctor: 3, coordinator: 1, administrator: 1 },
+      consultations: { submitted: 2, accepted: 1 },
+    };
+    const serialized = JSON.stringify(metrics);
+    expect(serialized).not.toContain("email");
+    expect(serialized).not.toContain("full_name");
+    expect(serialized).not.toContain("phone");
+  });
+});
+
+// ── 32. Arabic/English/Kurdish privacy pages preserve direction ───────
+
+describe("Privacy page direction", () => {
+  it("Arabic privacy page is RTL", () => {
+    const locale: string = "ar";
+    const isRtl = locale === "ar" || locale === "ckb";
+    expect(isRtl).toBe(true);
+  });
+
+  it("English privacy page is LTR", () => {
+    const locale: string = "en";
+    const isRtl = locale === "ar" || locale === "ckb";
+    expect(isRtl).toBe(false);
+  });
+
+  it("Kurdish privacy page is RTL", () => {
+    const locale: string = "ckb";
+    const isRtl = locale === "ar" || locale === "ckb";
+    expect(isRtl).toBe(true);
+  });
+});

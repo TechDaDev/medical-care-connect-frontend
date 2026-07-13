@@ -130,6 +130,37 @@ npm run test         # Run tests
 npm run preview      # Preview production build
 ```
 
+## Phase 8C — Privacy, Operations & Observability
+
+### Routes Added
+
+| Path | Access | Description |
+|------|--------|-------------|
+| `/app/privacy` | All auth | Privacy settings hub |
+| `/app/privacy/exports` | All auth | Data export management |
+| `/app/privacy/deactivation` | All auth | Account deactivation |
+| `/app/privacy/deletion` | All auth | Account deletion request |
+| `/app/staff/operations` | Admin | Operations dashboard |
+| `/app/staff/operations/status` | Admin | System status |
+| `/app/staff/operations/metrics` | Admin | Aggregated metrics |
+
+### Features Added
+
+- **Data Export** — request, download, and manage personal data exports
+- **Account Deactivation** — self-service deactivation with password confirmation
+- **Account Deletion Request** — request deletion with admin review workflow
+- **Operations Dashboard** — admin-only system status and metrics views
+- **Request ID in errors** — `X-Request-ID` header and `request_id` field
+  in error responses for debugging
+- **E2E tests** — Playwright tests for privacy and operations flows
+
+### Environment Variables Added
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `VITE_APP_VERSION` | — | App version for display |
+| `VITE_APP_RELEASE` | — | Release name for display |
+
 ## Known Limitations
 
 - No WebSockets — messaging uses HTTP polling
@@ -137,7 +168,6 @@ npm run preview      # Preview production build
 - No payments
 - No appointments/scheduling
 - No video consultations
-- No E2E tests
 - Consultation `description` field maps from what was previously called `chief_complaint` in frontend types
 - All normalised errors follow `{detail, code, fields}` format from backend
 - JWT localStorage (not httpOnly cookie) — CSRF risk accepted for local dev

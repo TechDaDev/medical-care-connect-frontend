@@ -30,3 +30,9 @@ e2e/.env
 *.njsproj
 *.sln
 *.sw?
+
+# Test artifacts
+playwright-report/
+test-results/
+*.dump
+*.manifest.json

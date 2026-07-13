@@ -58,6 +58,34 @@ three locale files share identical keys. Missing keys cause test failure.
 
 ## Translation Audit
 
+## Phase 8C Keys Added
+
+### Privacy Module (`privacy.*`)
+
+| Key | Description |
+|-----|-------------|
+| `privacy.title` | Privacy settings page title |
+| `privacy.export.*` | Data export labels, statuses, messages |
+| `privacy.deactivation.*` | Account deactivation labels, confirmations |
+| `privacy.deletion.*` | Account deletion labels, statuses |
+| `privacy.status.*` | Status labels (pending, completed, expired, etc.) |
+
+See `docs/PRIVACY.md` for full key reference.
+
+### Operations Module (`operations.*`)
+
+| Key | Description |
+|-----|-------------|
+| `operations.title` | Operations dashboard title |
+| `operations.status.*` | System status labels |
+| `operations.metrics.*` | Metrics labels and values |
+| `operations.version` | Version display |
+| `operations.degraded` | Degraded components warning |
+
+See `docs/OPERATIONS.md` for full key reference.
+
+---
+
 Before release, search for hardcoded display strings:
 ```bash
 grep -rn '>[A-Z][a-z]' src/pages/ src/components/ | grep -v '\.tsx:.*//'

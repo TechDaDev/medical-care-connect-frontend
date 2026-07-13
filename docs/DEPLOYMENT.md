@@ -41,6 +41,10 @@ cp .env.production.example .env
 Required:
 - `VITE_API_BASE_URL` — backend API URL
 
+Optional:
+- `VITE_APP_VERSION` — displayed in operations dashboard
+- `VITE_APP_RELEASE` — release name in operations dashboard
+
 ## Production Compose
 
 See backend `docker-compose.production.yml` — frontend service included.

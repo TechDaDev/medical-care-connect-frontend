@@ -6,8 +6,6 @@ import {
   getDoctorCreds,
 } from "./helpers";
 
-const TEST_FILE = new URL("data:text/plain;base64,SGVsbG8sIE1DQyE=", "data:").href; // "Hello, MCC!"
-
 test.describe("Attachment flow", () => {
   test("Arabic default — page loads with RTL dir", async ({ page }) => {
     const creds = getPatientCreds();
