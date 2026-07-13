@@ -26,6 +26,7 @@
   "auth.register": "خۆتۆمارکردن",
   "auth.email": "ئیمەیل",
   "auth.password": "وشەی نهێنی",
+  "auth.phone": "ژمارەی مۆبایل",
   "auth.confirmPassword": "دووپاتکردنەوەی وشەی نهێنی",
   "auth.submit": "ناردن",
   "auth.noAccount": "ئەژمێرت نییە؟",

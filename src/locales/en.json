@@ -26,6 +26,7 @@
   "auth.register": "Register",
   "auth.email": "Email",
   "auth.password": "Password",
+  "auth.phone": "Phone Number",
   "auth.confirmPassword": "Confirm Password",
   "auth.submit": "Submit",
   "auth.noAccount": "Don't have an account?",

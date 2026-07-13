@@ -26,6 +26,7 @@
   "auth.register": "إنشاء حساب",
   "auth.email": "البريد الإلكتروني",
   "auth.password": "كلمة المرور",
+  "auth.phone": "رقم الهاتف",
   "auth.confirmPassword": "تأكيد كلمة المرور",
   "auth.submit": "إرسال",
   "auth.noAccount": "ليس لديك حساب؟",
