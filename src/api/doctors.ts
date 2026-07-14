@@ -18,6 +18,22 @@ export const doctorsApi = {
     return data;
   },
 
+  /** Normalized list — always returns an array regardless of API shape. */
+  listNormalized: async (params?: {
+    search?: string;
+    specialty?: string;
+    accepting?: boolean;
+    language?: string;
+    ordering?: string;
+    page?: number;
+    page_size?: number;
+  }) => {
+    const raw = await doctorsApi.list(params);
+    if (Array.isArray(raw)) return raw;
+    if (raw && Array.isArray(raw.results)) return raw.results;
+    return [];
+  },
+
   getById: async (id: string) => {
     const { data } = await client.get<DoctorPublicProfile>(`/doctors/${id}/`);
     return data;
@@ -48,7 +64,9 @@ export const doctorsApi = {
 
 export const specialtiesApi = {
   list: async () => {
-    const { data } = await client.get<Specialty[]>("/specialties/");
-    return data;
+    const { data } = await client.get<PaginatedResponse<Specialty> | Specialty[]>("/specialties/");
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.results)) return data.results;
+    return [];
   },
 };

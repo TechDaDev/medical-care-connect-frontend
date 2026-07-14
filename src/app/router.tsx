@@ -29,6 +29,7 @@ const LoginPage = lazy(() => import("../pages/auth/LoginPage").then(m => ({ defa
 const RegisterPage = lazy(() => import("../pages/auth/RegisterPage").then(m => ({ default: m.RegisterPage })));
 const NotFoundPage = lazy(() => import("../pages/errors/NotFoundPage").then(m => ({ default: m.NotFoundPage })));
 const UnauthorizedPage = lazy(() => import("../pages/errors/UnauthorizedPage").then(m => ({ default: m.UnauthorizedPage })));
+const ErrorPage = lazy(() => import("../pages/errors/ErrorPage").then(m => ({ default: m.ErrorPage })));
 const PatientDashboard = lazy(() => import("../pages/patient/PatientDashboard").then(m => ({ default: m.PatientDashboard })));
 const PatientConsultationList = lazy(() => import("../pages/patient/PatientConsultationList").then(m => ({ default: m.PatientConsultationList })));
 const NewConsultationPage = lazy(() => import("../pages/patient/NewConsultationPage").then(m => ({ default: m.NewConsultationPage })));
@@ -51,14 +52,15 @@ const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPag
 const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
 
 export const router = createBrowserRouter([
-  { path: "/", element: <LazyLoad><LandingPage /></LazyLoad> },
-  { path: "/doctors", element: <LazyLoad><DoctorListPage /></LazyLoad> },
-  { path: "/doctors/:doctorId", element: <LazyLoad><DoctorDetailPage /></LazyLoad> },
-  { path: "/login", element: <LazyLoad><LoginPage /></LazyLoad> },
-  { path: "/register", element: <LazyLoad><RegisterPage /></LazyLoad> },
-  { path: "/unauthorized", element: <LazyLoad><UnauthorizedPage /></LazyLoad> },
+  { path: "/", element: <LazyLoad><LandingPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+  { path: "/doctors", element: <LazyLoad><DoctorListPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+  { path: "/doctors/:doctorId", element: <LazyLoad><DoctorDetailPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+  { path: "/login", element: <LazyLoad><LoginPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+  { path: "/register", element: <LazyLoad><RegisterPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+  { path: "/unauthorized", element: <LazyLoad><UnauthorizedPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
   {
     path: "/app",
+    errorElement: <LazyLoad><ErrorPage /></LazyLoad>,
     element: <RequireAuth><AppLayout><Outlet /></AppLayout></RequireAuth>,
     children: [
       { index: true, element: <RoleBasedRedirect /> },

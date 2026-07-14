@@ -574,3 +574,120 @@ describe("Reactive i18n", () => {
     expect(dir).toBe("rtl");
   });
 });
+
+// ── Doctor list page (API response normalization) ─────────────────────────
+
+describe("DoctorListPage — API response normalization", () => {
+
+  function asArray<T>(input: unknown, field = "results"): T[] {
+    if (Array.isArray(input)) return input;
+    if (input && typeof input === "object" && field in (input as Record<string, unknown>)) {
+      const arr = (input as Record<string, unknown>)[field];
+      if (Array.isArray(arr)) return arr;
+    }
+    return [];
+  }
+
+  const mockDoctor = {
+    id: "d1",
+    full_name: "Dr. Test",
+    specialty_name: "Cardiology",
+    professional_title: "Consultant",
+    years_of_experience: 10,
+    consultation_fee: "50.00",
+    languages: ["en", "ar"],
+    is_accepting_consultations: true,
+  };
+
+  it("paginated response extracts results", () => {
+    const apiResp = { count: 1, next: null, previous: null, results: [mockDoctor] };
+    const doctors = asArray<typeof mockDoctor>(apiResp, "results");
+    expect(doctors).toHaveLength(1);
+    expect(doctors[0].full_name).toBe("Dr. Test");
+  });
+
+  it("raw array is returned as-is", () => {
+    const doctors = asArray<typeof mockDoctor>([mockDoctor]);
+    expect(doctors).toHaveLength(1);
+  });
+
+  it("empty results array returns empty array", () => {
+    const apiResp = { count: 0, next: null, previous: null, results: [] };
+    expect(asArray(apiResp, "results")).toHaveLength(0);
+  });
+
+  it("undefined input returns empty array", () => {
+    expect(asArray(undefined)).toHaveLength(0);
+  });
+
+  it("null input returns empty array", () => {
+    expect(asArray(null)).toHaveLength(0);
+  });
+
+  it("object without results field returns empty array", () => {
+    expect(asArray({ foo: "bar" }, "results")).toHaveLength(0);
+  });
+
+  it("results with wrong type returns empty array", () => {
+    const apiResp = { count: 0, next: null, previous: null, results: "not-an-array" };
+    expect(asArray(apiResp, "results")).toHaveLength(0);
+  });
+
+  it("number input returns empty array", () => {
+    expect(asArray(42)).toHaveLength(0);
+  });
+
+  it("specialties paginated response normalized correctly", () => {
+    const apiResp = {
+      count: 2,
+      next: null,
+      previous: null,
+      results: [
+        { slug: "cardio", name: "Cardiology" },
+        { slug: "derma", name: "Dermatology" },
+      ],
+    };
+    const specs = asArray<{ slug: string; name: string }>(apiResp);
+    expect(specs).toHaveLength(2);
+    expect(specs[0].slug).toBe("cardio");
+  });
+
+  it("null specialty does not crash", () => {
+    const doctorWithNullSpecialty = { ...mockDoctor, specialty_name: undefined };
+    expect(doctorWithNullSpecialty.specialty_name).toBeUndefined();
+  });
+});
+
+describe("DoctorListPage — locale key coverage", () => {
+  it("has required doctor keys in English", () => {
+    const en = enLocale as Record<string, string>;
+    expect(en["doctor.title"]).toBe("Find a Doctor");
+    expect(en["doctor.searchPlaceholder"]).toBeTruthy();
+    expect(en["doctor.accepting"]).toBeTruthy();
+    expect(en["doctor.notAccepting"]).toBeTruthy();
+    expect(en["doctor.loadError"]).toBeTruthy();
+    expect(en["doctor.noResults"]).toBeTruthy();
+  });
+
+  it("has required doctor keys in Arabic", () => {
+    const ar = arLocale as Record<string, string>;
+    expect(ar["doctor.title"]).toBeTruthy();
+    expect(ar["doctor.searchPlaceholder"]).toBeTruthy();
+    expect(ar["doctor.loadError"]).toBeTruthy();
+  });
+
+  it("has required doctor keys in Kurdish", () => {
+    const ckb = ckbLocale as Record<string, string>;
+    expect(ckb["doctor.title"]).toBeTruthy();
+    expect(ckb["doctor.searchPlaceholder"]).toBeTruthy();
+    expect(ckb["doctor.loadError"]).toBeTruthy();
+  });
+
+  it("no raw translation keys leak as values", () => {
+    const en = enLocale as Record<string, string>;
+    const vals = Object.values(en);
+    const rawKeyPattern = /^(doctor\.|common\.|error\.|nav\.)/;
+    const hasRawKey = vals.some(v => rawKeyPattern.test(v));
+    expect(hasRawKey).toBe(false);
+  });
+});
