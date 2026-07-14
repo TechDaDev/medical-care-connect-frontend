@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Spinner } from "../../components/common/Spinner";
+import { useI18n } from "../../i18n";
 
 interface ExportRequest {
   id: string;
@@ -15,6 +16,7 @@ interface ExportRequest {
 }
 
 export function PrivacyExportsPage() {
+  const { t } = useI18n();
   const [requesting, setRequesting] = useState(false);
   const [exports, setExports] = useState<ExportRequest[]>([]);
   const [loading, setLoading] = useState(true);

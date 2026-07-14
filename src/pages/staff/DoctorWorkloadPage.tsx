@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { staffApi } from "../../api/staff";
 import { useI18n } from "../../i18n";
@@ -10,24 +10,33 @@ import { Input } from "../../components/common/Input";
 import { Select } from "../../components/common/Select";
 import { getErrorMessage } from "../../utils/errors";
 
-const SPECIALTY_OPTIONS = [
-  { value: "", label: t("common.all") },
-];
-
-const ACCEPTING_OPTIONS = [
-  { value: "", label: t("common.all") },
-  { value: "true", label: t("doctor.accepting") },
-  { value: "false", label: t("doctor.notAccepting") },
-];
-
-const APPROVED_OPTIONS = [
-  { value: "", label: t("common.all") },
-  { value: "true", label: t("doctor.approved") },
-  { value: "false", label: "Unapproved" },
-];
-
 export function DoctorWorkloadPage() {
   const { t } = useI18n();
+
+  const SPECIALTY_OPTIONS = useMemo(
+    () => [
+      { value: "", label: t("common.all") },
+    ],
+    [t]
+  );
+
+  const ACCEPTING_OPTIONS = useMemo(
+    () => [
+      { value: "", label: t("common.all") },
+      { value: "true", label: t("doctor.accepting") },
+      { value: "false", label: t("doctor.notAccepting") },
+    ],
+    [t]
+  );
+
+  const APPROVED_OPTIONS = useMemo(
+    () => [
+      { value: "", label: t("common.all") },
+      { value: "true", label: t("doctor.approved") },
+      { value: "false", label: "Unapproved" },
+    ],
+    [t]
+  );
   const [search, setSearch] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [accepting, setAccepting] = useState("");

@@ -207,6 +207,7 @@ export function ConsultationDetailPage() {
 }
 
 function ConsultationAttachments({ consultationId, isPatient, isDoctor }: { consultationId: string; isPatient: boolean; isDoctor: boolean }) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
 

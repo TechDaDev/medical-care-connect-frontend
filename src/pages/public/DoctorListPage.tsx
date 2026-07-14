@@ -12,8 +12,10 @@ import { EmptyState } from "../../components/common/EmptyState";
 import { Badge } from "../../components/common/Badge";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
 import { useAuth } from "../../auth";
+import { useI18n } from "../../i18n";
 
 export function DoctorListPage() {
+  const { t } = useI18n();
   const { isAuthenticated } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1", 10);

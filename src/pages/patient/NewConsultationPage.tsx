@@ -15,16 +15,20 @@ import { Alert } from "../../components/common/Alert";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
 import { ApiRequestError, getErrorMessage } from "../../utils/errors";
 
-const schema = z.object({
-  doctor: z.string().min(1, t("auth.required")),
-  specialty: z.string().min(1, t("auth.required")),
-  description: z.string().min(1, t("auth.required")),
-});
-
-type FormData = z.infer<typeof schema>;
-
 export function NewConsultationPage() {
   const { t } = useI18n();
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        doctor: z.string().min(1, t("auth.required")),
+        specialty: z.string().min(1, t("auth.required")),
+        description: z.string().min(1, t("auth.required")),
+      }),
+    [t]
+  );
+
+  type FormData = z.infer<typeof schema>;
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedDoctor = searchParams.get("doctor") || "";

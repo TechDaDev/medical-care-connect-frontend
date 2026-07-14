@@ -212,6 +212,7 @@ export function StaffConsultationDetail() {
 }
 
 function StaffAttachmentsSection({ consultationId }: { consultationId: string }) {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
 
