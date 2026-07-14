@@ -557,19 +557,19 @@ describe("Reactive i18n", () => {
   });
 
   it("direction is RTL for Arabic", () => {
-    const locale = "ar";
+    const locale: string = "ar";
     const dir = locale === "en" ? "ltr" : "rtl";
     expect(dir).toBe("rtl");
   });
 
   it("direction is LTR for English", () => {
-    const locale = "en";
+    const locale: string = "en";
     const dir = locale === "en" ? "ltr" : "rtl";
     expect(dir).toBe("ltr");
   });
 
   it("direction is RTL for Kurdish", () => {
-    const locale = "ckb";
+    const locale: string = "ckb";
     const dir = locale === "en" ? "ltr" : "rtl";
     expect(dir).toBe("rtl");
   });
