@@ -21,6 +21,7 @@
   "nav.priority": "Priority",
   "nav.workload": "Workload",
   "nav.attachments": "Attachments",
+  "nav.findDoctor": "Find a doctor",
 
   "auth.login": "Login",
   "auth.register": "Register",
@@ -69,6 +70,8 @@
   "consultation.detail": "Consultation Details",
   "consultation.cancel": "Cancel Consultation",
   "consultation.cancelReason": "Cancellation Reason",
+  "consultation.active": "Active consultations",
+  "consultation.awaitingYou": "Consultations awaiting you",
   "consultation.cancelConfirm": "Are you sure you want to cancel this consultation?",
   "consultation.accept": "Accept Consultation",
   "consultation.noConsultations": "No consultations",
@@ -115,9 +118,11 @@
   "message.send": "Send",
   "message.noMessages": "No messages",
   "message.charCount": "{count} characters",
+  "message.unread": "Unread messages",
 
   "notification.title": "Notifications",
   "notification.noNotifications": "No notifications",
+  "notification.unread": "Unread notifications",
 
   "profile.title": "Profile",
   "profile.edit": "Edit",
@@ -174,6 +179,7 @@
   "common.retry": "Retry",
   "common.confirm": "Confirm",
   "common.cancel": "Cancel",
+  "common.refresh": "Refresh",
   "common.close": "Close",
   "common.save": "Save",
   "common.search": "Search",

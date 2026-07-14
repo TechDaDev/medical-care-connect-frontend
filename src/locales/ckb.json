@@ -21,6 +21,7 @@
   "nav.priority": "ئۆلویەت",
   "nav.workload": "باری کار",
   "nav.attachments": "پێوەکراوەکان",
+  "nav.findDoctor": "گەڕان بەدوای پزیشک",
 
   "auth.login": "چوونەژوور",
   "auth.register": "خۆتۆمارکردن",
@@ -69,6 +70,8 @@
   "consultation.detail": "وردەکاری ڕاوێژکاری",
   "consultation.cancel": "ڕاوێژکاری هەڵوەشێنەرەوە",
   "consultation.cancelReason": "هۆکاری هەڵوەشاندنەوە",
+  "consultation.active": "ڕاوێژکارییە چالاکەکان",
+  "consultation.awaitingYou": "ڕاوێژکارییە چاوەڕوانەکان",
   "consultation.cancelConfirm": "دڵنیای لە هەڵوەشاندنەوەی ئەم ڕاوێژکارییە؟",
   "consultation.accept": "قبوڵکردنی ڕاوێژکاری",
   "consultation.noConsultations": "هیچ ڕاوێژکارییەک نییە",
@@ -115,9 +118,11 @@
   "message.send": "ناردن",
   "message.noMessages": "هیچ پەیامێک نییە",
   "message.charCount": "{count} پیت",
+  "message.unread": "نامە نەخوێندراوەکان",
 
   "notification.title": "ئاگادارییەکان",
   "notification.noNotifications": "هیچ ئاگادارییەک نییە",
+  "notification.unread": "ئاگادارکردنەوە نەخوێندراوەکان",
 
   "profile.title": "پڕۆفایل",
   "profile.edit": "دەستکاری کردن",
@@ -174,6 +179,7 @@
   "common.retry": "هەوڵدانەوە",
   "common.confirm": "دڵنیاکردنەوە",
   "common.cancel": "پاشگەزبوونەوە",
+  "common.refresh": "نوێکردنەوە",
   "common.close": "داخستن",
   "common.save": "پاشەکەوت کردن",
   "common.search": "گەڕان",

@@ -21,6 +21,7 @@
   "nav.priority": "الأولوية",
   "nav.workload": "عبء العمل",
   "nav.attachments": "المرفقات",
+  "nav.findDoctor": "البحث عن طبيب",
 
   "auth.login": "تسجيل الدخول",
   "auth.register": "إنشاء حساب",
@@ -69,6 +70,8 @@
   "consultation.detail": "تفاصيل الاستشارة",
   "consultation.cancel": "إلغاء الاستشارة",
   "consultation.cancelReason": "سبب الإلغاء",
+  "consultation.active": "الاستشارات النشطة",
+  "consultation.awaitingYou": "استشارات بانتظارك",
   "consultation.cancelConfirm": "هل أنت متأكد من إلغاء هذه الاستشارة؟",
   "consultation.accept": "قبول الاستشارة",
   "consultation.noConsultations": "لا توجد استشارات",
@@ -115,9 +118,11 @@
   "message.send": "إرسال",
   "message.noMessages": "لا توجد رسائل",
   "message.charCount": "{count} أحرف",
+  "message.unread": "رسائل غير مقروءة",
 
   "notification.title": "الإشعارات",
   "notification.noNotifications": "لا توجد إشعارات",
+  "notification.unread": "إشعارات غير مقروءة",
 
   "profile.title": "الملف الشخصي",
   "profile.edit": "تعديل",
@@ -174,6 +179,7 @@
   "common.retry": "إعادة المحاولة",
   "common.confirm": "تأكيد",
   "common.cancel": "إلغاء",
+  "common.refresh": "تحديث",
   "common.close": "إغلاق",
   "common.save": "حفظ",
   "common.search": "بحث",
