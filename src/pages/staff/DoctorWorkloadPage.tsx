@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { staffApi } from "../../api/staff";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -27,6 +27,7 @@ const APPROVED_OPTIONS = [
 ];
 
 export function DoctorWorkloadPage() {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [specialty, setSpecialty] = useState("");
   const [accepting, setAccepting] = useState("");

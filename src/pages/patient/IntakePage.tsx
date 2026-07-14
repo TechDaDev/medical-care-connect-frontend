@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { intakeApi } from "../../api/intake";
 import { consultationsApi } from "../../api/consultations";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Textarea } from "../../components/common/Textarea";
@@ -12,6 +12,7 @@ import { Alert } from "../../components/common/Alert";
 import { ApiRequestError } from "../../utils/errors";
 
 export function IntakePage() {
+  const { t } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | null>(null);

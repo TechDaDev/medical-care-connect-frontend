@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { messagesApi } from "../../api/messages";
 import { consultationsApi } from "../../api/consultations";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Textarea } from "../../components/common/Textarea";
@@ -15,6 +15,7 @@ import { useAuth } from "../../auth";
 const POLL_MS = Number(import.meta.env.VITE_MESSAGE_POLL_INTERVAL_MS) || 10000;
 
 export function MessagingPage() {
+  const { t } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const { user } = useAuth();
   const queryClient = useQueryClient();

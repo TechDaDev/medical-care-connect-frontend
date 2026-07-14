@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 
 export function NotFoundPage() {
+  const { t } = useI18n();
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="text-center">

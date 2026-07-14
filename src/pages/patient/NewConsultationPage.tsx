@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { doctorsApi, specialtiesApi } from "../../api/doctors";
 import { consultationsApi } from "../../api/consultations";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Textarea } from "../../components/common/Textarea";
@@ -24,6 +24,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export function NewConsultationPage() {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const preselectedDoctor = searchParams.get("doctor") || "";

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
 import type { Consultation } from "../../types";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { PageHeader } from "../../components/common/PageHeader";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
@@ -24,6 +24,7 @@ const statusColors: Record<string, "success" | "warning" | "danger" | "info" | "
 };
 
 export function PatientConsultationList() {
+  const { t } = useI18n();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["patient-consultations"],
     queryFn: () => consultationsApi.list(),

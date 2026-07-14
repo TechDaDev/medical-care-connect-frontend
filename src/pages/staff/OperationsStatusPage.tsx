@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
 
@@ -29,6 +29,7 @@ interface MetricsData {
 }
 
 export function OperationsStatusPage() {
+  const { t } = useI18n();
   const [status, setStatus] = useState<StatusData | null>(null);
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +51,7 @@ export function OperationsStatusPage() {
       }
     };
     fetchData();
-  }, []);
+  }, [t]);
 
   if (loading) return <Spinner />;
   if (error) return <p className="text-red-600">{error}</p>;

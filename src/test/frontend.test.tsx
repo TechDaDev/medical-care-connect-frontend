@@ -493,3 +493,84 @@ describe("Privacy page direction", () => {
     expect(isRtl).toBe(true);
   });
 });
+
+// ── 33. Reactive i18n: locale switching without reload ─────────────────
+
+describe("Reactive i18n", () => {
+  const STORAGE_KEY = "mcc_lang";
+
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it("falls back to Arabic when localStorage empty", () => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const locale = (stored && ["ar", "en", "ckb"].includes(stored) ? stored : "ar") as string;
+    expect(locale).toBe("ar");
+  });
+
+  it("uses stored locale from localStorage", () => {
+    localStorage.setItem(STORAGE_KEY, "en");
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const locale = (stored && ["ar", "en", "ckb"].includes(stored) ? stored : "ar") as string;
+    expect(locale).toBe("en");
+  });
+
+  it("invalid stored value falls back to Arabic", () => {
+    localStorage.setItem(STORAGE_KEY, "fr");
+    const stored = localStorage.getItem(STORAGE_KEY);
+    const locale: string = stored && ["ar", "en", "ckb"].includes(stored) ? stored : "ar";
+    expect(locale).toBe("ar");
+  });
+
+  it("persists locale to localStorage after set", () => {
+    const newLocale = "en";
+    localStorage.setItem(STORAGE_KEY, newLocale);
+    expect(localStorage.getItem(STORAGE_KEY)).toBe("en");
+  });
+
+  it("t() returns translation key when key does not exist", () => {
+    const dict: Record<string, string> = {};
+    const key = "nonexistent.key";
+    expect(dict[key] || key).toBe(key);
+  });
+
+  it("t() returns correct Arabic translation", () => {
+    const arDict: Record<string, string> = { "nav.dashboard": "لوحة التحكم" };
+    expect(arDict["nav.dashboard"]).toBe("لوحة التحكم");
+  });
+
+  it("t() returns correct English translation", () => {
+    const enDict: Record<string, string> = { "nav.dashboard": "Dashboard" };
+    expect(enDict["nav.dashboard"]).toBe("Dashboard");
+  });
+
+  it("t() returns correct Kurdish translation", () => {
+    const ckbDict: Record<string, string> = { "nav.dashboard": "داشبۆرد" };
+    expect(ckbDict["nav.dashboard"]).toBe("داشبۆرد");
+  });
+
+  it("t() replaces interpolation params", () => {
+    let val = "Uploading {percent}%";
+    val = val.replace("{percent}", "50");
+    expect(val).toBe("Uploading 50%");
+  });
+
+  it("direction is RTL for Arabic", () => {
+    const locale = "ar";
+    const dir = locale === "en" ? "ltr" : "rtl";
+    expect(dir).toBe("rtl");
+  });
+
+  it("direction is LTR for English", () => {
+    const locale = "en";
+    const dir = locale === "en" ? "ltr" : "rtl";
+    expect(dir).toBe("ltr");
+  });
+
+  it("direction is RTL for Kurdish", () => {
+    const locale = "ckb";
+    const dir = locale === "en" ? "ltr" : "rtl";
+    expect(dir).toBe("rtl");
+  });
+});

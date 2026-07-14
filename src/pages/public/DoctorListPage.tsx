@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { doctorsApi, specialtiesApi } from "../../api/doctors";
-import { t } from "../../utils/i18n";
 import { Card } from "../../components/common/Card";
 import { Input } from "../../components/common/Input";
 import { Select } from "../../components/common/Select";

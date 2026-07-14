@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   Menu,
@@ -14,54 +14,58 @@ import {
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
 import { clsx } from "../../utils/clsx";
-import { t, setLanguage, getLanguage, type Lang } from "../../utils/i18n";
+import { useI18n, type SupportedLocale } from "../../i18n";
 import { AvatarFallback } from "../common/AvatarFallback";
-
-interface NavItem {
-  label: string;
-  path: string;
-  icon: React.ReactNode;
-}
-
-const patientNav: NavItem[] = [
-  { label: t("nav.dashboard"), path: "/app/patient", icon: <LayoutDashboard className="h-5 w-5" /> },
-  { label: t("nav.findDoctor"), path: "/doctors", icon: <Stethoscope className="h-5 w-5" /> },
-  { label: t("nav.consultations"), path: "/app/patient/consultations", icon: <MessageSquare className="h-5 w-5" /> },
-  { label: t("nav.notifications"), path: "/app/notifications", icon: <Bell className="h-5 w-5" /> },
-  { label: t("nav.profile"), path: "/app/profile", icon: <User className="h-5 w-5" /> },
-];
-
-const doctorNav: NavItem[] = [
-  { label: t("nav.dashboard"), path: "/app/doctor", icon: <LayoutDashboard className="h-5 w-5" /> },
-  { label: t("nav.consultations"), path: "/app/doctor/consultations", icon: <MessageSquare className="h-5 w-5" /> },
-  { label: t("nav.notifications"), path: "/app/notifications", icon: <Bell className="h-5 w-5" /> },
-  { label: t("nav.profile"), path: "/app/profile", icon: <User className="h-5 w-5" /> },
-];
-
-const staffNav: NavItem[] = [
-  { label: t("nav.dashboard"), path: "/app/staff", icon: <LayoutDashboard className="h-5 w-5" /> },
-  { label: t("nav.staffConsultations"), path: "/app/staff/consultations", icon: <MessageSquare className="h-5 w-5" /> },
-  { label: t("nav.doctorWorkload"), path: "/app/staff/doctors", icon: <Stethoscope className="h-5 w-5" /> },
-  { label: t("nav.notifications"), path: "/app/notifications", icon: <Bell className="h-5 w-5" /> },
-  { label: t("nav.profile"), path: "/app/profile", icon: <User className="h-5 w-5" /> },
-];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
+  const { t, locale, direction, setLocale } = useI18n();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [langSwitch, setLangSwitch] = useState<Lang>(getLanguage());
 
   const role = user?.role as UserRole;
-  const navItems =
-    role === UserRole.PATIENT
-      ? patientNav
-      : role === UserRole.DOCTOR
-      ? doctorNav
-      : staffNav;
+
+  const navItems = useMemo(() => {
+    const items =
+      role === UserRole.PATIENT
+        ? [
+            { label: t("nav.dashboard"), path: "/app/patient" },
+            { label: t("nav.findDoctor"), path: "/doctors" },
+            { label: t("nav.consultations"), path: "/app/patient/consultations" },
+            { label: t("nav.notifications"), path: "/app/notifications" },
+            { label: t("nav.profile"), path: "/app/profile" },
+          ]
+        : role === UserRole.DOCTOR
+        ? [
+            { label: t("nav.dashboard"), path: "/app/doctor" },
+            { label: t("nav.consultations"), path: "/app/doctor/consultations" },
+            { label: t("nav.notifications"), path: "/app/notifications" },
+            { label: t("nav.profile"), path: "/app/profile" },
+          ]
+        : [
+            { label: t("nav.dashboard"), path: "/app/staff" },
+            { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
+            { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
+            { label: t("nav.notifications"), path: "/app/notifications" },
+            { label: t("nav.profile"), path: "/app/profile" },
+          ];
+    return items.map((item) => ({
+      ...item,
+      icon:
+        item.path.includes("dashboard") || item.path === "/app/patient" || item.path === "/app/doctor" || item.path === "/app/staff"
+          ? <LayoutDashboard className="h-5 w-5" />
+          : item.path.includes("doctor") || item.path.includes("workload")
+          ? <Stethoscope className="h-5 w-5" />
+          : item.path.includes("consultation")
+          ? <MessageSquare className="h-5 w-5" />
+          : item.path.includes("notification")
+          ? <Bell className="h-5 w-5" />
+          : <User className="h-5 w-5" />,
+    }));
+  }, [role, t]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir={getLanguage() === "en" ? "ltr" : "rtl"}>
+    <div className="min-h-screen bg-gray-50 flex" dir={direction === "rtl" ? "rtl" : "ltr"}>
       {/* Sidebar */}
       <aside
         className={clsx(
@@ -123,12 +127,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
           <div className="flex items-center gap-3 ml-auto">
             <select
-              value={langSwitch}
-              onChange={(e) => {
-                const v = e.target.value as Lang;
-                setLangSwitch(v);
-                setLanguage(v);
-              }}
+              value={locale}
+              onChange={(e) => setLocale(e.target.value as SupportedLocale)}
               className="text-sm border rounded px-2 py-1"
             >
               <option value="ar">العربية</option>

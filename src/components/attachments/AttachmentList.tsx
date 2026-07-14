@@ -1,7 +1,7 @@
 import { Attachment as AttachmentType, AttachmentStatus } from "../../types/attachments";
 import { AttachmentCard } from "./AttachmentCard";
 import { AttachmentUploadForm } from "./AttachmentUploadForm";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 
 interface Props {
   attachments: AttachmentType[];
@@ -24,6 +24,7 @@ export function AttachmentList({
   allowedExtensions = "pdf,jpg,jpeg,png",
   showUpload = true,
 }: Props) {
+  const { t } = useI18n();
   const visible = attachments.filter((a) => a.status !== AttachmentStatus.DELETED);
 
   return (

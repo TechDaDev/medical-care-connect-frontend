@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { consultationsApi } from "../../api/consultations";
 import { messagesApi } from "../../api/messages";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -15,6 +15,7 @@ import { AttachmentList } from "../../components/attachments/AttachmentList";
 import { attachmentsApi } from "../../api/attachments";
 
 export function DoctorConsultationDetail() {
+  const { t } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const queryClient = useQueryClient();
   const [noteContent, setNoteContent] = useState("");

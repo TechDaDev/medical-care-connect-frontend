@@ -1,10 +1,8 @@
-import { getLanguage } from "./i18n";
-
+/** @deprecated Use useI18n() hook formatters for reactive locale updates */
 export function formatDate(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    const lang = getLanguage();
-    return d.toLocaleDateString(lang === "ckb" ? "ku" : lang, {
+    return d.toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -14,11 +12,11 @@ export function formatDate(dateStr: string): string {
   }
 }
 
+/** @deprecated Use useI18n() hook formatters for reactive locale updates */
 export function formatDateTime(dateStr: string): string {
   try {
     const d = new Date(dateStr);
-    const lang = getLanguage();
-    return d.toLocaleDateString(lang === "ckb" ? "ku" : lang, {
+    return d.toLocaleDateString(undefined, {
       year: "numeric",
       month: "short",
       day: "numeric",
@@ -30,10 +28,10 @@ export function formatDateTime(dateStr: string): string {
   }
 }
 
+/** @deprecated Use useI18n() hook formatters for reactive locale updates */
 export function formatNumber(n: number): string {
   try {
-    const lang = getLanguage();
-    return new Intl.NumberFormat(lang === "ckb" ? "ku" : lang).format(n);
+    return new Intl.NumberFormat().format(n);
   } catch {
     return String(n);
   }
@@ -47,10 +45,10 @@ export function formatFileSize(bytes: number): string {
   return `${size} ${units[i]}`;
 }
 
+/** @deprecated Use useI18n() hook formatters for reactive locale updates */
 export function formatCurrency(amount: number, currency = "USD"): string {
   try {
-    const lang = getLanguage();
-    return new Intl.NumberFormat(lang === "ckb" ? "ku" : lang, {
+    return new Intl.NumberFormat(undefined, {
       style: "currency",
       currency,
     }).format(amount);

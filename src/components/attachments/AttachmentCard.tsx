@@ -1,4 +1,4 @@
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Attachment } from "../../types/attachments";
 import { attachmentCategoryLabel } from "./attachmentUtils";
 import { AttachmentStatusBadge } from "./AttachmentStatusBadge";
@@ -12,6 +12,7 @@ interface Props {
 }
 
 export function AttachmentCard({ attachment, onDownload, onDelete }: Props) {
+  const { t } = useI18n();
   return (
     <div className="border rounded-lg p-3 bg-white space-y-2 text-sm">
       <div className="flex items-start justify-between gap-2">
@@ -20,7 +21,7 @@ export function AttachmentCard({ attachment, onDownload, onDelete }: Props) {
             {attachment.safe_display_name || attachment.original_filename}
           </p>
           <p className="text-xs text-gray-500">
-            {attachmentCategoryLabel(attachment.category)}
+            {attachmentCategoryLabel(attachment.category, t)}
             {" · "}
             {formatFileSize(attachment.size_bytes)}
           </p>

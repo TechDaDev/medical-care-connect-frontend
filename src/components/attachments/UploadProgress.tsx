@@ -1,4 +1,4 @@
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 
 interface Props {
   percent: number;
@@ -6,6 +6,7 @@ interface Props {
 }
 
 export function UploadProgress({ percent, onCancel }: Props) {
+  const { t } = useI18n();
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-xs text-gray-600">

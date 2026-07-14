@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Button } from "../../components/common/Button";
 import { Alert } from "../../components/common/Alert";
 
 export function LandingPage() {
+  const { t } = useI18n();
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <header className="border-b border-gray-200 bg-white">

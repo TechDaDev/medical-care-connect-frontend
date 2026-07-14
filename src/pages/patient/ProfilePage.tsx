@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useAuth } from "../../auth";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
 import { PageHeader } from "../../components/common/PageHeader";
 
 export function ProfilePage() {
+  const { t } = useI18n();
   const { user, updateCurrentUser } = useAuth();
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState("");

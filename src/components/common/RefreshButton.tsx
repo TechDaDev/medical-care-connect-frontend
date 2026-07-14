@@ -1,5 +1,5 @@
 import { RefreshCw } from "lucide-react";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 
 interface Props {
   onClick: () => void;
@@ -7,6 +7,7 @@ interface Props {
 }
 
 export function RefreshButton({ onClick, loading }: Props) {
+  const { t } = useI18n();
   return (
     <button
       onClick={onClick}

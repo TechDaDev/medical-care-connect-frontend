@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, Link } from "react-router-dom";
 import { staffApi } from "../../api/staff";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -12,23 +12,6 @@ import { Select } from "../../components/common/Select";
 import { Button } from "../../components/common/Button";
 import { getErrorMessage } from "../../utils/errors";
 
-const STATUS_OPTIONS = [
-  { value: "", label: t("common.all") },
-  { value: "submitted", label: t("consultation.submitted") },
-  { value: "accepted", label: t("consultation.accepted") },
-  { value: "intake_in_progress", label: t("consultation.inProgress") },
-  { value: "intake_completed", label: t("consultation.intakeCompleted") },
-  { value: "doctor_review", label: t("consultation.doctorReview") },
-  { value: "cancelled", label: t("consultation.cancelled") },
-];
-
-const PRIORITY_OPTIONS = [
-  { value: "", label: t("common.all") },
-  { value: "routine", label: t("consultation.priorityRoutine") },
-  { value: "urgent", label: t("consultation.priorityUrgent") },
-  { value: "emergency", label: t("consultation.priorityEmergency") },
-];
-
 const priorityColors: Record<string, "info" | "warning" | "danger" | "neutral"> = {
   routine: "info",
   urgent: "warning",
@@ -36,6 +19,7 @@ const priorityColors: Record<string, "info" | "warning" | "danger" | "neutral"> 
 };
 
 export function StaffConsultationList() {
+  const { t } = useI18n();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const status = searchParams.get("status") || "";
@@ -43,6 +27,23 @@ export function StaffConsultationList() {
   const search = searchParams.get("search") || "";
 
   const [searchInput, setSearchInput] = useState(search);
+
+  const statusOptions = [
+    { value: "", label: t("common.all") },
+    { value: "submitted", label: t("consultation.submitted") },
+    { value: "accepted", label: t("consultation.accepted") },
+    { value: "intake_in_progress", label: t("consultation.inProgress") },
+    { value: "intake_completed", label: t("consultation.intakeCompleted") },
+    { value: "doctor_review", label: t("consultation.doctorReview") },
+    { value: "cancelled", label: t("consultation.cancelled") },
+  ];
+
+  const priorityOptions = [
+    { value: "", label: t("common.all") },
+    { value: "routine", label: t("consultation.priorityRoutine") },
+    { value: "urgent", label: t("consultation.priorityUrgent") },
+    { value: "emergency", label: t("consultation.priorityEmergency") },
+  ];
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["staff-consultations", { page, status, priority, search }],
@@ -107,12 +108,12 @@ export function StaffConsultationList() {
         <Select
           value={status}
           onChange={(e) => handleStatusChange(e.target.value)}
-          options={STATUS_OPTIONS}
+          options={statusOptions}
         />
         <Select
           value={priority}
           onChange={(e) => handlePriorityChange(e.target.value)}
-          options={PRIORITY_OPTIONS}
+          options={priorityOptions}
         />
       </div>
 

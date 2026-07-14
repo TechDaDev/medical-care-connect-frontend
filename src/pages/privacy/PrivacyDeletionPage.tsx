@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Spinner } from "../../components/common/Spinner";
@@ -14,6 +14,7 @@ interface DeletionRequest {
 }
 
 export function PrivacyDeletionPage() {
+  const { t } = useI18n();
   const [requests, setRequests] = useState<DeletionRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -37,7 +38,7 @@ export function PrivacyDeletionPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [t]);
 
   const reloadRequests = async () => {
     try {

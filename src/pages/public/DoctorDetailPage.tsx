@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { doctorsApi } from "../../api/doctors";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Spinner } from "../../components/common/Spinner";
@@ -11,6 +11,7 @@ import { AvatarFallback } from "../../components/common/AvatarFallback";
 import { useAuth } from "../../auth";
 
 export function DoctorDetailPage() {
+  const { t } = useI18n();
   const { doctorId } = useParams<{ doctorId: string }>();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();

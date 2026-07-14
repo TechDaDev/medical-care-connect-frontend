@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { staffApi } from "../../api/staff";
 import { doctorsApi } from "../../api/doctors";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Modal } from "../../components/common/Modal";
 import { Button } from "../../components/common/Button";
 import { Select } from "../../components/common/Select";
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export function TransferModal({ consultationId, onClose, onSuccess }: Props) {
+  const { t } = useI18n();
   const qc = useQueryClient();
   const [doctorId, setDoctorId] = useState("");
   const [reason, setReason] = useState("");

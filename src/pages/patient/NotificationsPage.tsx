@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { notificationsApi } from "../../api/notifications";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { PageHeader } from "../../components/common/PageHeader";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
@@ -10,6 +10,7 @@ import { Spinner } from "../../components/common/Spinner";
 import { EmptyState } from "../../components/common/EmptyState";
 
 export function NotificationsPage() {
+  const { t } = useI18n();
   const queryClient = useQueryClient();
   const [unreadOnly, setUnreadOnly] = useState(false);
 

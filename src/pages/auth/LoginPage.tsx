@@ -3,21 +3,20 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
 import { Card } from "../../components/common/Card";
 import { ApiRequestError } from "../../utils/errors";
-import { useState } from "react";
-
-const schema = z.object({
-  email: z.string().email(t("auth.invalidEmail")),
-  password: z.string().min(1, t("auth.required")),
-});
-
-type FormData = z.infer<typeof schema>;
+import { useState, useMemo } from "react";
 
 export function LoginPage() {
+  const { t } = useI18n();
+  const schema = useMemo(() => z.object({
+    email: z.string().email(t("auth.invalidEmail")),
+    password: z.string().min(1, t("auth.required")),
+  }), [t]);
+  type FormData = z.infer<typeof schema>;
   const { login } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");

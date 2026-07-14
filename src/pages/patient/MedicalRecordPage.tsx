@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { medicalRecordsApi } from "../../api/medicalRecords";
 import { consultationsApi } from "../../api/consultations";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Spinner } from "../../components/common/Spinner";
@@ -29,6 +29,7 @@ function Field({ label, value }: FieldProps) {
 }
 
 export function MedicalRecordPage() {
+  const { t } = useI18n();
   const { recordId } = useParams<{ recordId: string }>();
   const { user } = useAuth();
   const navigate = useNavigate();

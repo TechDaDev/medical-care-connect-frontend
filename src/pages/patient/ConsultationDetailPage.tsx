@@ -3,7 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
 import { attachmentsApi } from "../../api/attachments";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
@@ -33,6 +33,7 @@ const statusLabels: Record<string, string> = {
 };
 
 export function ConsultationDetailPage() {
+  const { t } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const { user } = useAuth();
   const queryClient = useQueryClient();

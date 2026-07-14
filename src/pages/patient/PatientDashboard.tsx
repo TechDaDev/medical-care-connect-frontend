@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { accountsApi } from "../../api/auth";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Spinner } from "../../components/common/Spinner";
@@ -10,6 +10,7 @@ import { ErrorState } from "../../components/common/ErrorState";
 import { getErrorMessage } from "../../utils/errors";
 
 export function PatientDashboard() {
+  const { t } = useI18n();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["patient-dashboard"],
     queryFn: () => accountsApi.getPatientDashboard(),

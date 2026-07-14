@@ -1,10 +1,10 @@
 import { useCallback, useRef, useState } from "react";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Button } from "../common/Button";
 import { Input } from "../common/Input";
 import { Select } from "../common/Select";
 import { UploadProgress } from "./UploadProgress";
-import { ATTACHMENT_CATEGORIES } from "./attachmentUtils";
+import { getAttachmentCategories } from "./attachmentUtils";
 
 interface Props {
   onUpload: (file: File, category: string, description: string, signal: AbortSignal) => Promise<void>;
@@ -14,8 +14,10 @@ interface Props {
 }
 
 export function AttachmentUploadForm({ onUpload, maxSizeMB, allowedExtensions, disabled }: Props) {
+  const { t } = useI18n();
   const [file, setFile] = useState<File | null>(null);
-  const [category, setCategory] = useState<string>(ATTACHMENT_CATEGORIES[0]?.value || "");
+  const categories = getAttachmentCategories(t);
+  const [category, setCategory] = useState<string>(categories[0]?.value || "");
   const [description, setDescription] = useState("");
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -55,7 +57,7 @@ export function AttachmentUploadForm({ onUpload, maxSizeMB, allowedExtensions, d
       setUploading(false);
       abortRef.current = null;
     }
-  }, [file, category, description, onUpload]);
+  }, [file, category, description, onUpload, t]);
 
   const handleCancel = () => {
     abortRef.current?.abort();
@@ -89,7 +91,7 @@ export function AttachmentUploadForm({ onUpload, maxSizeMB, allowedExtensions, d
         label={t("attachment.category")}
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        options={ATTACHMENT_CATEGORIES.map((c) => ({ value: c.value, label: c.label }))}
+        options={categories.map((c) => ({ value: c.value, label: c.label }))}
         disabled={uploading || disabled}
       />
 

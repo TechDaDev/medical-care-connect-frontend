@@ -1,5 +1,5 @@
-import { t } from "../../utils/i18n";
 import { AttachmentCategory } from "../../types/attachments";
+import type { I18nContextValue } from "../../i18n";
 
 const CATEGORY_KEYS: Record<AttachmentCategory, string> = {
   [AttachmentCategory.MEDICAL_REPORT]: "attachment.category_medical_report",
@@ -11,11 +11,13 @@ const CATEGORY_KEYS: Record<AttachmentCategory, string> = {
   [AttachmentCategory.OTHER]: "attachment.category_other",
 };
 
-export function attachmentCategoryLabel(category: AttachmentCategory): string {
+export function attachmentCategoryLabel(category: AttachmentCategory, t: I18nContextValue["t"]): string {
   return t(CATEGORY_KEYS[category] || "attachment.category_other");
 }
 
-export const ATTACHMENT_CATEGORIES = Object.values(AttachmentCategory).map((cat) => ({
-  value: cat,
-  label: attachmentCategoryLabel(cat),
-}));
+export function getAttachmentCategories(t: I18nContextValue["t"]) {
+  return Object.values(AttachmentCategory).map((cat) => ({
+    value: cat,
+    label: attachmentCategoryLabel(cat, t),
+  }));
+}

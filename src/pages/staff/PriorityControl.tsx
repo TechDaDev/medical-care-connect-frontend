@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { staffApi } from "../../api/staff";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
+
 import { Modal } from "../../components/common/Modal";
 import { Button } from "../../components/common/Button";
 import { Select } from "../../components/common/Select";
@@ -15,19 +16,19 @@ interface Props {
   onSuccess: () => void;
 }
 
-const PRIORITY_OPTIONS = [
-  { value: "routine", label: t("consultation.priorityRoutine") },
-  { value: "urgent", label: t("consultation.priorityUrgent") },
-  { value: "emergency", label: t("consultation.priorityEmergency") },
-];
-
 export function PriorityControl({
   consultationId,
   currentPriority,
   onClose,
   onSuccess,
 }: Props) {
+  const { t } = useI18n();
   const qc = useQueryClient();
+  const priorityOptions = useMemo(() => [
+    { value: "routine", label: t("consultation.priorityRoutine") },
+    { value: "urgent", label: t("consultation.priorityUrgent") },
+    { value: "emergency", label: t("consultation.priorityEmergency") },
+  ], [t]);
   const [priority, setPriority] = useState(currentPriority);
   const [reason, setReason] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -91,7 +92,7 @@ export function PriorityControl({
           <Select
             value={priority}
             onChange={(e) => setPriority(e.target.value)}
-            options={PRIORITY_OPTIONS}
+            options={priorityOptions}
           />
           {fieldErrors.priority && (
             <p className="text-sm text-red-600 mt-1">{fieldErrors.priority}</p>

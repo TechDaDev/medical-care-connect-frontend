@@ -1,11 +1,12 @@
 import { Link } from "react-router-dom";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
 
 export function PrivacyPage() {
+  const { t } = useI18n();
   const { user } = useAuth();
   const isStaff = user?.role === UserRole.ADMINISTRATOR;
 

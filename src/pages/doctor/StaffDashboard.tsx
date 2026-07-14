@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { staffApi } from "../../api/staff";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import { Button } from "../../components/common/Button";
 
 export function StaffDashboard() {
+  const { t } = useI18n();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["staff-dashboard"],
     queryFn: () => staffApi.dashboard(),

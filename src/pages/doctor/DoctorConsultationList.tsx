@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
 import type { Consultation } from "../../types";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { PageHeader } from "../../components/common/PageHeader";
 import { Card } from "../../components/common/Card";
 import { Badge } from "../../components/common/Badge";
@@ -12,6 +12,7 @@ import { ErrorState } from "../../components/common/ErrorState";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
 
 export function DoctorConsultationList() {
+  const { t } = useI18n();
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["doctor-consultations"],
     queryFn: () => consultationsApi.list(),

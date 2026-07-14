@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 import { consultationsApi } from "../../api/consultations";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -17,6 +17,7 @@ import { attachmentsApi } from "../../api/attachments";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function StaffConsultationDetail() {
+  const { t } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const [showTransfer, setShowTransfer] = useState(false);
   const [showPriority, setShowPriority] = useState(false);

@@ -1,2 +1,1 @@
-export { t, setLanguage, getLanguage } from "./i18n";
-export type { Lang } from "./i18n";
+// i18n utilities moved to src/i18n — useI18n() hook for reactive translations

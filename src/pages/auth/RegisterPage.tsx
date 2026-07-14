@@ -3,30 +3,29 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth";
-import { t } from "../../utils/i18n";
+import { useI18n } from "../../i18n";
 import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
 import { Card } from "../../components/common/Card";
 import { ApiRequestError } from "../../utils/errors";
-import { useState } from "react";
-
-const schema = z
-  .object({
-    first_name: z.string().min(1, t("auth.required")),
-    last_name: z.string().min(1, t("auth.required")),
-    email: z.string().email(t("auth.invalidEmail")),
-    phone_number: z.string().min(1, t("auth.required")),
-    password: z.string().min(6, "Minimum 6 characters"),
-    password_confirm: z.string().min(1, t("auth.required")),
-  })
-  .refine((d) => d.password === d.password_confirm, {
-    message: t("auth.passwordMismatch"),
-    path: ["password_confirm"],
-  });
-
-type FormData = z.infer<typeof schema>;
+import { useState, useMemo } from "react";
 
 export function RegisterPage() {
+  const { t } = useI18n();
+  const schema = useMemo(() => z
+    .object({
+      first_name: z.string().min(1, t("auth.required")),
+      last_name: z.string().min(1, t("auth.required")),
+      email: z.string().email(t("auth.invalidEmail")),
+      phone_number: z.string().min(1, t("auth.required")),
+      password: z.string().min(6, "Minimum 6 characters"),
+      password_confirm: z.string().min(1, t("auth.required")),
+    })
+    .refine((d) => d.password === d.password_confirm, {
+      message: t("auth.passwordMismatch"),
+      path: ["password_confirm"],
+    }), [t]);
+  type FormData = z.infer<typeof schema>;
   const { registerPatient } = useAuth();
   const navigate = useNavigate();
   const [error, setError] = useState("");
