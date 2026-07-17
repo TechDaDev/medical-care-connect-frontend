@@ -3,6 +3,7 @@ import { lazy } from "react";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { RequireAuth, RequireRole, useAuth } from "../auth";
 import { UserRole } from "../types";
+import { I18nProvider } from "../i18n";
 import { AppLayout } from "../components/layout/AppLayout";
 import { LazyLoad } from "../components/common/LazyLoad";
 
@@ -52,64 +53,70 @@ const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPag
 const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
 
 export const router = createBrowserRouter([
-  { path: "/", element: <LazyLoad><LandingPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
-  { path: "/doctors", element: <LazyLoad><DoctorListPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
-  { path: "/doctors/:doctorId", element: <LazyLoad><DoctorDetailPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
-  { path: "/login", element: <LazyLoad><LoginPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
-  { path: "/register", element: <LazyLoad><RegisterPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
-  { path: "/unauthorized", element: <LazyLoad><UnauthorizedPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
   {
-    path: "/app",
+    element: <I18nProvider><Outlet /></I18nProvider>,
     errorElement: <LazyLoad><ErrorPage /></LazyLoad>,
-    element: <RequireAuth><AppLayout><Outlet /></AppLayout></RequireAuth>,
     children: [
-      { index: true, element: <RoleBasedRedirect /> },
-      { path: "profile", element: <LazyLoad><ProfilePage /></LazyLoad> },
-      { path: "notifications", element: <LazyLoad><NotificationsPage /></LazyLoad> },
-      { path: "privacy", element: <LazyLoad><PrivacyPage /></LazyLoad> },
-      { path: "privacy/exports", element: <LazyLoad><PrivacyExportsPage /></LazyLoad> },
-      { path: "privacy/deletion", element: <LazyLoad><PrivacyDeletionPage /></LazyLoad> },
+      { path: "/", element: <LazyLoad><LandingPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+      { path: "/doctors", element: <LazyLoad><DoctorListPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+      { path: "/doctors/:doctorId", element: <LazyLoad><DoctorDetailPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+      { path: "/login", element: <LazyLoad><LoginPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+      { path: "/register", element: <LazyLoad><RegisterPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+      { path: "/unauthorized", element: <LazyLoad><UnauthorizedPage /></LazyLoad>, errorElement: <LazyLoad><ErrorPage /></LazyLoad> },
+      { path: "*", element: <LazyLoad><NotFoundPage /></LazyLoad> },
       {
-        path: "patient",
-        element: <RequireRole roles={[UserRole.PATIENT]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
+        path: "/app",
+        errorElement: <LazyLoad><ErrorPage /></LazyLoad>,
+        element: <RequireAuth><AppLayout><Outlet /></AppLayout></RequireAuth>,
         children: [
-          { index: true, element: <PatientDashboard /> },
-          { path: "doctors", element: <DoctorListPage /> },
-          { path: "doctors/:doctorId", element: <DoctorDetailPage /> },
-          { path: "consultations", element: <PatientConsultationList /> },
-          { path: "consultations/new", element: <NewConsultationPage /> },
-          { path: "consultations/:consultationId", element: <ConsultationDetailPage /> },
-          { path: "consultations/:consultationId/intake", element: <IntakePage /> },
-          { path: "messages/:consultationId", element: <MessagingPage /> },
-          { path: "medical-records/:recordId", element: <MedicalRecordPage /> },
+          { index: true, element: <RoleBasedRedirect /> },
+          { path: "profile", element: <LazyLoad><ProfilePage /></LazyLoad> },
+          { path: "notifications", element: <LazyLoad><NotificationsPage /></LazyLoad> },
+          { path: "privacy", element: <LazyLoad><PrivacyPage /></LazyLoad> },
+          { path: "privacy/exports", element: <LazyLoad><PrivacyExportsPage /></LazyLoad> },
+          { path: "privacy/deletion", element: <LazyLoad><PrivacyDeletionPage /></LazyLoad> },
+          {
+            path: "patient",
+            element: <RequireRole roles={[UserRole.PATIENT]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
+            children: [
+              { index: true, element: <PatientDashboard /> },
+              { path: "doctors", element: <DoctorListPage /> },
+              { path: "doctors/:doctorId", element: <DoctorDetailPage /> },
+              { path: "consultations", element: <PatientConsultationList /> },
+              { path: "consultations/new", element: <NewConsultationPage /> },
+              { path: "consultations/:consultationId", element: <ConsultationDetailPage /> },
+              { path: "consultations/:consultationId/intake", element: <IntakePage /> },
+              { path: "messages/:consultationId", element: <MessagingPage /> },
+              { path: "medical-records/:recordId", element: <MedicalRecordPage /> },
+            ],
+          },
+          {
+            path: "doctor",
+            element: <RequireRole roles={[UserRole.DOCTOR]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
+            children: [
+              { index: true, element: <DoctorDashboard /> },
+              { path: "consultations", element: <DoctorConsultationList /> },
+              { path: "consultations/:consultationId", element: <DoctorConsultationDetail /> },
+              { path: "messages/:consultationId", element: <MessagingPage /> },
+            ],
+          },
+          {
+            path: "staff",
+            element: <RequireRole roles={[UserRole.COORDINATOR, UserRole.ADMINISTRATOR]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
+            children: [
+              { index: true, element: <StaffDashboard /> },
+              { path: "consultations", element: <StaffConsultationList /> },
+              { path: "consultations/:consultationId", element: <StaffConsultationDetail /> },
+              { path: "doctors", element: <DoctorWorkloadPage /> },
+              { path: "operations", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><OperationsStatusPage /></RequireRole> },
+            ],
+          },
+          {
+            path: "medical-records/:recordId",
+            element: <LazyLoad><MedicalRecordPage /></LazyLoad>,
+          },
         ],
-      },
-      {
-        path: "doctor",
-        element: <RequireRole roles={[UserRole.DOCTOR]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
-        children: [
-          { index: true, element: <DoctorDashboard /> },
-          { path: "consultations", element: <DoctorConsultationList /> },
-          { path: "consultations/:consultationId", element: <DoctorConsultationDetail /> },
-          { path: "messages/:consultationId", element: <MessagingPage /> },
-        ],
-      },
-      {
-        path: "staff",
-        element: <RequireRole roles={[UserRole.COORDINATOR, UserRole.ADMINISTRATOR]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
-        children: [
-          { index: true, element: <StaffDashboard /> },
-          { path: "consultations", element: <StaffConsultationList /> },
-          { path: "consultations/:consultationId", element: <StaffConsultationDetail /> },
-          { path: "doctors", element: <DoctorWorkloadPage /> },
-          { path: "operations", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><OperationsStatusPage /></RequireRole> },
-        ],
-      },
-      {
-        path: "medical-records/:recordId",
-        element: <LazyLoad><MedicalRecordPage /></LazyLoad>,
       },
     ],
   },
-  { path: "*", element: <LazyLoad><NotFoundPage /></LazyLoad> },
 ]);
