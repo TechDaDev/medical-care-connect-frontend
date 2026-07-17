@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { useI18n } from "../../i18n";
+import { useI18n, type SupportedLocale } from "../../i18n";
+import { useTheme } from "../../hooks/useTheme";
 import { Button } from "../../components/common/Button";
 import { Alert } from "../../components/common/Alert";
 import {
   Stethoscope, HeartPulse, Shield, MessageSquare,
-  Users, Clock, ArrowRight, Sparkles
+  Users, Clock, ArrowRight, Sparkles,
+  Sun, Moon
 } from "lucide-react";
 
 const features = [
@@ -26,7 +28,13 @@ const howItWorksSteps = [
 function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      className={`bg-white/70 backdrop-blur-xl border border-white/30 rounded-2xl shadow-lg shadow-slate-900/5 ${className}`}
+      className={`rounded-2xl shadow-lg shadow-slate-900/5 ${className}`}
+      style={{
+        backgroundColor: "var(--lp-card-bg)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        border: "1px solid var(--lp-card-border)",
+      }}
     >
       {children}
     </div>
@@ -65,7 +73,8 @@ function CTASection() {
 }
 
 export function LandingPage() {
-  const { t } = useI18n();
+  const { t, locale, setLocale } = useI18n();
+  const { isDark, toggleTheme } = useTheme();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -75,32 +84,67 @@ export function LandingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#EAEAEA" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "var(--lp-bg)" }}>
       {/* Glass Navbar */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-sm"
-            : "bg-transparent"
+          scrolled ? "border-b shadow-sm" : ""
         }`}
+        style={{
+          backgroundColor: scrolled ? "var(--lp-navbar-scrolled)" : "transparent",
+          backdropFilter: scrolled ? "blur(24px)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(24px)" : "none",
+          borderColor: scrolled ? "var(--lp-navbar-border)" : "transparent",
+        }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="text-xl font-bold" style={{ color: "#1C252E" }}>
+            <Link to="/" className="text-xl font-bold" style={{ color: "var(--lp-text)" }}>
               {t("app.name")}
             </Link>
-            <nav className="hidden md:flex items-center gap-8">
-              <Link to="/doctors" className="font-medium transition-colors" style={{ color: "#2C3E50" }}>
+
+            {/* Desktop nav + controls */}
+            <nav className="hidden md:flex items-center gap-4">
+              <Link to="/doctors" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text-secondary)" }}>
                 {t("nav.findDoctor")}
               </Link>
-              <Link to="/login" className="font-medium transition-colors" style={{ color: "#2C3E50" }}>
+              <Link to="/login" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text-secondary)" }}>
                 {t("nav.login")}
               </Link>
               <Link to="/register">
-                <Button size="sm" className="!bg-[#C28F79] hover:!bg-[#b07d67] !text-white">
+                <Button size="sm" className="!border-0" style={{ backgroundColor: "var(--lp-accent)", color: "#fff" }}>
                   {t("nav.register")}
                 </Button>
               </Link>
+
+              {/* Divider */}
+              <div className="w-px h-6" style={{ backgroundColor: "var(--lp-card-border)" }} />
+
+              {/* Language selector */}
+              <select
+                value={locale}
+                onChange={(e) => setLocale(e.target.value as SupportedLocale)}
+                className="text-sm rounded px-2 py-1 border cursor-pointer"
+                style={{
+                  backgroundColor: "var(--lp-glass-bg)",
+                  color: "var(--lp-text)",
+                  borderColor: "var(--lp-card-border)",
+                }}
+              >
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="ckb">کوردی</option>
+              </select>
+
+              {/* Dark mode toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2 rounded-full transition-colors"
+                style={{ color: "var(--lp-text-secondary)" }}
+                title={isDark ? "Light mode" : "Dark mode"}
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
             </nav>
           </div>
         </div>
@@ -111,56 +155,64 @@ export function LandingPage() {
         <section className="relative overflow-hidden min-h-screen flex items-center">
           {/* Ambient background blobs */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #C28F79 0%, transparent 70%)" }} />
-            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, #2C3E50 0%, transparent 70%)" }} />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-20" style={{ background: "radial-gradient(circle, #C28F79 0%, transparent 60%)" }} />
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, var(--lp-accent) 0%, transparent 70%)" }} />
+            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, var(--lp-text-secondary) 0%, transparent 70%)" }} />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-20" style={{ background: "radial-gradient(circle, var(--lp-accent) 0%, transparent 60%)" }} />
           </div>
 
           <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 sm:py-40">
             <div className="text-center max-w-3xl mx-auto">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 bg-white/60 backdrop-blur-md border border-white/40 text-[#2C3E50]">
-                <Sparkles className="h-4 w-4" style={{ color: "#C28F79" }} />
+              <GlassCard className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium mb-6 !shadow-none"
+                style={{ color: "var(--lp-text-secondary)" }}
+              >
+                <Sparkles className="h-4 w-4" style={{ color: "var(--lp-accent)" }} />
                 {t("landing.badge")}
-              </div>
+              </GlassCard>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ color: "#1C252E" }}>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6" style={{ color: "var(--lp-text)" }}>
                 {t("landing.title")}
               </h1>
-              <p className="text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed" style={{ color: "#2C3E50" }}>
+              <p className="text-lg sm:text-xl mb-10 max-w-2xl mx-auto leading-relaxed" style={{ color: "var(--lp-text-secondary)" }}>
                 {t("landing.description")}
               </p>
 
               {/* CTA buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
                 <Link to="/doctors">
-                  <Button size="lg" className="gap-2 w-full sm:w-auto !bg-[#C28F79] hover:!bg-[#b07d67] !text-white !border-0">
+                  <Button size="lg" className="gap-2 w-full sm:w-auto !text-white !border-0"
+                    style={{ backgroundColor: "var(--lp-accent)" }}
+                  >
                     <Stethoscope className="h-5 w-5" />
                     {t("landing.findDoctor")}
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <GlassCard className="!p-0 !shadow-none !bg-transparent !border-0">
-                    <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto !border-[#2C3E50]/30 !text-[#2C3E50] hover:!bg-white/60">
-                      {t("landing.getStarted")}
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
-                  </GlassCard>
+                  <Button variant="outline" size="lg" className="gap-2 w-full sm:w-auto"
+                    style={{
+                      borderColor: "var(--lp-text-secondary)",
+                      color: "var(--lp-text-secondary)",
+                      opacity: 0.8,
+                    }}
+                  >
+                    {t("landing.getStarted")}
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
                 </Link>
               </div>
 
-              {/* Trust Indicators — Glass cards */}
-              <div className="flex flex-wrap items-center justify-center gap-4 text-sm" style={{ color: "#2C3E50" }}>
-                <GlassCard className="px-4 py-2 flex items-center gap-2">
-                  <Shield className="h-4 w-4" style={{ color: "#C28F79" }} />
+              {/* Trust Indicators */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-sm" style={{ color: "var(--lp-text-secondary)" }}>
+                <GlassCard className="px-4 py-2 flex items-center gap-2 !shadow-none">
+                  <Shield className="h-4 w-4" style={{ color: "var(--lp-accent)" }} />
                   <span>{t("landing.secureCompliant")}</span>
                 </GlassCard>
-                <GlassCard className="px-4 py-2 flex items-center gap-2">
-                  <HeartPulse className="h-4 w-4" style={{ color: "#C28F79" }} />
+                <GlassCard className="px-4 py-2 flex items-center gap-2 !shadow-none">
+                  <HeartPulse className="h-4 w-4" style={{ color: "var(--lp-accent)" }} />
                   <span>{t("landing.patientFirst")}</span>
                 </GlassCard>
-                <GlassCard className="px-4 py-2 flex items-center gap-2">
-                  <Clock className="h-4 w-4" style={{ color: "#C28F79" }} />
+                <GlassCard className="px-4 py-2 flex items-center gap-2 !shadow-none">
+                  <Clock className="h-4 w-4" style={{ color: "var(--lp-accent)" }} />
                   <span>{t("landing.available247")}</span>
                 </GlassCard>
               </div>
@@ -169,13 +221,13 @@ export function LandingPage() {
         </section>
 
         {/* ── Features Section ──────────────────────────────────────── */}
-        <section className="py-20 sm:py-28" style={{ backgroundColor: "#EAEAEA" }}>
+        <section className="py-20 sm:py-28" style={{ backgroundColor: "var(--lp-bg)" }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#1C252E" }}>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--lp-text)" }}>
                 {t("landing.featuresTitle")}
               </h2>
-              <p className="text-lg" style={{ color: "#2C3E50" }}>
+              <p className="text-lg" style={{ color: "var(--lp-text-secondary)" }}>
                 {t("landing.featuresDescription")}
               </p>
             </div>
@@ -185,13 +237,18 @@ export function LandingPage() {
                   key={index}
                   className="group p-6 hover:-translate-y-1 transition-all duration-300 cursor-default"
                 >
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300 bg-white/60 group-hover:bg-[#C28F79]/20 border border-white/40">
-                    <feature.icon className="h-7 w-7" style={{ color: "#C28F79" }} />
+                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300 border"
+                    style={{
+                      backgroundColor: "var(--lp-glass-bg)",
+                      borderColor: "var(--lp-card-border)",
+                    }}
+                  >
+                    <feature.icon className="h-7 w-7" style={{ color: "var(--lp-accent)" }} />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2" style={{ color: "#1C252E" }}>
+                  <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--lp-text)" }}>
                     {t(feature.title)}
                   </h3>
-                  <p className="leading-relaxed" style={{ color: "#2C3E50" }}>
+                  <p className="leading-relaxed" style={{ color: "var(--lp-text-secondary)" }}>
                     {t(feature.description)}
                   </p>
                 </GlassCard>
@@ -201,13 +258,13 @@ export function LandingPage() {
         </section>
 
         {/* ── How It Works ──────────────────────────────────────────── */}
-        <section className="py-20 sm:py-28" style={{ backgroundColor: "#EAEAEA" }}>
+        <section className="py-20 sm:py-28" style={{ backgroundColor: "var(--lp-bg)" }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
-              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "#1C252E" }}>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4" style={{ color: "var(--lp-text)" }}>
                 {t("landing.howItWorksTitle")}
               </h2>
-              <p className="text-lg" style={{ color: "#2C3E50" }}>
+              <p className="text-lg" style={{ color: "var(--lp-text-secondary)" }}>
                 {t("landing.howItWorksDescription")}
               </p>
             </div>
@@ -215,20 +272,37 @@ export function LandingPage() {
               {howItWorksSteps.map((item, index) => (
                 <div key={index} className="relative text-center">
                   {index < 2 && (
-                    <div className="hidden lg:block absolute top-8 left-1/2 w-full h-px bg-white/40 z-0" />
+                    <div className="hidden lg:block absolute top-8 left-1/2 w-full h-px z-0"
+                      style={{ backgroundColor: "var(--lp-card-border)" }}
+                    />
                   )}
                   <div className="relative z-10 flex flex-col items-center">
-                    {/* Step number glass circle */}
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 font-bold text-xl bg-white/70 backdrop-blur-md border border-white/40 shadow-md" style={{ color: "#1C252E" }}>
+                    {/* Step number */}
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 font-bold text-xl shadow-md"
+                      style={{
+                        backgroundColor: "var(--lp-step-circle)",
+                        backdropFilter: "blur(12px)",
+                        WebkitBackdropFilter: "blur(12px)",
+                        border: "1px solid var(--lp-card-border)",
+                        color: "var(--lp-text)",
+                      }}
+                    >
                       {item.step}
                     </div>
-                    <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 bg-white/60 backdrop-blur-sm border border-white/30">
-                      <item.icon className="h-7 w-7" style={{ color: "#C28F79" }} />
+                    <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 border"
+                      style={{
+                        backgroundColor: "var(--lp-glass-bg)",
+                        backdropFilter: "blur(8px)",
+                        WebkitBackdropFilter: "blur(8px)",
+                        borderColor: "var(--lp-card-border)",
+                      }}
+                    >
+                      <item.icon className="h-7 w-7" style={{ color: "var(--lp-accent)" }} />
                     </div>
-                    <h3 className="text-lg font-semibold mb-2" style={{ color: "#1C252E" }}>
+                    <h3 className="text-lg font-semibold mb-2" style={{ color: "var(--lp-text)" }}>
                       {t(item.title)}
                     </h3>
-                    <p style={{ color: "#2C3E50" }}>{t(item.description)}</p>
+                    <p style={{ color: "var(--lp-text-secondary)" }}>{t(item.description)}</p>
                   </div>
                 </div>
               ))}
@@ -239,9 +313,11 @@ export function LandingPage() {
         <CTASection />
 
         {/* Emergency Notice */}
-        <section className="py-8" style={{ backgroundColor: "#EAEAEA" }}>
+        <section className="py-8" style={{ backgroundColor: "var(--lp-bg)" }}>
           <div className="max-w-7xl mx-auto px-4">
-            <Alert variant="warning" className="!bg-white/60 !backdrop-blur-md !border-white/30">
+            <Alert variant="warning" className="!bg-white/60 dark:!bg-slate-800/60 !backdrop-blur-md"
+              style={{ borderColor: "var(--lp-card-border)" }}
+            >
               <strong>{t("landing.emergency.title")}: </strong>
               {t("landing.emergency.description")}
             </Alert>
@@ -250,40 +326,40 @@ export function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="py-12" style={{ backgroundColor: "#1C252E", color: "#94a3b8" }}>
+      <footer className="py-12" style={{ backgroundColor: "var(--lp-footer-bg)", color: "var(--lp-footer-text)" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="md:col-span-2">
               <Link to="/" className="text-xl font-bold mb-4 block text-white">
                 {t("app.name")}
               </Link>
-              <p className="max-w-sm" style={{ color: "#64748b" }}>
+              <p className="max-w-sm" style={{ color: "var(--lp-footer-text)" }}>
                 {t("landing.footerDescription")}
               </p>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-4">{t("footer.quickLinks")}</h4>
               <ul className="space-y-2">
-                <li><Link to="/doctors" className="hover:text-white transition-colors">{t("nav.findDoctor")}</Link></li>
-                <li><Link to="/login" className="hover:text-white transition-colors">{t("nav.login")}</Link></li>
-                <li><Link to="/register" className="hover:text-white transition-colors">{t("nav.register")}</Link></li>
+                <li><Link to="/doctors" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("nav.findDoctor")}</Link></li>
+                <li><Link to="/login" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("nav.login")}</Link></li>
+                <li><Link to="/register" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("nav.register")}</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-4">{t("footer.support")}</h4>
               <ul className="space-y-2">
-                <li><a href="#" className="hover:text-white transition-colors">{t("footer.helpCenter")}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t("footer.contact")}</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">{t("footer.privacy")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("footer.helpCenter")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("footer.contact")}</a></li>
+                <li><a href="#" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("footer.privacy")}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderColor: "#2C3E50" }}>
             <p className="text-sm">{t("footer.copyright")}</p>
             <div className="flex items-center gap-6 text-sm">
-              <a href="#" className="hover:text-white transition-colors">{t("footer.terms")}</a>
-              <a href="#" className="hover:text-white transition-colors">{t("footer.privacy")}</a>
-              <a href="#" className="hover:text-white transition-colors">{t("footer.cookies")}</a>
+              <a href="#" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("footer.terms")}</a>
+              <a href="#" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("footer.privacy")}</a>
+              <a href="#" className="hover:text-white transition-colors" style={{ color: "var(--lp-footer-text)" }}>{t("footer.cookies")}</a>
             </div>
           </div>
         </div>

@@ -1,5 +1,93 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary - Medical Blue (trust, professionalism) */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  /* Medical Teal - Healthcare, healing, calm */
+  --color-medical-teal-50: #f0fdfa;
+  --color-medical-teal-100: #ccfbf1;
+  --color-medical-teal-200: #99f6e4;
+  --color-medical-teal-300: #5eead4;
+  --color-medical-teal-400: #2dd4bf;
+  --color-medical-teal-500: #14b8a6;
+  --color-medical-teal-600: #0d9488;
+  --color-medical-teal-700: #0f766e;
+  --color-medical-teal-800: #115e59;
+  --color-medical-teal-900: #134e4a;
+  --color-medical-teal-950: #042f2e;
+
+  /* Status Colors */
+  --color-status-info-50: #eff6ff;
+  --color-status-info-100: #dbeafe;
+  --color-status-info-200: #bfdbfe;
+  --color-status-info-300: #93c5fd;
+  --color-status-info-400: #60a5fa;
+  --color-status-info-500: #3b82f6;
+  --color-status-info-600: #2563eb;
+  --color-status-info-700: #1d4ed8;
+  --color-status-info-800: #1e40af;
+  --color-status-info-900: #1e3a8a;
+
+  --color-status-success-50: #f0fdf4;
+  --color-status-success-100: #dcfce7;
+  --color-status-success-200: #bbf7d0;
+  --color-status-success-300: #86efac;
+  --color-status-success-400: #4ade80;
+  --color-status-success-500: #22c55e;
+  --color-status-success-600: #16a34a;
+  --color-status-success-700: #15803d;
+  --color-status-success-800: #166534;
+  --color-status-success-900: #14532d;
+
+  --color-status-warning-50: #fffbeb;
+  --color-status-warning-100: #fef3c7;
+  --color-status-warning-200: #fde68a;
+  --color-status-warning-300: #fcd34d;
+  --color-status-warning-400: #fbbf24;
+  --color-status-warning-500: #f59e0b;
+  --color-status-warning-600: #d97706;
+  --color-status-warning-700: #b45309;
+  --color-status-warning-800: #92400e;
+  --color-status-warning-900: #78350f;
+
+  --color-status-error-50: #fef2f2;
+  --color-status-error-100: #fee2e2;
+  --color-status-error-200: #fecaca;
+  --color-status-error-300: #fca5a5;
+  --color-status-error-400: #f87171;
+  --color-status-error-500: #ef4444;
+  --color-status-error-600: #dc2626;
+  --color-status-error-700: #b91c1c;
+  --color-status-error-800: #991b1b;
+  --color-status-error-900: #7f1d1d;
+
+  /* Neutral - Slate for text and borders */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #020617;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
@@ -10,4 +98,37 @@ body {
 
 [dir="rtl"] {
   font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+}
+
+/* ── Landing Page color tokens (Warm Tech) ─────────────── */
+:root {
+  --lp-bg: #eaeaea;
+  --lp-text: #1c252e;
+  --lp-text-secondary: #2c3e50;
+  --lp-accent: #c28f79;
+  --lp-accent-hover: #b07d67;
+  --lp-card-bg: rgba(255, 255, 255, 0.7);
+  --lp-card-border: rgba(255, 255, 255, 0.3);
+  --lp-glass-bg: rgba(255, 255, 255, 0.6);
+  --lp-navbar-scrolled: rgba(255, 255, 255, 0.7);
+  --lp-navbar-border: rgba(255, 255, 255, 0.3);
+  --lp-footer-bg: #1c252e;
+  --lp-footer-text: #94a3b8;
+  --lp-step-circle: rgba(255, 255, 255, 0.7);
+}
+
+.dark {
+  --lp-bg: #0f172a;
+  --lp-text: #e2e8f0;
+  --lp-text-secondary: #94a3b8;
+  --lp-accent: #c28f79;
+  --lp-accent-hover: #b07d67;
+  --lp-card-bg: rgba(30, 41, 59, 0.7);
+  --lp-card-border: rgba(51, 65, 85, 0.5);
+  --lp-glass-bg: rgba(30, 41, 59, 0.6);
+  --lp-navbar-scrolled: rgba(15, 23, 42, 0.7);
+  --lp-navbar-border: rgba(51, 65, 85, 0.5);
+  --lp-footer-bg: #020617;
+  --lp-footer-text: #64748b;
+  --lp-step-circle: rgba(30, 41, 59, 0.7);
 }
