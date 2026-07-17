@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useCallback, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import en_base from "../utils/en.json";
 import ar_base from "../utils/ar.json";
 import ar from "../locales/ar.json";
@@ -50,6 +50,10 @@ export const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<SupportedLocale>(getInitialLocale);
+
+  useEffect(() => {
+    applyHtmlAttrs(locale);
+  }, [locale]);
 
   const setLocale = useCallback((newLocale: SupportedLocale) => {
     setLocaleState(newLocale);
