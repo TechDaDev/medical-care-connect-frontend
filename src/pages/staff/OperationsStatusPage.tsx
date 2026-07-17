@@ -28,6 +28,39 @@ interface MetricsData {
   retention_candidates: number;
 }
 
+const labelMap: Record<string, string> = {
+  total: "operations.total",
+  patient: "operations.patient",
+  doctor: "operations.doctor",
+  coordinator: "operations.coordinator",
+  administrator: "operations.administrator",
+  draft: "operations.status.draft",
+  submitted: "operations.status.submitted",
+  accepted: "operations.status.accepted",
+  intake_in_progress: "operations.status.intakeInProgress",
+  intake_completed: "operations.status.intakeCompleted",
+  doctor_review: "operations.status.doctorReview",
+  awaiting_patient_response: "operations.status.awaitingPatient",
+  awaiting_doctor_response: "operations.status.awaitingDoctor",
+  under_review: "operations.status.underReview",
+  follow_up_required: "operations.status.followUp",
+  physical_visit_required: "operations.status.physicalVisit",
+  transferred: "operations.status.transferred",
+  completed: "operations.status.completed",
+  cancelled: "operations.status.cancelled",
+  emergency_escalated: "operations.status.emergency",
+  pending: "operations.attachment.pending",
+  available: "operations.attachment.available",
+  quarantined: "operations.attachment.quarantined",
+  rejected: "operations.attachment.rejected",
+  deleted: "operations.attachment.deleted",
+};
+
+function translateLabel(key: string, t: (k: string) => string): string {
+  const translationKey = labelMap[key];
+  return translationKey ? t(translationKey) : key;
+}
+
 export function OperationsStatusPage() {
   const { t } = useI18n();
   const [status, setStatus] = useState<StatusData | null>(null);
@@ -94,7 +127,7 @@ export function OperationsStatusPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                 {Object.entries(metrics.users).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
-                    <span className="text-gray-500">{k}</span>
+                    <span className="text-gray-500">{translateLabel(k, t)}</span>
                     <span className="font-medium">{v}</span>
                   </div>
                 ))}
@@ -108,7 +141,7 @@ export function OperationsStatusPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                 {Object.entries(metrics.consultations).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
-                    <span className="text-gray-500">{k}</span>
+                    <span className="text-gray-500">{translateLabel(k, t)}</span>
                     <span className="font-medium">{v}</span>
                   </div>
                 ))}
@@ -122,7 +155,7 @@ export function OperationsStatusPage() {
               <div className="space-y-1 text-sm">
                 {Object.entries(metrics.attachments.by_status).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
-                    <span className="text-gray-500">{k}</span>
+                    <span className="text-gray-500">{translateLabel(k, t)}</span>
                     <span className="font-medium">{v}</span>
                   </div>
                 ))}
