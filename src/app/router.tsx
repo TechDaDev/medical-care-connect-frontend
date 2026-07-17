@@ -74,6 +74,8 @@ export const router = createBrowserRouter([
         element: <RequireRole roles={[UserRole.PATIENT]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
         children: [
           { index: true, element: <PatientDashboard /> },
+          { path: "doctors", element: <DoctorListPage /> },
+          { path: "doctors/:doctorId", element: <DoctorDetailPage /> },
           { path: "consultations", element: <PatientConsultationList /> },
           { path: "consultations/new", element: <NewConsultationPage /> },
           { path: "consultations/:consultationId", element: <ConsultationDetailPage /> },

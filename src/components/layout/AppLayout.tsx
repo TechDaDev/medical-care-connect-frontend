@@ -30,7 +30,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       role === UserRole.PATIENT
         ? [
             { label: t("nav.dashboard"), path: "/app/patient" },
-            { label: t("nav.findDoctor"), path: "/doctors" },
+            { label: t("nav.findDoctor"), path: "/app/patient/doctors" },
             { label: t("nav.consultations"), path: "/app/patient/consultations" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
@@ -65,20 +65,20 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }, [role, t]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex" dir={direction === "rtl" ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-slate-50 flex" dir={direction === "rtl" ? "rtl" : "ltr"}>
       {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform lg:translate-x-0 lg:static lg:inset-auto",
+          "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-slate-200 transform transition-transform lg:translate-x-0 lg:static lg:inset-auto",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
-          <Link to="/" className="text-lg font-bold text-blue-600">
+        <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200">
+          <Link to="/" className="text-lg font-bold text-primary-600">
             {t("app.name")}
           </Link>
           <button
-            className="lg:hidden text-gray-500"
+            className="lg:hidden text-slate-500"
             onClick={() => setSidebarOpen(false)}
           >
             <X className="h-5 w-5" />
@@ -95,8 +95,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                 className={clsx(
                   "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                   active
-                    ? "bg-blue-50 text-blue-700"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-primary-50 text-primary-700"
+                    : "text-slate-600 hover:bg-slate-100"
                 )}
               >
                 {item.icon}
@@ -118,9 +118,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
+        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 lg:px-6">
           <button
-            className="lg:hidden text-gray-500"
+            className="lg:hidden text-slate-500"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu className="h-6 w-6" />
@@ -129,7 +129,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <select
               value={locale}
               onChange={(e) => setLocale(e.target.value as SupportedLocale)}
-              className="text-sm border rounded px-2 py-1"
+              className="text-sm border-slate-300 rounded px-2 py-1 bg-white focus:border-primary-500 focus:ring-primary-500/20"
             >
               <option value="ar">العربية</option>
               <option value="en">English</option>
@@ -138,14 +138,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             {user && (
               <div className="flex items-center gap-2">
                 <AvatarFallback name={user.full_name} size="sm" />
-                <span className="text-sm text-gray-700 hidden sm:block">
+                <span className="text-sm text-slate-700 hidden sm:block">
                   {user.full_name}
                 </span>
               </div>
             )}
             <button
               onClick={logout}
-              className="text-gray-500 hover:text-gray-700 p-1"
+              className="text-slate-500 hover:text-slate-700 p-1"
               title={t("nav.logout")}
             >
               <LogOut className="h-5 w-5" />

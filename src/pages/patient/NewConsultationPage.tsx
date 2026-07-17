@@ -45,18 +45,25 @@ export function NewConsultationPage() {
     queryFn: () => doctorsApi.list({ page_size: 100 }),
   });
 
+  const doctorList = useMemo(() => {
+    if (!doctors) return [];
+    if (Array.isArray(doctors)) return doctors;
+    if (doctors.results) return doctors.results;
+    return [];
+  }, [doctors]);
+
   const doctorOptions = useMemo(
     () =>
-      doctors?.results.map((d) => ({
+      doctorList.map((d) => ({
         value: d.id,
         label: `${d.full_name}${d.specialty_name ? ` - ${d.specialty_name}` : ""}`,
-      })) || [],
-    [doctors]
+      })),
+    [doctorList]
   );
 
   const selectedDoctor = useMemo(
-    () => doctors?.results.find((d) => d.id === preselectedDoctor) || doctors?.results[0],
-    [doctors, preselectedDoctor]
+    () => doctorList.find((d) => d.id === preselectedDoctor) || doctorList[0],
+    [doctorList, preselectedDoctor]
   );
 
   const {
@@ -127,7 +134,7 @@ export function NewConsultationPage() {
 
           <Select
             label={t("doctor.specialty")}
-            options={specialties?.map((s) => ({ value: s.id, label: s.name })) || []}
+            options={(Array.isArray(specialties) ? specialties : specialties?.results || []).map((s: any) => ({ value: s.id, label: s.name }))}
             placeholder={t("doctor.specialty")}
             error={errors.specialty?.message || fieldErrors.specialty}
             {...register("specialty")}

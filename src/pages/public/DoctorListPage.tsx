@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { doctorsApi, specialtiesApi } from "../../api/doctors";
 import { Card } from "../../components/common/Card";
@@ -27,6 +27,7 @@ function asArray<T>(input: unknown, field = "results"): T[] {
 export function DoctorListPage() {
   const { t } = useI18n();
   const { isAuthenticated } = useAuth();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page") || "1", 10);
   const search = searchParams.get("search") || "";
@@ -183,7 +184,9 @@ export function DoctorListPage() {
             key={doc.id}
             to={
               isAuthenticated
-                ? `/doctors/${doc.id}`
+                ? location.pathname.startsWith("/app/")
+                  ? `/app/patient/doctors/${doc.id}`
+                  : `/doctors/${doc.id}`
                 : `/login?redirect=/doctors/${doc.id}`
             }
           >
