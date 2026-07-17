@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { clsx } from "../../utils/clsx";
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "ghost";
+  variant?: "primary" | "secondary" | "danger" | "ghost" | "outline";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   children: ReactNode;
@@ -20,18 +20,20 @@ export function Button({
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
+        "inline-flex items-center justify-center rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed",
         variant === "primary" &&
-          "bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500",
+          "bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500",
         variant === "secondary" &&
-          "bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-400",
+          "bg-slate-100 text-slate-700 hover:bg-slate-200 focus:ring-slate-400",
+        variant === "outline" &&
+          "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus:ring-slate-400",
         variant === "danger" &&
-          "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
+          "bg-status-error-600 text-white hover:bg-status-error-700 focus:ring-status-error-500",
         variant === "ghost" &&
-          "text-gray-600 hover:bg-gray-100 focus:ring-gray-400",
-        size === "sm" && "px-3 py-1.5 text-sm",
-        size === "md" && "px-4 py-2 text-sm",
-        size === "lg" && "px-6 py-3 text-base",
+          "text-slate-600 hover:bg-slate-100 focus:ring-slate-400",
+        size === "sm" && "px-3 py-1.5 text-sm gap-1.5",
+        size === "md" && "px-4 py-2 text-sm gap-2",
+        size === "lg" && "px-6 py-3 text-base gap-2",
         className
       )}
       disabled={disabled || loading}
@@ -51,11 +53,7 @@ export function Button({
 
 function SpinnerSmall() {
   return (
-    <svg
-      className="animate-spin h-4 w-4"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
       <circle
         className="opacity-25"
         cx="12"

@@ -13,7 +13,7 @@ export function Input({ label, error, className, id, ...props }: Props) {
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-slate-700"
         >
           {label}
         </label>
@@ -21,15 +21,21 @@ export function Input({ label, error, className, id, ...props }: Props) {
       <input
         id={inputId}
         className={clsx(
-          "block w-full rounded-lg border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500",
+          "block w-full rounded-lg border px-3 py-2 text-sm shadow-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-0",
           error
-            ? "border-red-300 text-red-900 placeholder-red-300"
-            : "border-gray-300 text-gray-900 placeholder-gray-400",
+            ? "border-status-error-300 text-slate-900 placeholder-slate-400 focus:border-status-error-500 focus:ring-status-error-500/20"
+            : "border-slate-300 text-slate-900 placeholder-slate-400 focus:border-primary-500 focus:ring-primary-500/20",
           className
         )}
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? `${inputId}-error` : undefined}
         {...props}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && (
+        <p id={`${inputId}-error`} className="text-sm text-status-error-600" role="alert">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

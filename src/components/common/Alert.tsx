@@ -4,6 +4,7 @@ import { clsx } from "../../utils/clsx";
 interface Props {
   variant?: "info" | "success" | "warning" | "error";
   children: React.ReactNode;
+  className?: string;
 }
 
 const icons = {
@@ -14,19 +15,20 @@ const icons = {
 };
 
 const styles = {
-  info: "bg-blue-50 text-blue-800 border-blue-200",
-  success: "bg-green-50 text-green-800 border-green-200",
-  warning: "bg-yellow-50 text-yellow-800 border-yellow-200",
-  error: "bg-red-50 text-red-800 border-red-200",
+  info: "bg-status-info-50 text-status-info-900 border-status-info-200",
+  success: "bg-status-success-50 text-status-success-900 border-status-success-200",
+  warning: "bg-status-warning-50 text-status-warning-900 border-status-warning-200",
+  error: "bg-status-error-50 text-status-error-900 border-status-error-200",
 };
 
-export function Alert({ variant = "info", children }: Props) {
+export function Alert({ variant = "info", children, className }: Props) {
   const Icon = icons[variant];
   return (
     <div
       className={clsx(
         "flex items-start gap-3 rounded-lg border p-4 text-sm",
-        styles[variant]
+        styles[variant],
+        className
       )}
       role="alert"
     >

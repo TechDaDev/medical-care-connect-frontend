@@ -1,16 +1,25 @@
 import { clsx } from "../../utils/clsx";
 
 interface Props {
-  variant?: "success" | "warning" | "danger" | "info" | "neutral";
+  variant?:
+    | "success"
+    | "warning"
+    | "danger"
+    | "info"
+    | "neutral"
+    | "primary"
+    | "medical";
   children: string;
 }
 
 const colors: Record<string, string> = {
-  success: "bg-green-100 text-green-800",
-  warning: "bg-yellow-100 text-yellow-800",
-  danger: "bg-red-100 text-red-800",
-  info: "bg-blue-100 text-blue-800",
-  neutral: "bg-gray-100 text-gray-800",
+  success: "bg-status-success-100 text-status-success-800",
+  warning: "bg-status-warning-100 text-status-warning-800",
+  danger: "bg-status-error-100 text-status-error-800",
+  info: "bg-status-info-100 text-status-info-800",
+  neutral: "bg-slate-100 text-slate-800",
+  primary: "bg-primary-100 text-primary-800",
+  medical: "bg-medical-teal-100 text-medical-teal-800",
 };
 
 export function Badge({ variant = "neutral", children }: Props) {

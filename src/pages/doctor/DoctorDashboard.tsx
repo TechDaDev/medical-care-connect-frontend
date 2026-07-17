@@ -7,6 +7,20 @@ import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
 import { RefreshButton } from "../../components/common/RefreshButton";
 import { getErrorMessage } from "../../utils/errors";
+import { Stethoscope, Clock, MessageSquare, Bell, CheckCircle, FileText, UserCheck } from "lucide-react";
+
+const statCards = [
+  { key: "total_active", label: "consultation.active", icon: Stethoscope, color: "text-primary-600", bg: "bg-primary-100" },
+  { key: "submitted", label: "consultation.pending", icon: Clock, color: "text-status-warning-600", bg: "bg-status-warning-100" },
+  { key: "unread_messages", label: "message.unread", icon: MessageSquare, color: "text-medical-teal-600", bg: "bg-medical-teal-100" },
+  { key: "unread_notifications", label: "notification.unread", icon: Bell, color: "text-status-info-600", bg: "bg-status-info-100" },
+] as const;
+
+const detailCards = [
+  { key: "accepted", label: "consultation.accepted", icon: CheckCircle, color: "text-status-success-600", bg: "bg-status-success-100" },
+  { key: "intake_completed", label: "consultation.intakeCompleted", icon: FileText, color: "text-medical-teal-600", bg: "bg-medical-teal-100" },
+  { key: "doctor_review", label: "consultation.doctorReview", icon: UserCheck, color: "text-primary-600", bg: "bg-primary-100" },
+] as const;
 
 export function DoctorDashboard() {
   const { t } = useI18n();
@@ -34,20 +48,23 @@ export function DoctorDashboard() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">{t("nav.dashboard")}</h1>
+        <h1 className="text-2xl font-bold text-slate-900">{t("nav.dashboard")}</h1>
         <RefreshButton onClick={() => refetch()} />
       </div>
 
       {!profile.is_approved && (
-        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 text-sm font-medium">{t("doctor.notApproved")}</p>
+        <div className="mb-6 p-4 bg-status-warning-50 border border-status-warning-200 rounded-lg flex items-start gap-3">
+          <div className="w-8 h-8 rounded-lg bg-status-warning-100 flex items-center justify-center flex-shrink-0">
+            <Bell className="h-5 w-5 text-status-warning-600" />
+          </div>
+          <p className="text-status-warning-800 text-sm font-medium mt-0.5">{t("doctor.notApproved")}</p>
         </div>
       )}
 
       <div className="mb-6 flex items-center gap-3">
-        <span className="text-sm text-gray-600">{t("doctor.acceptingStatus")}:</span>
+        <span className="text-sm text-slate-600">{t("doctor.acceptingStatus")}:</span>
         <Button
-          variant={profile.is_accepting_consultations ? "primary" : "secondary"}
+          variant={profile.is_accepting_consultations ? "primary" : "outline"}
           size="sm"
           disabled={!canToggle || toggleMut.isPending}
           onClick={() => toggleMut.mutate(!profile.is_accepting_consultations)}
@@ -57,37 +74,39 @@ export function DoctorDashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <Card>
-          <p className="text-sm text-gray-500">{t("consultation.active")}</p>
-          <p className="text-2xl font-bold text-gray-900">{consultations.total_active}</p>
-        </Card>
-        <Card>
-          <p className="text-sm text-gray-500">{t("consultation.pending")}</p>
-          <p className="text-2xl font-bold text-blue-600">{consultations.submitted}</p>
-        </Card>
-        <Card>
-          <p className="text-sm text-gray-500">{t("message.unread")}</p>
-          <p className="text-2xl font-bold text-purple-600">{unread_messages}</p>
-        </Card>
-        <Card>
-          <p className="text-sm text-gray-500">{t("notification.unread")}</p>
-          <p className="text-2xl font-bold text-purple-600">{unread_notifications}</p>
-        </Card>
+        {statCards.map((stat) => (
+          <Card key={stat.key} className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">{t(stat.label)}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">
+                  {consultations[stat.key as keyof typeof consultations]}
+                </p>
+              </div>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              </div>
+            </div>
+          </Card>
+        ))}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <Card>
-          <p className="text-xs text-gray-500">{t("consultation.accepted")}</p>
-          <p className="text-lg font-bold text-gray-900">{consultations.accepted}</p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">{t("consultation.intakeCompleted")}</p>
-          <p className="text-lg font-bold text-gray-900">{consultations.intake_completed}</p>
-        </Card>
-        <Card>
-          <p className="text-xs text-gray-500">{t("consultation.doctorReview")}</p>
-          <p className="text-lg font-bold text-gray-900">{consultations.doctor_review}</p>
-        </Card>
+        {detailCards.map((card) => (
+          <Card key={card.key} className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-slate-500">{t(card.label)}</p>
+                <p className="text-lg font-bold text-slate-900 mt-1">
+                  {consultations[card.key as keyof typeof consultations]}
+                </p>
+              </div>
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${card.bg}`}>
+                <card.icon className={`h-5 w-5 ${card.color}`} />
+              </div>
+            </div>
+          </Card>
+        ))}
       </div>
     </div>
   );

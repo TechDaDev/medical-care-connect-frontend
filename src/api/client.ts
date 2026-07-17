@@ -72,10 +72,9 @@ client.interceptors.response.use(
       } catch {
         refreshQueue.forEach((q) => q.reject(error));
         refreshQueue = [];
-        // Only redirect to login if not already there (avoid reload loop)
-        if (!window.location.pathname.startsWith("/login")) {
-          window.location.href = "/login";
-        }
+        // Don't hard-redirect — RequireAuth router guard handles
+        // redirect for protected routes; public pages like /
+        // must remain accessible without auth.
         return Promise.reject(error);
       } finally {
         isRefreshing = false;
