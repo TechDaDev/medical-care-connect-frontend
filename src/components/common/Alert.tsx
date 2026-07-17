@@ -5,6 +5,7 @@ interface Props {
   variant?: "info" | "success" | "warning" | "error";
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 const icons = {
@@ -21,7 +22,7 @@ const styles = {
   error: "bg-status-error-50 text-status-error-900 border-status-error-200",
 };
 
-export function Alert({ variant = "info", children, className }: Props) {
+export function Alert({ variant = "info", children, className, style }: Props) {
   const Icon = icons[variant];
   return (
     <div
@@ -31,6 +32,7 @@ export function Alert({ variant = "info", children, className }: Props) {
         className
       )}
       role="alert"
+      style={style}
     >
       <Icon className="h-5 w-5 shrink-0 mt-0.5" />
       <div>{children}</div>

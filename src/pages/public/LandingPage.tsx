@@ -25,7 +25,7 @@ const howItWorksSteps = [
   { step: "03", title: "landing.steps.consult.title", description: "landing.steps.consult.description", icon: MessageSquare },
 ] as const;
 
-function GlassCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+function GlassCard({ children, className = "", style }: { children: React.ReactNode; className?: string; style?: React.CSSProperties }) {
   return (
     <div
       className={`rounded-2xl shadow-lg shadow-slate-900/5 ${className}`}
@@ -34,6 +34,7 @@ function GlassCard({ children, className = "" }: { children: React.ReactNode; cl
         backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
         border: "1px solid var(--lp-card-border)",
+        ...style,
       }}
     >
       {children}
