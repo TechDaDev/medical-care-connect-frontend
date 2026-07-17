@@ -11,6 +11,8 @@
   "nav.logout": "تسجيل الخروج",
   "nav.findDoctor": "ابحث عن طبيب",
   "nav.newConsultation": "استشارة جديدة",
+  "nav.privacy": "الخصوصية",
+  "nav.operations": "الحالة التشغيلية",
   "auth.login": "تسجيل الدخول",
   "auth.register": "إنشاء حساب",
   "auth.email": "البريد الإلكتروني",

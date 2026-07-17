@@ -9,7 +9,8 @@ import {
   Bell,
   User,
   LogOut,
-
+  Shield,
+  Activity,
 } from "lucide-react";
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
@@ -48,6 +49,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
+            { label: t("nav.privacy"), path: "/app/privacy" },
+            { label: t("nav.operations"), path: "/app/staff/operations" },
           ];
     return items.map((item) => ({
       ...item,
@@ -60,6 +63,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ? <MessageSquare className="h-5 w-5" />
           : item.path.includes("notification")
           ? <Bell className="h-5 w-5" />
+          : item.path.includes("privacy")
+          ? <Shield className="h-5 w-5" />
+          : item.path.includes("operation")
+          ? <Activity className="h-5 w-5" />
           : <User className="h-5 w-5" />,
     }));
   }, [role, t]);

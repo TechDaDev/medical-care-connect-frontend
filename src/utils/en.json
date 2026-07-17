@@ -11,6 +11,8 @@
   "nav.logout": "Logout",
   "nav.findDoctor": "Find a Doctor",
   "nav.newConsultation": "New Consultation",
+  "nav.privacy": "Privacy",
+  "nav.operations": "Operations",
   "auth.login": "Login",
   "auth.register": "Create Account",
   "auth.email": "Email",
