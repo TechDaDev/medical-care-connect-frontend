@@ -36,3 +36,4 @@ playwright-report/
 test-results/
 *.dump
 *.manifest.json
+.railway/
