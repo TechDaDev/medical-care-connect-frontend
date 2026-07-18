@@ -31,13 +31,24 @@ export function getCoordinatorCreds() {
   };
 }
 
+export async function setLocale(page: Page, locale: string = "en"): Promise<void> {
+  await page.goto(getBaseUrl(), { waitUntil: "domcontentloaded" });
+  await page.evaluate((l) => {
+    localStorage.setItem("mcc_lang", l);
+    document.documentElement.lang = l;
+    document.documentElement.dir = l === "ar" || l === "ckb" ? "rtl" : "ltr";
+  }, locale);
+}
+
 export async function login(
   page: Page,
   email: string,
   password: string
 ): Promise<void> {
-  await page.goto(getBaseUrl() + "/login", { waitUntil: "load" });
-  // Wait for login form
+  // Set locale to English for consistent test text matching
+  await setLocale(page, "en");
+  await page.goto(getBaseUrl() + "/login", { waitUntil: "networkidle" });
+  // Wait for React hydration - login form should render
   await page.waitForSelector('input[type="email"]', { timeout: 15000 });
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
