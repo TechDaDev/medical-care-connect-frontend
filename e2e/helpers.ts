@@ -4,24 +4,30 @@ export function getBaseUrl(): string {
   return process.env.E2E_BASE_URL || "http://localhost:5173";
 }
 
+function requireEnv(key: string): string {
+  const val = process.env[key];
+  if (!val) throw new Error(`Missing required env var: ${key}`);
+  return val;
+}
+
 export function getPatientCreds() {
   return {
-    email: process.env.E2E_PATIENT_EMAIL || "john.doe@mcc.dev",
-    password: process.env.E2E_PATIENT_PASSWORD || "Development123!",
+    email: requireEnv("E2E_PATIENT_EMAIL"),
+    password: requireEnv("E2E_PATIENT_PASSWORD"),
   };
 }
 
 export function getDoctorCreds() {
   return {
-    email: process.env.E2E_DOCTOR_EMAIL || "dr.ali@mcc.dev",
-    password: process.env.E2E_DOCTOR_PASSWORD || "Development123!",
+    email: requireEnv("E2E_DOCTOR_EMAIL"),
+    password: requireEnv("E2E_DOCTOR_PASSWORD"),
   };
 }
 
 export function getCoordinatorCreds() {
   return {
-    email: process.env.E2E_COORDINATOR_EMAIL || "coordinator@mcc.dev",
-    password: process.env.E2E_COORDINATOR_PASSWORD || "Development123!",
+    email: requireEnv("E2E_COORDINATOR_EMAIL"),
+    password: requireEnv("E2E_COORDINATOR_PASSWORD"),
   };
 }
 

@@ -34,6 +34,8 @@ e2e/.env
 # Test artifacts
 playwright-report/
 test-results/
+e2e/auth/*.auth.json
+e2e/.auth/
 *.dump
 *.manifest.json
 .railway/

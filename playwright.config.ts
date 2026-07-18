@@ -1,4 +1,8 @@
 import { defineConfig } from "@playwright/test";
+import * as dotenv from "dotenv";
+
+// Load E2E credentials from e2e/.env
+dotenv.config({ path: "e2e/.env" });
 
 export default defineConfig({
   testDir: "./e2e",
