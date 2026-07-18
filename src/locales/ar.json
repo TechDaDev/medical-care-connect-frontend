@@ -400,6 +400,8 @@
   "registration.biography": "السيرة المهنية",
   "registration.spokenLanguages": "اللغات المنطوقة",
   "registration.submitApplication": "إرسال الطلب",
+  "registration.licenseDoc": "رفع وثيقة الترخيص الطبي",
+  "registration.licenseDocRequired": "يرجى رفع وثيقة الترخيص الطبي.",
   "registration.loadingSpecialties": "جار تحميل التخصصات…",
   "registration.loadSpecialtiesError": "تعذر تحميل التخصصات.",
   "registration.retry": "إعادة المحاولة",

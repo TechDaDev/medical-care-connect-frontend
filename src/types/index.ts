@@ -27,6 +27,7 @@ export interface DoctorRegistrationInput {
   password: string; password_confirm: string; specialty: string;
   medical_license_number: string; years_of_experience: number; workplace_name: string;
   professional_bio: string; languages: string[];
+  medical_license_document: File;
 }
 
 export interface DoctorRegistrationResponse {

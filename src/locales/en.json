@@ -400,6 +400,8 @@
   "registration.biography": "Professional biography",
   "registration.spokenLanguages": "Spoken languages",
   "registration.submitApplication": "Submit application",
+  "registration.licenseDoc": "Upload medical license document",
+  "registration.licenseDocRequired": "Please upload your medical license document.",
   "registration.loadingSpecialties": "Loading specialties…",
   "registration.loadSpecialtiesError": "Could not load specialties.",
   "registration.retry": "Retry",

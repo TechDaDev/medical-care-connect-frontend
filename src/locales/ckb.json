@@ -400,6 +400,8 @@
   "registration.biography": "ژیاننامەی پیشەیی",
   "registration.spokenLanguages": "زمانە قسەکراوەکان",
   "registration.submitApplication": "ناردنی داواکاری",
+  "registration.licenseDoc": "بارکردنی بەڵگەی مۆڵەتی پزیشکی",
+  "registration.licenseDocRequired": "تکایە بەڵگەی مۆڵەتی پزیشکییەکەت باربکە.",
   "registration.loadingSpecialties": "پسپۆڕییەکان بار دەکرێن…",
   "registration.loadSpecialtiesError": "بارکردنی پسپۆڕییەکان سەرکەوتوو نەبوو.",
   "registration.retry": "دووبارە هەوڵبدەرەوە",

@@ -38,6 +38,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const [accountType, setAccountType] = useState<AccountType | null>(null);
   const [error, setError] = useState("");
+  const [licenseFile, setLicenseFile] = useState<File | null>(null);
   const { data: specialties = [], isLoading: specialtiesLoading, isError, refetch } = useQuery({
     queryKey: ["registration-specialties"], queryFn: specialtiesApi.list, enabled: accountType === "doctor",
   });
@@ -47,7 +48,7 @@ export function RegisterPage() {
   const specialtyOptions = useMemo(() => specialties.map(s => ({ value: s.id, label: s.name })), [specialties]);
 
   const chooseType = (type: AccountType) => { setAccountType(type); setError(""); };
-  const goBack = () => { setAccountType(null); setError(""); reset(undefined, { keepValues: true }); };
+  const goBack = () => { setAccountType(null); setError(""); reset(undefined, { keepValues: true }); setLicenseFile(null); };
   const onSubmit = async (data: FormData) => {
     setError("");
     try {
@@ -59,7 +60,8 @@ export function RegisterPage() {
       if (!data.specialty || !data.medical_license_number || data.years_of_experience === undefined || !data.workplace_name || !data.professional_bio || !data.languages?.length) {
         setError(t("registration.completeFields")); return;
       }
-      const response = await registerDoctor(data as DoctorRegistrationInput);
+      if (!licenseFile) { setError(t("registration.licenseDocRequired")); return; }
+      const response = await registerDoctor({ ...data, medical_license_document: licenseFile } as DoctorRegistrationInput);
       navigate(response.next_path);
     } catch (err) {
       setError(err instanceof ApiRequestError ? err.message : t("registration.failed"));
@@ -93,6 +95,7 @@ export function RegisterPage() {
             <Input label={t("registration.license")} error={errors.medical_license_number?.message} {...register("medical_license_number")} />
             <div className="grid grid-cols-2 gap-4"><Input label={t("registration.experience")} type="number" error={errors.years_of_experience?.message} {...register("years_of_experience", { valueAsNumber: true })} /><Input label={t("registration.workplace")} error={errors.workplace_name?.message} {...register("workplace_name")} /></div>
             <label className="block text-sm font-medium">{t("registration.biography")}<textarea className="mt-1 block w-full rounded-lg border border-slate-300 p-2" rows={4} {...register("professional_bio")} /></label>
+            <div><label className="block text-sm font-medium mb-1">{t("registration.licenseDoc")} <span className="text-red-500">*</span></label><input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={e => setLicenseFile(e.target.files?.[0] || null)} className="block w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer" /></div>
             <fieldset><legend className="text-sm font-medium">{t("registration.spokenLanguages")}</legend>{LANG_CODES.map(code => <label key={code} className="mr-4 inline-flex items-center gap-1"><input type="checkbox" value={code} {...register("languages")} />{LANG_MAP[code] || code}</label>)}</fieldset>
           </fieldset>}
           <Button type="submit" loading={isSubmitting} className="w-full">{accountType === "doctor" ? t("registration.submitApplication") : t("auth.submit")}</Button>

@@ -34,8 +34,20 @@ export const authApi = {
   },
 
   registerDoctor: async (payload: DoctorRegistrationInput) => {
+    const formData = new FormData();
+    Object.entries(payload).forEach(([key, value]) => {
+      if (value instanceof File) {
+        formData.append(key, value);
+      } else if (Array.isArray(value)) {
+        formData.append(key, JSON.stringify(value));
+      } else if (value !== undefined && value !== null) {
+        formData.append(key, String(value));
+      }
+    });
     const { data } = await client.post<DoctorRegistrationResponse>(
-      "/auth/register/doctor/", payload
+      "/auth/register/doctor/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
     );
     return data;
   },
