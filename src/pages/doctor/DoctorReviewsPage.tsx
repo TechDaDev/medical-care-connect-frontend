@@ -8,11 +8,10 @@ import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Button } from "../../components/common/Button";
-import { Badge } from "../../components/common/Badge";
 import { StarRating } from "../../components/reviews/StarRating";
 import { DoctorReputationCard } from "../../components/reviews/DoctorReputationCard";
 import { getErrorMessage } from "../../utils/errors";
-import { MessageSquare, ThumbsUp } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import type { ConsultationReview } from "../../types";
 
 export function DoctorReviewsPage() {

@@ -11,7 +11,6 @@ import { Badge } from "../../components/common/Badge";
 import { AttachmentList } from "../../components/attachments/AttachmentList";
 import { ReviewForm } from "../../components/reviews/ReviewForm";
 import { ReviewCard } from "../../components/reviews/ReviewCard";
-import { StarRating } from "../../components/reviews/StarRating";
 
 import { Modal } from "../../components/common/Modal";
 import { AvatarFallback } from "../../components/common/AvatarFallback";

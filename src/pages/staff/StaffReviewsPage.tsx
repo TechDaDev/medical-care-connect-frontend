@@ -4,16 +4,14 @@ import { useI18n } from "../../i18n";
 import { reviewsApi } from "../../api/reviews";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
-import { ErrorState } from "../../components/common/ErrorState";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { Select } from "../../components/common/Select";
 import { Modal } from "../../components/common/Modal";
 import { StarRating } from "../../components/reviews/StarRating";
-import { getErrorMessage } from "../../utils/errors";
-import { Flag, Shield, MessageSquare } from "lucide-react";
-import type { ConsultationReview } from "../../types";
+import { Flag } from "lucide-react";
+import type { ConsultationReview, ReviewReport } from "../../types";
 
 const statusOptions = [
   { value: "", label: "review.filterAll" },
@@ -45,11 +43,11 @@ export function StaffReviewsPage() {
   const [moderateStatus, setModerateStatus] = useState("");
   const [moderateReason, setModerateReason] = useState("");
   const [tab, setTab] = useState<"reviews" | "reports">("reviews");
-  const [resolveTarget, setResolveTarget] = useState<any>(null);
+  const [resolveTarget, setResolveTarget] = useState<ReviewReport | null>(null);
   const [resolveValue, setResolveValue] = useState("");
   const [resolveNotes, setResolveNotes] = useState("");
 
-  const { data: reviewsData, isLoading, error, refetch } = useQuery({
+  const { data: reviewsData, isLoading } = useQuery({
     queryKey: ["staff-reviews", statusFilter],
     queryFn: () => reviewsApi.listReviews(statusFilter ? { status: statusFilter } : undefined),
   });
@@ -75,11 +73,13 @@ export function StaffReviewsPage() {
   });
 
   const resolveMut = useMutation({
-    mutationFn: () =>
-      reviewsApi.resolveReport(resolveTarget.id, {
+    mutationFn: () => {
+      if (!resolveTarget) throw new Error("No report selected");
+      return reviewsApi.resolveReport(resolveTarget.id, {
         resolution: resolveValue,
         resolution_notes: resolveNotes,
-      }),
+      });
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["staff-reports"] });
       setResolveTarget(null);
@@ -191,7 +191,7 @@ export function StaffReviewsPage() {
             <EmptyState message="No Reports" />
           ) : (
             <div className="space-y-4">
-              {reports.map((report: any) => (
+              {reports.map((report: ReviewReport) => (
                 <Card key={report.id} className="p-4">
                   <div className="flex items-start justify-between mb-2">
                     <div>

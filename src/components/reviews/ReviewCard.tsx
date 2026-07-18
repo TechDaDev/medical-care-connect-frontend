@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Flag, MessageSquare, Trash2 } from "lucide-react";
+import { Flag, MessageSquare } from "lucide-react";
 import { useI18n } from "../../i18n";
 import { useAuth } from "../../auth";
 import { reviewsApi } from "../../api/reviews";
@@ -24,14 +23,12 @@ interface ReviewCardProps {
 export function ReviewCard({ review, showActions = true, onModerate }: ReviewCardProps) {
   const { t } = useI18n();
   const { user } = useAuth();
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const [showReport, setShowReport] = useState(false);
   const [showResponse, setShowResponse] = useState(false);
   const [responseBody, setResponseBody] = useState("");
   const [reportReason, setReportReason] = useState("");
 
-  const isPatientView = user?.role === UserRole.PATIENT;
   const isDoctorView = user?.role === UserRole.DOCTOR;
   const isStaffView = user?.role === UserRole.COORDINATOR || user?.role === UserRole.ADMINISTRATOR;
   const isMyReview = review.reviewer === user?.id;

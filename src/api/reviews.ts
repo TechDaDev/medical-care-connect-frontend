@@ -1,5 +1,5 @@
 import client from "./client";
-import type { ConsultationReview, DoctorReputation, PaginatedResponse } from "../types";
+import type { ConsultationReview, DoctorReputation, PaginatedResponse, ReviewReport } from "../types";
 
 export const reviewsApi = {
   // ── Patient ──
@@ -116,17 +116,7 @@ export const reviewsApi = {
 
   listReports: async (params?: { resolved?: string; page?: number }) => {
     const { data } = await client.get("/staff/reviews/reports/", { params });
-    return data as PaginatedResponse<{
-      id: string;
-      review: string;
-      reporter: string;
-      reason: string;
-      description: string;
-      resolved_at: string | null;
-      resolution: string;
-      resolution_notes: string;
-      created_at: string;
-    }>;
+    return data as PaginatedResponse<ReviewReport>;
   },
 
   resolveReport: async (reportId: string, payload: {
