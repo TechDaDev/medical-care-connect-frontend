@@ -11,6 +11,7 @@ import {
   LogOut,
   Shield,
   Activity,
+  Star,
 } from "lucide-react";
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
@@ -40,12 +41,14 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         ? [
             { label: t("nav.dashboard"), path: "/app/doctor" },
             { label: t("nav.consultations"), path: "/app/doctor/consultations" },
+            { label: t("nav.reviews"), path: "/app/doctor/reviews" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
           ]
         : [
             { label: t("nav.dashboard"), path: "/app/staff" },
             { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
+            { label: t("nav.staffReviews"), path: "/app/staff/reviews" },
             { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
@@ -59,6 +62,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ? <LayoutDashboard className="h-5 w-5" />
           : item.path.includes("doctor") || item.path.includes("workload")
           ? <Stethoscope className="h-5 w-5" />
+          : item.path.includes("review")
+          ? <Star className="h-5 w-5" />
           : item.path.includes("consultation")
           ? <MessageSquare className="h-5 w-5" />
           : item.path.includes("notification")

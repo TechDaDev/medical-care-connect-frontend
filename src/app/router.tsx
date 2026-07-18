@@ -43,9 +43,11 @@ const ProfilePage = lazy(() => import("../pages/patient/ProfilePage").then(m => 
 const DoctorDashboard = lazy(() => import("../pages/doctor/DoctorDashboard").then(m => ({ default: m.DoctorDashboard })));
 const DoctorConsultationList = lazy(() => import("../pages/doctor/DoctorConsultationList").then(m => ({ default: m.DoctorConsultationList })));
 const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsultationDetail").then(m => ({ default: m.DoctorConsultationDetail })));
+const DoctorReviewsPage = lazy(() => import("../pages/doctor/DoctorReviewsPage").then(m => ({ default: m.DoctorReviewsPage })));
 const StaffDashboard = lazy(() => import("../pages/doctor/StaffDashboard").then(m => ({ default: m.StaffDashboard })));
 const StaffConsultationList = lazy(() => import("../pages/staff/StaffConsultationList").then(m => ({ default: m.StaffConsultationList })));
 const StaffConsultationDetail = lazy(() => import("../pages/staff/StaffConsultationDetail").then(m => ({ default: m.StaffConsultationDetail })));
+const StaffReviewsPage = lazy(() => import("../pages/staff/StaffReviewsPage").then(m => ({ default: m.StaffReviewsPage })));
 const DoctorWorkloadPage = lazy(() => import("../pages/staff/DoctorWorkloadPage").then(m => ({ default: m.DoctorWorkloadPage })));
 const OperationsStatusPage = lazy(() => import("../pages/staff/OperationsStatusPage").then(m => ({ default: m.OperationsStatusPage })));
 const PrivacyPage = lazy(() => import("../pages/privacy/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
@@ -97,6 +99,7 @@ export const router = createBrowserRouter([
               { index: true, element: <DoctorDashboard /> },
               { path: "consultations", element: <DoctorConsultationList /> },
               { path: "consultations/:consultationId", element: <DoctorConsultationDetail /> },
+              { path: "reviews", element: <DoctorReviewsPage /> },
               { path: "messages/:consultationId", element: <MessagingPage /> },
             ],
           },
@@ -106,6 +109,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <StaffDashboard /> },
               { path: "consultations", element: <StaffConsultationList /> },
+              { path: "reviews", element: <StaffReviewsPage /> },
               { path: "consultations/:consultationId", element: <StaffConsultationDetail /> },
               { path: "doctors", element: <DoctorWorkloadPage /> },
               { path: "operations", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><OperationsStatusPage /></RequireRole> },

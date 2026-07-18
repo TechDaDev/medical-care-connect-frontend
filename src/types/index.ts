@@ -231,6 +231,61 @@ export interface Notification {
   created_at: string;
 }
 
+export interface ConsultationReview {
+  id: string;
+  consultation: string;
+  reviewer: string;
+  reviewer_name: string;
+  doctor_id: string;
+  doctor_name: string;
+  rating: number;
+  title: string;
+  body: string;
+  is_anonymous: boolean;
+  status: string;
+  consultation_status: string;
+  has_response: boolean;
+  response?: {
+    id: string;
+    review: string;
+    doctor: string;
+    body: string;
+    created_at: string;
+    updated_at: string;
+  } | null;
+  report_count?: number;
+  edit_count: number;
+  last_edited_at: string | null;
+  moderated_at?: string | null;
+  moderation_reason?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DoctorReputation {
+  doctor_id: string;
+  doctor_name: string;
+  average_rating: number;
+  total_reviews: number;
+  rating_distribution: Record<string, number>;
+  response_rate: number;
+  recent_ratings_trend: string;
+}
+
+export interface ReviewReport {
+  id: string;
+  review: string;
+  reporter: string;
+  reason: string;
+  description: string;
+  resolved_at: string | null;
+  resolved_by: string | null;
+  resolution: string;
+  resolution_notes: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface PaginatedResponse<T> {
   count: number;
   next: string | null;

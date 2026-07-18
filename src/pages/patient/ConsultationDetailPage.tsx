@@ -3,16 +3,20 @@ import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { consultationsApi } from "../../api/consultations";
 import { attachmentsApi } from "../../api/attachments";
+import { reviewsApi } from "../../api/reviews";
 import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Button } from "../../components/common/Button";
 import { Badge } from "../../components/common/Badge";
 import { AttachmentList } from "../../components/attachments/AttachmentList";
+import { ReviewForm } from "../../components/reviews/ReviewForm";
+import { ReviewCard } from "../../components/reviews/ReviewCard";
+import { StarRating } from "../../components/reviews/StarRating";
 
 import { Modal } from "../../components/common/Modal";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
 import { useAuth } from "../../auth";
-import { UserRole } from "../../types";
+import { UserRole, ConsultationStatus } from "../../types";
 
 const statusLabels: Record<string, string> = {
   draft: "Draft",
@@ -202,6 +206,74 @@ export function ConsultationDetailPage() {
           />
         </div>
       )}
+
+      {/* ── Review Section (patient, completed consultation) ──────── */}
+      {consultation && consultation.status === ConsultationStatus.COMPLETED && isPatient && (
+        <ReviewSection consultationId={consultationId!} />
+      )}
+    </div>
+  );
+}
+
+function ReviewSection({ consultationId }: { consultationId: string }) {
+  const { t } = useI18n();
+  const qc = useQueryClient();
+  const [showForm, setShowForm] = useState(false);
+
+  const { data: review, isLoading } = useQuery({
+    queryKey: ["review", consultationId],
+    queryFn: () => reviewsApi.getReview(consultationId),
+    retry: false,
+  });
+
+  const createMut = useMutation({
+    mutationFn: (payload: Parameters<typeof reviewsApi.createReview>[1]) =>
+      reviewsApi.createReview(consultationId, payload),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["review", consultationId] });
+      setShowForm(false);
+    },
+  });
+
+  if (isLoading) return null;
+
+  // Existing review — show it
+  if (review) {
+    return (
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">
+          {t("review.yourReview")}
+        </h2>
+        <ReviewCard review={review} />
+      </div>
+    );
+  }
+
+  // No review yet — show create button or form
+  if (!showForm) {
+    return (
+      <div className="mt-8">
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">
+          {t("review.title")}
+        </h2>
+        <p className="text-sm text-slate-500 mb-3">{t("review.shareExperience")}</p>
+        <Button onClick={() => setShowForm(true)}>{t("review.writeReview")}</Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-8">
+      <h2 className="text-lg font-semibold text-slate-900 mb-4">
+        {t("review.writeReview")}
+      </h2>
+      <Card className="p-4">
+        <ReviewForm
+          onSubmit={(data) => createMut.mutate(data)}
+          onCancel={() => setShowForm(false)}
+          isSubmitting={createMut.isPending}
+        />
+      </Card>
     </div>
   );
 }
