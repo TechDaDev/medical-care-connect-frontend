@@ -11,6 +11,7 @@ import { ErrorState } from "../../components/common/ErrorState";
 import { EmptyState } from "../../components/common/EmptyState";
 import { Badge } from "../../components/common/Badge";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
+import { PublicHeader } from "../../components/layout/PublicHeader";
 import { useAuth } from "../../auth";
 import { useI18n } from "../../i18n";
 
@@ -97,38 +98,82 @@ export function DoctorListPage() {
   // ── Loading ────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("doctor.title")}</h1>
-        <Spinner />
-      </div>
+      <>
+        <PublicHeader />
+        <div className="max-w-5xl mx-auto pt-16">
+          <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--lp-text)" }}>{t("doctor.title")}</h1>
+          <Spinner />
+        </div>
+      </>
     );
   }
 
   // ── API error ──────────────────────────────────────────────────────────
   if (error) {
     return (
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("doctor.title")}</h1>
-        <ErrorState message={t("doctor.loadError")} onRetry={() => refetch()} />
-      </div>
+      <>
+        <PublicHeader />
+        <div className="max-w-5xl mx-auto pt-16">
+          <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--lp-text)" }}>{t("doctor.title")}</h1>
+          <ErrorState message={t("doctor.loadError")} onRetry={() => refetch()} />
+        </div>
+      </>
     );
   }
 
   // ── Malformed response ─────────────────────────────────────────────────
   if (isMalformed) {
     return (
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("doctor.title")}</h1>
-        <ErrorState message={t("doctor.loadError")} onRetry={() => refetch()} />
-      </div>
+      <>
+        <PublicHeader />
+        <div className="max-w-5xl mx-auto pt-16">
+          <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--lp-text)" }}>{t("doctor.title")}</h1>
+          <ErrorState message={t("doctor.loadError")} onRetry={() => refetch()} />
+        </div>
+      </>
     );
   }
 
   // ── Empty ──────────────────────────────────────────────────────────────
   if (doctors.length === 0) {
     return (
-      <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("doctor.title")}</h1>
+      <>
+        <PublicHeader />
+        <div className="max-w-5xl mx-auto pt-16">
+          <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--lp-text)" }}>{t("doctor.title")}</h1>
+
+          <div className="flex flex-wrap gap-4 mb-6">
+            <div className="flex-1 min-w-[200px]">
+              <Input
+                placeholder={t("doctor.searchPlaceholder")}
+                value={search}
+                onChange={(e) => updateParams({ search: e.target.value, page: "1" })}
+              />
+            </div>
+            <div className="w-48">
+              <Select
+                options={specialties.map((s) => ({ value: s.slug, label: s.name }))}
+                placeholder={t("doctor.specialty")}
+                value={specialtySlug}
+                onChange={(e) => updateParams({ specialty: e.target.value, page: "1" })}
+              />
+            </div>
+          </div>
+
+          <EmptyState message={t("doctor.noResults")} />
+        </div>
+      </>
+    );
+  }
+
+  // ── Populated ──────────────────────────────────────────────────────────
+  return (
+    <>
+      <PublicHeader />
+      <div className="max-w-5xl mx-auto pt-16">
+        <h1 className="text-2xl font-bold mb-6" style={{ color: "var(--lp-text)" }}>
+          {t("doctor.title")}
+        </h1>
 
         <div className="flex flex-wrap gap-4 mb-6">
           <div className="flex-1 min-w-[200px]">
@@ -140,43 +185,13 @@ export function DoctorListPage() {
           </div>
           <div className="w-48">
             <Select
-              options={specialties.map((s) => ({ value: s.slug, label: s.name }))}
+              options={specialties.length > 0 ? specialties.map((s) => ({ value: s.slug, label: s.name })) : []}
               placeholder={t("doctor.specialty")}
               value={specialtySlug}
               onChange={(e) => updateParams({ specialty: e.target.value, page: "1" })}
             />
           </div>
         </div>
-
-        <EmptyState message={t("doctor.noResults")} />
-      </div>
-    );
-  }
-
-  // ── Populated ──────────────────────────────────────────────────────────
-  return (
-    <div className="max-w-5xl mx-auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">
-        {t("doctor.title")}
-      </h1>
-
-      <div className="flex flex-wrap gap-4 mb-6">
-        <div className="flex-1 min-w-[200px]">
-          <Input
-            placeholder={t("doctor.searchPlaceholder")}
-            value={search}
-            onChange={(e) => updateParams({ search: e.target.value, page: "1" })}
-          />
-        </div>
-        <div className="w-48">
-          <Select
-            options={specialties.length > 0 ? specialties.map((s) => ({ value: s.slug, label: s.name })) : []}
-            placeholder={t("doctor.specialty")}
-            value={specialtySlug}
-            onChange={(e) => updateParams({ specialty: e.target.value, page: "1" })}
-          />
-        </div>
-      </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         {doctors.map((doc) => (
@@ -242,5 +257,6 @@ export function DoctorListPage() {
         </div>
       )}
     </div>
+    </>
   );
 }
