@@ -134,7 +134,7 @@ export function NewConsultationPage() {
 
           <Select
             label={t("doctor.specialty")}
-            options={(specialties || []).map((s: any) => ({ value: s.id, label: s.name }))}
+            options={(specialties || []).map((s: { id: string; name: string }) => ({ value: s.id, label: s.name }))}
             placeholder={t("doctor.specialty")}
             error={errors.specialty?.message || fieldErrors.specialty}
             {...register("specialty")}

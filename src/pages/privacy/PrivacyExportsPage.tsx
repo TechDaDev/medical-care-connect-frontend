@@ -36,7 +36,7 @@ export function PrivacyExportsPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [t]);
 
   const reloadExports = async () => {
     try {

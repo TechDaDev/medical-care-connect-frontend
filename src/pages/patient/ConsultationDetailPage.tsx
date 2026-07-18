@@ -299,7 +299,7 @@ function ConsultationAttachments({ consultationId, isPatient, isDoctor }: { cons
     } catch {
       setError(t("attachment.error.not_available"));
     }
-  }, []);
+  }, [t]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!confirm(t("attachment.deleteConfirm"))) return;
@@ -309,7 +309,7 @@ function ConsultationAttachments({ consultationId, isPatient, isDoctor }: { cons
     } catch {
       setError(t("attachment.error.permission"));
     }
-  }, [consultationId, queryClient]);
+  }, [consultationId, queryClient, t]);
 
   const handleUpload = useCallback(async (file: File, category: string, description: string, signal: AbortSignal) => {
     await attachmentsApi.upload(consultationId, file, category, description, undefined, signal);

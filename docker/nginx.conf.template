@@ -30,6 +30,13 @@ server {
         access_log off;
     }
 
+    # Source-map files must not be served or fall through to SPA
+    location ~* \.map$ {
+        return 404;
+        access_log off;
+        log_not_found off;
+    }
+
     location / {
         try_files $uri $uri/ /index.html;
     }

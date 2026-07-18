@@ -9,9 +9,12 @@ import { RefreshButton } from "../../components/common/RefreshButton";
 import { getErrorMessage } from "../../utils/errors";
 import { Stethoscope, Clock, MessageSquare, Bell, CheckCircle, FileText, UserCheck } from "lucide-react";
 
-const statCards = [
+const consultationStatCards = [
   { key: "total_active", label: "consultation.active", icon: Stethoscope, color: "text-primary-600", bg: "bg-primary-100" },
   { key: "submitted", label: "consultation.pending", icon: Clock, color: "text-status-warning-600", bg: "bg-status-warning-100" },
+] as const;
+
+const topStatCards = [
   { key: "unread_messages", label: "message.unread", icon: MessageSquare, color: "text-medical-teal-600", bg: "bg-medical-teal-100" },
   { key: "unread_notifications", label: "notification.unread", icon: Bell, color: "text-status-info-600", bg: "bg-status-info-100" },
 ] as const;
@@ -42,7 +45,7 @@ export function DoctorDashboard() {
   if (error) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
   if (!data) return null;
 
-  const { consultations, unread_messages, unread_notifications, profile } = data;
+  const { consultations, profile, ...topStats } = data;
   const canToggle = profile.is_approved;
 
   return (
@@ -74,13 +77,28 @@ export function DoctorDashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statCards.map((stat) => (
+        {consultationStatCards.map((stat) => (
           <Card key={stat.key} className="p-5">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-slate-500">{t(stat.label)}</p>
                 <p className="text-2xl font-bold text-slate-900 mt-1">
                   {consultations[stat.key as keyof typeof consultations]}
+                </p>
+              </div>
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              </div>
+            </div>
+          </Card>
+        ))}
+        {topStatCards.map((stat) => (
+          <Card key={stat.key} className="p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-slate-500">{t(stat.label)}</p>
+                <p className="text-2xl font-bold text-slate-900 mt-1">
+                  {topStats[stat.key] ?? 0}
                 </p>
               </div>
               <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${stat.bg}`}>
