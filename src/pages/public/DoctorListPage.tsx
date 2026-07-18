@@ -209,18 +209,18 @@ export function DoctorListPage() {
               <div className="flex items-start gap-4">
                 <AvatarFallback name={doc.full_name} size="lg" />
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 truncate">
+                  <h3 className="font-semibold truncate" style={{ color: "var(--page-text)" }}>
                     {doc.full_name}
                   </h3>
                   {doc.professional_title && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm" style={{ color: "var(--page-text-secondary)" }}>
                       {doc.professional_title}
                     </p>
                   )}
                   {doc.specialty_name && (
                     <Badge variant="info">{doc.specialty_name}</Badge>
                   )}
-                  <div className="mt-2 text-sm text-gray-500 space-y-1">
+                  <div className="mt-2 text-sm space-y-1" style={{ color: "var(--page-text-secondary)" }}>
                     {doc.years_of_experience > 0 && (
                       <p>{doc.years_of_experience} {t("doctor.experience")}</p>
                     )}
@@ -250,7 +250,7 @@ export function DoctorListPage() {
           <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => updateParams({ page: String(page - 1) })}>
             {t("common.previous")}
           </Button>
-          <span className="text-sm text-gray-600">{t("common.page", { page })}</span>
+          <span className="text-sm" style={{ color: "var(--page-text-secondary)" }}>{t("common.page", { page })}</span>
           <Button variant="secondary" size="sm" disabled={page >= totalPages} onClick={() => updateParams({ page: String(page + 1) })}>
             {t("common.next")}
           </Button>

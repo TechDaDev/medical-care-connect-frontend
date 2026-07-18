@@ -8,6 +8,7 @@ import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
 import { Badge } from "../../components/common/Badge";
 import { AvatarFallback } from "../../components/common/AvatarFallback";
+import { PublicHeader } from "../../components/layout/PublicHeader";
 import { useAuth } from "../../auth";
 
 export function DoctorDetailPage() {
@@ -22,21 +23,23 @@ export function DoctorDetailPage() {
     enabled: !!doctorId,
   });
 
-  if (isLoading) return <Spinner />;
-  if (error) return <ErrorState />;
+  if (isLoading) return <><PublicHeader /><Spinner /></>;
+  if (error) return <><PublicHeader /><ErrorState /></>;
   if (!doctor) return null;
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <>
+      <PublicHeader />
+      <div className="max-w-3xl mx-auto pt-16" style={{ backgroundColor: "var(--page-bg)", minHeight: "100vh" }}>
       <Card>
         <div className="flex items-start gap-4 mb-6">
           <AvatarFallback name={doctor.full_name} size="lg" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold" style={{ color: "var(--page-text)" }}>
               {doctor.full_name}
             </h1>
             {doctor.professional_title && (
-              <p className="text-gray-600">{doctor.professional_title}</p>
+              <p style={{ color: "var(--page-text-secondary)" }}>{doctor.professional_title}</p>
             )}
             {doctor.specialty_name && (
               <Badge variant="info">{doctor.specialty_name}</Badge>
@@ -47,30 +50,30 @@ export function DoctorDetailPage() {
         <div className="grid grid-cols-2 gap-4 mb-6 text-sm">
           {doctor.years_of_experience > 0 && (
             <div>
-              <span className="text-gray-500">
+              <span style={{ color: "var(--page-text-secondary)" }}>
                 {t("doctor.experience")}:
               </span>{" "}
-              <span className="font-medium">{doctor.years_of_experience}</span>
+              <span className="font-medium" style={{ color: "var(--page-text)" }}>{doctor.years_of_experience}</span>
             </div>
           )}
           {doctor.consultation_fee && (
             <div>
-              <span className="text-gray-500">{t("doctor.fee")}:</span>{" "}
-              <span className="font-medium">${doctor.consultation_fee}</span>
+              <span style={{ color: "var(--page-text-secondary)" }}>{t("doctor.fee")}:</span>{" "}
+              <span className="font-medium" style={{ color: "var(--page-text)" }}>${doctor.consultation_fee}</span>
             </div>
           )}
           {doctor.languages?.length > 0 && (
             <div>
-              <span className="text-gray-500">{t("doctor.languages")}:</span>{" "}
-              <span className="font-medium">{doctor.languages.join(", ")}</span>
+              <span style={{ color: "var(--page-text-secondary)" }}>{t("doctor.languages")}:</span>{" "}
+              <span className="font-medium" style={{ color: "var(--page-text)" }}>{doctor.languages.join(", ")}</span>
             </div>
           )}
           {doctor.estimated_response_minutes && (
             <div>
-              <span className="text-gray-500">
+              <span style={{ color: "var(--page-text-secondary)" }}>
                 {t("doctor.responseTime")}:
               </span>{" "}
-              <span className="font-medium">
+              <span className="font-medium" style={{ color: "var(--page-text)" }}>
                 {doctor.estimated_response_minutes} min
               </span>
             </div>
@@ -79,15 +82,15 @@ export function DoctorDetailPage() {
 
         {doctor.biography && (
           <div className="mb-6">
-            <h3 className="font-medium text-gray-900 mb-2">Biography</h3>
-            <p className="text-gray-600 text-sm">{doctor.biography}</p>
+            <h3 className="font-medium mb-2" style={{ color: "var(--page-text)" }}>Biography</h3>
+            <p className="text-sm" style={{ color: "var(--page-text-secondary)" }}>{doctor.biography}</p>
           </div>
         )}
 
         {doctor.qualifications && (
           <div className="mb-6">
-            <h3 className="font-medium text-gray-900 mb-2">Qualifications</h3>
-            <p className="text-gray-600 text-sm">{doctor.qualifications}</p>
+            <h3 className="font-medium mb-2" style={{ color: "var(--page-text)" }}>Qualifications</h3>
+            <p className="text-sm" style={{ color: "var(--page-text-secondary)" }}>{doctor.qualifications}</p>
           </div>
         )}
 
@@ -109,5 +112,6 @@ export function DoctorDetailPage() {
         )}
       </Card>
     </div>
+    </>
   );
 }

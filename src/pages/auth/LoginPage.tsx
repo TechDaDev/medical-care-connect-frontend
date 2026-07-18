@@ -43,9 +43,9 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: "var(--page-bg)" }}>
       <Card className="w-full max-w-md">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+        <h1 className="text-2xl font-bold mb-6 text-center" style={{ color: "var(--page-text)" }}>
           {t("auth.login")}
         </h1>
         {error && (
@@ -72,9 +72,9 @@ export function LoginPage() {
             {t("auth.submit")}
           </Button>
         </form>
-        <p className="mt-4 text-sm text-gray-600 text-center">
+        <p className="mt-4 text-sm text-center" style={{ color: "var(--page-text-secondary)" }}>
           {t("auth.noAccount")}{" "}
-          <Link to="/register" className="text-blue-600 hover:text-blue-800">
+          <Link to="/register" style={{ color: "var(--lp-accent)" }} className="hover:underline">
             {t("auth.register")}
           </Link>
         </p>
