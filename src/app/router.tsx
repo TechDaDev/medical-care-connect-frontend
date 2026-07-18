@@ -6,6 +6,8 @@ import { UserRole } from "../types";
 import { I18nProvider } from "../i18n";
 import { AppLayout } from "../components/layout/AppLayout";
 import { LazyLoad } from "../components/common/LazyLoad";
+import { useQuery } from "@tanstack/react-query";
+import { doctorsApi } from "../api/doctors";
 
 function RoleBasedRedirect() {
   const { user } = useAuth();
@@ -14,13 +16,25 @@ function RoleBasedRedirect() {
     case UserRole.PATIENT:
       return <Navigate to="/app/patient" replace />;
     case UserRole.DOCTOR:
-      return <Navigate to="/app/doctor" replace />;
+      return <DoctorRoleRedirect />;
     case UserRole.COORDINATOR:
     case UserRole.ADMINISTRATOR:
       return <Navigate to="/app/staff" replace />;
     default:
       return <Navigate to="/app/patient" replace />;
   }
+}
+
+function DoctorRoleRedirect() {
+  const { data: profile, isLoading } = useQuery({ queryKey: ["my-doctor-profile"], queryFn: doctorsApi.getProfile });
+  if (isLoading) return null;
+  return <Navigate to={profile?.is_approved ? "/app/doctor" : "/app/doctor/pending-approval"} replace />;
+}
+
+function DoctorHome() {
+  const { data: profile, isLoading } = useQuery({ queryKey: ["my-doctor-profile"], queryFn: doctorsApi.getProfile });
+  if (isLoading) return null;
+  return profile?.is_approved ? <DoctorDashboard /> : <Navigate to="/app/doctor/pending-approval" replace />;
 }
 
 const LandingPage = lazy(() => import("../pages/public/LandingPage").then(m => ({ default: m.LandingPage })));
@@ -44,6 +58,7 @@ const DoctorDashboard = lazy(() => import("../pages/doctor/DoctorDashboard").the
 const DoctorConsultationList = lazy(() => import("../pages/doctor/DoctorConsultationList").then(m => ({ default: m.DoctorConsultationList })));
 const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsultationDetail").then(m => ({ default: m.DoctorConsultationDetail })));
 const DoctorReviewsPage = lazy(() => import("../pages/doctor/DoctorReviewsPage").then(m => ({ default: m.DoctorReviewsPage })));
+const PendingApprovalPage = lazy(() => import("../pages/doctor/PendingApprovalPage").then(m => ({ default: m.PendingApprovalPage })));
 const StaffDashboard = lazy(() => import("../pages/doctor/StaffDashboard").then(m => ({ default: m.StaffDashboard })));
 const StaffConsultationList = lazy(() => import("../pages/staff/StaffConsultationList").then(m => ({ default: m.StaffConsultationList })));
 const StaffConsultationDetail = lazy(() => import("../pages/staff/StaffConsultationDetail").then(m => ({ default: m.StaffConsultationDetail })));
@@ -96,7 +111,8 @@ export const router = createBrowserRouter([
             path: "doctor",
             element: <RequireRole roles={[UserRole.DOCTOR]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
             children: [
-              { index: true, element: <DoctorDashboard /> },
+              { index: true, element: <DoctorHome /> },
+              { path: "pending-approval", element: <PendingApprovalPage /> },
               { path: "consultations", element: <DoctorConsultationList /> },
               { path: "consultations/:consultationId", element: <DoctorConsultationDetail /> },
               { path: "reviews", element: <DoctorReviewsPage /> },

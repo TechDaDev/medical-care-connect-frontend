@@ -50,7 +50,7 @@ python manage.py runserver
 | `/doctors` | Public | Doctor directory |
 | `/doctors/:id` | Public | Doctor detail |
 | `/login` | Public | Login |
-| `/register` | Public | Patient registration |
+| `/register` | Public | Patient or doctor registration |
 | `/app/patient` | Patient | Dashboard |
 | `/app/patient/consultations` | Patient | Consultation list |
 | `/app/patient/consultations/new` | Patient | New consultation |
@@ -58,7 +58,8 @@ python manage.py runserver
 | `/app/patient/consultations/:id/intake` | Patient | AI medical intake |
 | `/app/patient/messages/:id` | Patient/Doctor | Messaging |
 | `/app/patient/medical-records/:id` | Patient | Medical record view |
-| `/app/doctor` | Doctor | Dashboard |
+| `/app/doctor` | Approved doctor | Dashboard |
+| `/app/doctor/pending-approval` | Pending/rejected doctor | Application status |
 | `/app/doctor/consultations` | Doctor | Consultation list |
 | `/app/doctor/consultations/:id` | Doctor | Consultation + internal notes |
 | `/app/doctor/messages/:id` | Doctor | Messaging |
@@ -76,7 +77,7 @@ python manage.py runserver
 The `/app` root checks the authenticated user's role:
 
 - `patient` → `/app/patient`
-- `doctor` → `/app/doctor`
+- approved `doctor` → `/app/doctor`; other doctor applications → `/app/doctor/pending-approval`
 - `coordinator` or `administrator` → `/app/staff`
 
 Role-restricted routes enforce access via `RequireRole`. Unauthorized access redirects to `/unauthorized`.

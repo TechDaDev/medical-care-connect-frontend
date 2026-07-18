@@ -6,7 +6,7 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { User } from "../types";
+import { DoctorRegistrationInput, DoctorRegistrationResponse, User } from "../types";
 import { authApi, accountsApi } from "../api/auth";
 
 interface AuthContextType {
@@ -22,6 +22,7 @@ interface AuthContextType {
     password: string;
     password_confirm: string;
   }) => Promise<void>;
+  registerDoctor: (data: DoctorRegistrationInput) => Promise<DoctorRegistrationResponse>;
   logout: () => Promise<void>;
   refreshCurrentUser: () => Promise<void>;
   updateCurrentUser: (data: Partial<User>) => Promise<void>;
@@ -78,6 +79,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     []
   );
 
+  const registerDoctor = useCallback(async (data: DoctorRegistrationInput) => {
+    const res = await authApi.registerDoctor(data);
+    await refreshCurrentUser();
+    return res;
+  }, [refreshCurrentUser]);
+
   const logout = useCallback(async () => {
     try {
       await authApi.logout();
@@ -100,6 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         login,
         registerPatient,
+        registerDoctor,
         logout,
         refreshCurrentUser,
         updateCurrentUser,

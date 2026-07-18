@@ -1,5 +1,5 @@
 import client from "./client";
-import { User, PatientProfile, PatientDashboardData } from "../types";
+import { User, PatientProfile, PatientDashboardData, DoctorRegistrationInput, DoctorRegistrationResponse } from "../types";
 
 export interface LoginResponseData {
   user: User;
@@ -29,6 +29,13 @@ export const authApi = {
     const { data } = await client.post<RegisterResponseData>(
       "/auth/register/patient/",
       payload
+    );
+    return data;
+  },
+
+  registerDoctor: async (payload: DoctorRegistrationInput) => {
+    const { data } = await client.post<DoctorRegistrationResponse>(
+      "/auth/register/doctor/", payload
     );
     return data;
   },

@@ -8,6 +8,7 @@ import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
 import { Card } from "../../components/common/Card";
 import { ApiRequestError } from "../../utils/errors";
+import { doctorsApi } from "../../api/doctors";
 import { useState, useMemo } from "react";
 
 export function LoginPage() {
@@ -30,7 +31,10 @@ export function LoginPage() {
     setError("");
     try {
       const user = await login(data.email, data.password);
-      if (user.role === "doctor") navigate("/app/doctor");
+      if (user.role === "doctor") {
+        const profile = await doctorsApi.getProfile();
+        navigate(profile.is_approved ? "/app/doctor" : "/app/doctor/pending-approval");
+      }
       else if (user.role === "coordinator" || user.role === "administrator") navigate("/app/staff");
       else navigate("/app/patient");
     } catch (err) {

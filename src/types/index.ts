@@ -19,6 +19,22 @@ export enum UserRole {
   ADMINISTRATOR = "administrator",
 }
 
+export type AccountType = "patient" | "doctor";
+export type DoctorApplicationStatus = "pending" | "approved" | "rejected" | "suspended";
+
+export interface DoctorRegistrationInput {
+  first_name: string; last_name: string; email: string; phone_number: string;
+  password: string; password_confirm: string; specialty: string;
+  medical_license_number: string; years_of_experience: number; workplace_name: string;
+  professional_bio: string; languages: string[];
+}
+
+export interface DoctorRegistrationResponse {
+  user: Pick<User, "id" | "role" | "first_name" | "last_name">;
+  doctor_profile: { id: string; approval_status: DoctorApplicationStatus };
+  next_path: string;
+}
+
 export interface PatientProfile {
   id: string;
   email?: string;
@@ -49,6 +65,8 @@ export interface DoctorProfile {
   specialty_name: string;
   professional_title: string;
   license_number?: string;
+  workplace_name?: string;
+  approval_status?: DoctorApplicationStatus;
   qualifications: string;
   biography: string;
   years_of_experience: number;

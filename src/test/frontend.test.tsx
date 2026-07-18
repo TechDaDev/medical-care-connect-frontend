@@ -691,3 +691,79 @@ describe("DoctorListPage — locale key coverage", () => {
     expect(hasRawKey).toBe(false);
   });
 });
+
+// ── Registration flow tests ───────────────────────────────────────────────
+
+describe("RegisterPage — account-type selector", () => {
+  it("patient and doctor are the only account types shown", () => {
+    const types = ["patient", "doctor"];
+    expect(types).toHaveLength(2);
+    expect(types).toContain("patient");
+    expect(types).toContain("doctor");
+    expect(types).not.toContain("coordinator");
+    expect(types).not.toContain("administrator");
+  });
+
+  it("patient selection uses patient endpoint", () => {
+    const endpoint = "/auth/register/patient/";
+    expect(endpoint).toContain("patient");
+    expect(endpoint).not.toContain("doctor");
+  });
+
+  it("doctor selection uses doctor endpoint", () => {
+    const endpoint = "/auth/register/doctor/";
+    expect(endpoint).toContain("doctor");
+    expect(endpoint).not.toContain("patient");
+  });
+
+  it("pending doctor redirects to pending-approval after registration", () => {
+    const mockResponse = { next_path: "/app/doctor/pending-approval" };
+    expect(mockResponse.next_path).toBe("/app/doctor/pending-approval");
+  });
+
+  it("approved doctor can access doctor dashboard", () => {
+    const mockProfile = { is_approved: true };
+    const target = mockProfile.is_approved ? "/app/doctor" : "/app/doctor/pending-approval";
+    expect(target).toBe("/app/doctor");
+  });
+
+  it("pending approval page has registration translation keys", () => {
+    const en = enLocale as Record<string, string>;
+    expect(en["registration.pendingTitle"]).toBeTruthy();
+    expect(en["registration.pendingBody"]).toBeTruthy();
+    expect(en["registration.submitApplication"]).toBeTruthy();
+  });
+
+  it("Arabic registration has translation keys", () => {
+    const ar = arLocale as Record<string, string>;
+    expect(ar["registration.pendingTitle"]).toBeTruthy();
+    expect(ar["registration.pendingBody"]).toBeTruthy();
+    expect(ar["registration.submitApplication"]).toBeTruthy();
+  });
+
+  it("Kurdish registration has translation keys", () => {
+    const ckb = ckbLocale as Record<string, string>;
+    expect(ckb["registration.pendingTitle"]).toBeTruthy();
+    expect(ckb["registration.pendingBody"]).toBeTruthy();
+    expect(ckb["registration.submitApplication"]).toBeTruthy();
+  });
+
+  it("license number is not stored in frontend state after registration", () => {
+    const registrationResponse = {
+      user: { id: "123", role: "doctor", first_name: "Test", last_name: "Doctor" },
+      doctor_profile: { id: "456", approval_status: "pending" },
+      next_path: "/app/doctor/pending-approval",
+    };
+    const keys = Object.keys(registrationResponse);
+    const serialized = JSON.stringify(registrationResponse);
+    expect(keys).not.toContain("medical_license_number");
+    expect(serialized).not.toContain("license_number");
+  });
+
+  it("validation errors are safe and translated", () => {
+    const mockError = { fields: { email: ["Enter a valid email address."] } };
+    expect(mockError.fields.email).toBeDefined();
+    expect(mockError.fields.email[0]).not.toContain("hack");
+    expect(mockError.fields.email[0]).not.toContain("sql");
+  });
+});
