@@ -404,5 +404,7 @@
   "registration.loadSpecialtiesError": "بارکردنی پسپۆڕییەکان سەرکەوتوو نەبوو.",
   "registration.retry": "دووبارە هەوڵبدەرەوە",
   "registration.pendingTitle": "داواکاری وەرگیرا",
-  "registration.pendingBody": "پڕۆفایلە پیشەییەکەت لە ژێر پێداچوونەوەدایە."
+  "registration.pendingBody": "پڕۆفایلە پیشەییەکەت لە ژێر پێداچوونەوەدایە.",
+  "registration.completeFields": "تکایە هەموو خانە پیشەییە پێویستەکان پڕبکەرەوە.",
+  "registration.failed": "تۆمارکردن سەرکەوتوو نەبوو. تکایە دووبارە هەوڵبدەرەوە."
 }

@@ -404,5 +404,7 @@
   "registration.loadSpecialtiesError": "Could not load specialties.",
   "registration.retry": "Retry",
   "registration.pendingTitle": "Application received",
-  "registration.pendingBody": "Your professional profile is under staff review. You cannot receive consultations until approval. Staff may request corrections."
+  "registration.pendingBody": "Your professional profile is under staff review. You cannot receive consultations until approval. Staff may request corrections.",
+  "registration.completeFields": "Please complete all required professional fields.",
+  "registration.failed": "Registration failed. Please try again."
 }

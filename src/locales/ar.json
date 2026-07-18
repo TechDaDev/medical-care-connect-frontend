@@ -404,5 +404,7 @@
   "registration.loadSpecialtiesError": "تعذر تحميل التخصصات.",
   "registration.retry": "إعادة المحاولة",
   "registration.pendingTitle": "تم استلام الطلب",
-  "registration.pendingBody": "ملفك المهني قيد مراجعة الموظفين. لا يمكنك استقبال الاستشارات حتى الموافقة."
+  "registration.pendingBody": "ملفك المهني قيد مراجعة الموظفين. لا يمكنك استقبال الاستشارات حتى الموافقة.",
+  "registration.completeFields": "يرجى إكمال جميع الحقول المهنية المطلوبة.",
+  "registration.failed": "فشل التسجيل. يرجى المحاولة مرة أخرى."
 }

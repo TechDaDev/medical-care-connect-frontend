@@ -8,11 +8,16 @@ import { Button } from "../../components/common/Button";
 import { Input } from "../../components/common/Input";
 import { Select } from "../../components/common/Select";
 import { Card } from "../../components/common/Card";
+import { PublicHeader } from "../../components/common/PublicHeader";
 import { ApiRequestError } from "../../utils/errors";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { specialtiesApi } from "../../api/doctors";
 import type { AccountType, DoctorRegistrationInput } from "../../types";
+
+const LANG_MAP: Record<string, string> = {
+  en: "English", ar: "العربية", ckb: "کوردی",
+};
 
 const accountSchema = z.object({
   first_name: z.string().min(1), last_name: z.string().min(1),
@@ -24,6 +29,8 @@ const accountSchema = z.object({
   languages: z.array(z.string()).optional(),
 }).refine(d => d.password === d.password_confirm, { path: ["password_confirm"], message: "Passwords do not match" });
 type FormData = z.infer<typeof accountSchema>;
+
+const LANG_CODES = ["ar", "en", "ckb"] as const;
 
 export function RegisterPage() {
   const { t } = useI18n();
@@ -50,16 +57,18 @@ export function RegisterPage() {
         return;
       }
       if (!data.specialty || !data.medical_license_number || data.years_of_experience === undefined || !data.workplace_name || !data.professional_bio || !data.languages?.length) {
-        setError("Complete all professional fields."); return;
+        setError(t("registration.completeFields")); return;
       }
       const response = await registerDoctor(data as DoctorRegistrationInput);
       navigate(response.next_path);
     } catch (err) {
-      setError(err instanceof ApiRequestError ? err.message : "Registration failed. Please try again.");
+      setError(err instanceof ApiRequestError ? err.message : t("registration.failed"));
     }
   };
 
-  return <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ backgroundColor: "var(--page-bg)" }}>
+  return <div className="min-h-screen" style={{ backgroundColor: "var(--page-bg)" }}>
+    <PublicHeader />
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 pt-24">
     <Card className="w-full max-w-2xl">
       {!accountType ? <section aria-labelledby="account-type-title">
         <h1 id="account-type-title" className="text-2xl font-bold text-center" style={{ color: "var(--page-text)" }}>{t("registration.createAccount")}</h1>
@@ -84,12 +93,13 @@ export function RegisterPage() {
             <Input label={t("registration.license")} error={errors.medical_license_number?.message} {...register("medical_license_number")} />
             <div className="grid grid-cols-2 gap-4"><Input label={t("registration.experience")} type="number" error={errors.years_of_experience?.message} {...register("years_of_experience", { valueAsNumber: true })} /><Input label={t("registration.workplace")} error={errors.workplace_name?.message} {...register("workplace_name")} /></div>
             <label className="block text-sm font-medium">{t("registration.biography")}<textarea className="mt-1 block w-full rounded-lg border border-slate-300 p-2" rows={4} {...register("professional_bio")} /></label>
-            <fieldset><legend className="text-sm font-medium">{t("registration.spokenLanguages")}</legend>{[["ar", "Arabic"], ["en", "English"], ["ckb", "Kurdish Sorani"]].map(([value, label]) => <label key={value} className="mr-4 inline-flex items-center gap-1"><input type="checkbox" value={value} {...register("languages")} />{label}</label>)}</fieldset>
+            <fieldset><legend className="text-sm font-medium">{t("registration.spokenLanguages")}</legend>{LANG_CODES.map(code => <label key={code} className="mr-4 inline-flex items-center gap-1"><input type="checkbox" value={code} {...register("languages")} />{LANG_MAP[code] || code}</label>)}</fieldset>
           </fieldset>}
           <Button type="submit" loading={isSubmitting} className="w-full">{accountType === "doctor" ? t("registration.submitApplication") : t("auth.submit")}</Button>
         </form>
       </section>}
       <p className="mt-4 text-sm text-center" style={{ color: "var(--page-text-secondary)" }}>{t("auth.hasAccount")} <Link to="/login" style={{ color: "var(--lp-accent)" }}>{t("auth.login")}</Link></p>
     </Card>
+    </div>
   </div>;
 }
