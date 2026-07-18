@@ -67,7 +67,7 @@ export function DoctorReviewsPage() {
       </h2>
 
       {reviews.length === 0 ? (
-        <EmptyState icon={MessageSquare} title={t("review.noReviews")} />
+        <EmptyState message={t("review.noReviews")} />
       ) : (
         <div className="space-y-4">
           {reviews.map((review: ConsultationReview) => (

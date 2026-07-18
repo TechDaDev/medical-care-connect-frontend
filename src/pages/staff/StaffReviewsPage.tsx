@@ -131,7 +131,7 @@ export function StaffReviewsPage() {
           </div>
 
           {reviews.length === 0 ? (
-            <EmptyState icon={Shield} title={t("review.noReviews")} />
+            <EmptyState message={t("review.noReviews")} />
           ) : (
             <div className="space-y-4">
               {reviews.map((review: ConsultationReview) => (
@@ -188,7 +188,7 @@ export function StaffReviewsPage() {
       {tab === "reports" && (
         <>
           {reportsLoading ? <Spinner /> : reports.length === 0 ? (
-            <EmptyState icon={Flag} title="No Reports" />
+            <EmptyState message="No Reports" />
           ) : (
             <div className="space-y-4">
               {reports.map((report: any) => (
