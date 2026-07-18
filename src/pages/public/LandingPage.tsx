@@ -236,15 +236,15 @@ export function LandingPage() {
               {features.map((feature, index) => (
                 <GlassCard
                   key={index}
-                  className="group p-6 hover:-translate-y-1 transition-all duration-300 cursor-default"
+                  className="group p-6 hover:-translate-y-1 transition-all duration-300 cursor-default text-center"
                 >
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300 border"
+                  <div className="w-20 h-20 mx-auto rounded-xl flex items-center justify-center mb-5 transition-colors duration-300 border"
                     style={{
                       backgroundColor: "var(--lp-glass-bg)",
                       borderColor: "var(--lp-card-border)",
                     }}
                   >
-                    <feature.icon className="h-7 w-7" style={{ color: "var(--lp-accent)" }} />
+                    <feature.icon className="h-12 w-12" style={{ color: "var(--lp-accent)" }} />
                   </div>
                   <h3 className="text-xl font-semibold mb-2" style={{ color: "var(--lp-text)" }}>
                     {t(feature.title)}
