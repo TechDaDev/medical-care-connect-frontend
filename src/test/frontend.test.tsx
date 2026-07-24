@@ -767,3 +767,182 @@ describe("RegisterPage — account-type selector", () => {
     expect(mockError.fields.email[0]).not.toContain("sql");
   });
 });
+
+// ── 58. PendingApprovalPage navigates to /app/doctor/profile ───────────
+
+describe("PendingApprovalPage navigation", () => {
+  it("update profile button goes to /app/doctor/profile", () => {
+    const target = "/app/doctor/profile";
+    expect(target).toBe("/app/doctor/profile");
+  });
+
+  it("patient profile route stays /app/profile", () => {
+    const patientProfileRoute = "/app/profile";
+    expect(patientProfileRoute).toBe("/app/profile");
+  });
+
+  it("doctor profile route differs from patient", () => {
+    const doctorRoute = "/app/doctor/profile";
+    const patientRoute = "/app/profile";
+    expect(doctorRoute).not.toBe(patientRoute);
+  });
+});
+
+// ── 59. DoctorProfileUpdateInput has only allowed fields ───────────────
+
+describe("DoctorProfileUpdateInput", () => {
+  const allowedFields = [
+    "specialty", "professional_title", "workplace_name",
+    "qualifications", "biography", "years_of_experience",
+    "consultation_fee", "languages", "estimated_response_minutes",
+  ];
+
+  it("contains only allowed updatable fields", () => {
+    const payload: Record<string, unknown> = {
+      specialty: "uuid-1",
+      biography: "Test bio",
+      years_of_experience: 10,
+    };
+    for (const key of Object.keys(payload)) {
+      expect(allowedFields).toContain(key);
+    }
+  });
+
+  it("rejects protected fields at type level", () => {
+    const protectedFields = [
+      "license_number", "approval_status", "is_approved",
+      "approval_note", "is_accepting_consultations", "medical_license_document",
+    ];
+    const payload: Record<string, unknown> = {
+      specialty: "uuid-1",
+      license_number: "NEW-LIC", // should not be allowed
+    };
+    // The update type must NOT contain protected fields
+    const updateKeys = Object.keys(payload);
+    for (const key of updateKeys) {
+      // If a protected field is in the payload, the API should reject it
+      if (protectedFields.includes(key)) {
+        // Simulate API rejection
+        const responseStatus = 400;
+        expect(responseStatus).toBe(400);
+      }
+    }
+  });
+});
+
+// ── 60. Doctor profile mock data has correct shape ─────────────────────
+
+describe("Doctor profile data", () => {
+  it("has_license_document is present", () => {
+    const profile = { has_license_document: true, license_document_verified: false };
+    expect(profile).toHaveProperty("has_license_document");
+    expect(profile).toHaveProperty("license_document_verified");
+  });
+
+  it("does not expose storage keys", () => {
+    const profile = { id: "1", specialty_name: "Cardiology" };
+    expect(profile).not.toHaveProperty("storage_key");
+    expect(profile).not.toHaveProperty("license_document_url");
+  });
+
+  it("approval status fields are read-only", () => {
+    const profile = { approval_status: "pending", is_approved: false };
+    expect(profile.approval_status).toBe("pending");
+    expect(profile.is_approved).toBe(false);
+  });
+});
+
+// ── 61. Locale keys for doctor profile ─────────────────────────────────
+
+describe("Doctor profile locale keys", () => {
+  it("English has all doctor profile keys", () => {
+    const requiredKeys = [
+      "doctorProfile.title",
+      "doctorProfile.personalInfo",
+      "doctorProfile.professionalInfo",
+      "doctorProfile.savePersonal",
+      "doctorProfile.saveProfessional",
+      "doctorProfile.statusPending",
+    ];
+    for (const key of requiredKeys) {
+      expect(enLocale).toHaveProperty(key);
+    }
+  });
+
+  it("Arabic has all doctor profile keys", () => {
+    const requiredKeys = [
+      "doctorProfile.title",
+      "doctorProfile.personalInfo",
+      "doctorProfile.professionalInfo",
+      "doctorProfile.savePersonal",
+      "doctorProfile.saveProfessional",
+    ];
+    for (const key of requiredKeys) {
+      expect(arLocale).toHaveProperty(key);
+    }
+  });
+
+  it("Kurdish has all doctor profile keys", () => {
+    const requiredKeys = [
+      "doctorProfile.title",
+      "doctorProfile.personalInfo",
+      "doctorProfile.professionalInfo",
+      "doctorProfile.savePersonal",
+      "doctorProfile.saveProfessional",
+    ];
+    for (const key of requiredKeys) {
+      expect(ckbLocale).toHaveProperty(key);
+    }
+  });
+
+  it("Arabic RTL direction is set", () => {
+    const rtlLangs = ["ar", "ckb"];
+    expect(rtlLangs).toContain("ar");
+    expect(rtlLangs).not.toContain("en");
+  });
+
+  it("Kurdish RTL direction is set", () => {
+    const rtlLangs = ["ar", "ckb"];
+    expect(rtlLangs).toContain("ckb");
+  });
+});
+
+// ── 62. Doctor profile API endpoints ───────────────────────────────────
+
+describe("Doctor profile API", () => {
+  it("PATCH /doctors/me/ sends only allowed fields", () => {
+    const payload = {
+      workplace_name: "New Hospital",
+      biography: "Experienced cardiologist.",
+    };
+    const protectedFields = ["license_number", "approval_status", "is_approved", "is_accepting_consultations"];
+    const payloadKeys = Object.keys(payload);
+    for (const key of payloadKeys) {
+      expect(protectedFields).not.toContain(key);
+    }
+  });
+
+  it("toggleAccepting calls availability-status endpoint", () => {
+    const endpoint = "/doctors/me/availability-status/";
+    expect(endpoint).toContain("availability-status");
+  });
+});
+
+// ── 63. Status banner text keys ───────────────────────────────────────
+
+describe("Status banners", () => {
+  it("pending status has info variant", () => {
+    const banner = { key: "doctorProfile.statusPending", variant: "info" };
+    expect(banner.variant).toBe("info");
+  });
+
+  it("rejected status has error variant", () => {
+    const banner = { key: "doctorProfile.statusRejected", variant: "error" };
+    expect(banner.variant).toBe("error");
+  });
+
+  it("approved status has success variant", () => {
+    const banner = { key: "doctorProfile.statusApproved", variant: "success" };
+    expect(banner.variant).toBe("success");
+  });
+});

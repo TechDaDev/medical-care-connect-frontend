@@ -65,7 +65,6 @@ export interface DoctorProfile {
   specialty: string;
   specialty_name: string;
   professional_title: string;
-  license_number?: string;
   workplace_name?: string;
   approval_status?: DoctorApplicationStatus;
   qualifications: string;
@@ -76,8 +75,23 @@ export interface DoctorProfile {
   is_approved: boolean;
   is_accepting_consultations: boolean;
   estimated_response_minutes: number;
+  has_license_document?: boolean;
+  license_document_verified?: boolean;
   created_at?: string;
   updated_at?: string;
+}
+
+/** Strict update shape — only fields a doctor is allowed to edit. */
+export interface DoctorProfileUpdateInput {
+  specialty?: string;
+  professional_title?: string;
+  workplace_name?: string;
+  qualifications?: string;
+  biography?: string;
+  years_of_experience?: number;
+  consultation_fee?: string | number;
+  languages?: string[];
+  estimated_response_minutes?: number;
 }
 
 export interface DoctorPublicProfile {

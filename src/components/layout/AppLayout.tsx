@@ -43,7 +43,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.consultations"), path: "/app/doctor/consultations" },
             { label: t("nav.reviews"), path: "/app/doctor/reviews" },
             { label: t("nav.notifications"), path: "/app/notifications" },
-            { label: t("nav.profile"), path: "/app/profile" },
+            { label: t("nav.profile"), path: "/app/doctor/profile" },
           ]
         : [
             { label: t("nav.dashboard"), path: "/app/staff" },

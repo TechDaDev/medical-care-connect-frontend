@@ -1,5 +1,5 @@
 import client from "./client";
-import { DoctorPublicProfile, PaginatedResponse, Specialty, DoctorProfile, DoctorDashboardData } from "../types";
+import { DoctorPublicProfile, PaginatedResponse, Specialty, DoctorProfile, DoctorProfileUpdateInput, DoctorDashboardData } from "../types";
 
 export const doctorsApi = {
   list: async (params?: {
@@ -44,7 +44,7 @@ export const doctorsApi = {
     return data;
   },
 
-  updateProfile: async (payload: Partial<DoctorProfile>) => {
+  updateProfile: async (payload: DoctorProfileUpdateInput) => {
     const { data } = await client.patch<DoctorProfile>("/doctors/me/", payload);
     return data;
   },
@@ -55,9 +55,10 @@ export const doctorsApi = {
   },
 
   toggleAccepting: async (accepting: boolean) => {
-    const { data } = await client.patch<DoctorProfile>("/doctors/me/", {
-      is_accepting_consultations: accepting,
-    });
+    const { data } = await client.patch<{ is_accepting_consultations: boolean }>(
+      "/doctors/me/availability-status/",
+      { is_accepting_consultations: accepting }
+    );
     return data;
   },
 };

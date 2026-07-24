@@ -58,6 +58,7 @@ const DoctorDashboard = lazy(() => import("../pages/doctor/DoctorDashboard").the
 const DoctorConsultationList = lazy(() => import("../pages/doctor/DoctorConsultationList").then(m => ({ default: m.DoctorConsultationList })));
 const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsultationDetail").then(m => ({ default: m.DoctorConsultationDetail })));
 const DoctorReviewsPage = lazy(() => import("../pages/doctor/DoctorReviewsPage").then(m => ({ default: m.DoctorReviewsPage })));
+const DoctorProfilePage = lazy(() => import("../pages/doctor/DoctorProfilePage").then(m => ({ default: m.DoctorProfilePage })));
 const PendingApprovalPage = lazy(() => import("../pages/doctor/PendingApprovalPage").then(m => ({ default: m.PendingApprovalPage })));
 const StaffDashboard = lazy(() => import("../pages/doctor/StaffDashboard").then(m => ({ default: m.StaffDashboard })));
 const StaffConsultationList = lazy(() => import("../pages/staff/StaffConsultationList").then(m => ({ default: m.StaffConsultationList })));
@@ -113,6 +114,7 @@ export const router = createBrowserRouter([
             children: [
               { index: true, element: <DoctorHome /> },
               { path: "pending-approval", element: <PendingApprovalPage /> },
+              { path: "profile", element: <LazyLoad><DoctorProfilePage /></LazyLoad> },
               { path: "consultations", element: <DoctorConsultationList /> },
               { path: "consultations/:consultationId", element: <DoctorConsultationDetail /> },
               { path: "reviews", element: <DoctorReviewsPage /> },
