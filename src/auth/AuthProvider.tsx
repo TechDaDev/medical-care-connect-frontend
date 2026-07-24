@@ -25,7 +25,7 @@ interface AuthContextType {
   registerDoctor: (data: DoctorRegistrationInput) => Promise<DoctorRegistrationResponse>;
   logout: () => Promise<void>;
   refreshCurrentUser: () => Promise<void>;
-  updateCurrentUser: (data: Partial<User>) => Promise<void>;
+  updateCurrentUser: (data: Partial<User>) => Promise<User>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -97,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateCurrentUser = useCallback(async (data: Partial<User>) => {
     const updated = await accountsApi.updateMe(data);
     setUser(updated);
+    return updated;
   }, []);
 
   return (

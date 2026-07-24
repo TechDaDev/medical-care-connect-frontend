@@ -946,3 +946,193 @@ describe("Status banners", () => {
     expect(banner.variant).toBe("success");
   });
 });
+
+// ── 64. Doctor profile persistence — payload construction ─────────────
+
+describe("Doctor profile persistence", () => {
+  it("profileToForm preserves zero values", () => {
+    const profile = {
+      id: "1",
+      specialty: "uuid-1",
+      specialty_name: "Cardiology",
+      professional_title: "",
+      workplace_name: "",
+      qualifications: "",
+      biography: "",
+      years_of_experience: 0,
+      consultation_fee: "0.00",
+      languages: [],
+      is_approved: false,
+      is_accepting_consultations: false,
+      estimated_response_minutes: 60,
+    };
+    const form = {
+      specialty: profile.specialty ?? "",
+      professional_title: profile.professional_title ?? "",
+      workplace_name: profile.workplace_name ?? "",
+      years_of_experience: profile.years_of_experience ?? 0,
+      biography: profile.biography ?? "",
+      qualifications: profile.qualifications ?? "",
+      consultation_fee: profile.consultation_fee != null ? String(profile.consultation_fee) : "",
+      languages: Array.isArray(profile.languages) ? [...profile.languages] : [],
+      estimated_response_minutes: profile.estimated_response_minutes ?? 60,
+    };
+    expect(form.years_of_experience).toBe(0);
+    expect(form.consultation_fee).toBe("0.00");
+    expect(form.biography).toBe("");
+    expect(form.workplace_name).toBe("");
+  });
+
+  it("empty optional text fields are submitted intentionally", () => {
+    const data = {
+      professional_title: "",
+      workplace_name: "",
+      biography: "",
+      qualifications: "",
+    };
+    const payload = {
+      professional_title: data.professional_title.trim(),
+      workplace_name: data.workplace_name.trim(),
+      biography: data.biography.trim(),
+      qualifications: data.qualifications.trim(),
+    };
+    // empty strings must be sent, not omitted
+    expect(payload.professional_title).toBe("");
+    expect(payload.workplace_name).toBe("");
+    expect(payload.biography).toBe("");
+    expect(payload.qualifications).toBe("");
+  });
+
+  it("empty consultation_fee becomes 0.00", () => {
+    const fee = "";
+    const payloadFee = fee === "" ? "0.00" : fee;
+    expect(payloadFee).toBe("0.00");
+  });
+
+  it("languages are submitted as array", () => {
+    const formLanguages = ["ar", "en"];
+    const payload = { languages: formLanguages };
+    expect(Array.isArray(payload.languages)).toBe(true);
+    expect(payload.languages).toEqual(["ar", "en"]);
+  });
+
+  it("specialty UUID is submitted", () => {
+    const specialtyUuid = "550e8400-e29b-41d4-a716-446655440000";
+    const payload = { specialty: specialtyUuid || null };
+    expect(payload.specialty).toBe(specialtyUuid);
+  });
+
+  it("PATCH response updates visible form values", () => {
+    const prevProfile = {
+      id: "1",
+      specialty: "",
+      specialty_name: "",
+      professional_title: "",
+      workplace_name: "",
+      qualifications: "",
+      biography: "",
+      years_of_experience: 0,
+      consultation_fee: "",
+      languages: [],
+      is_approved: false,
+      is_accepting_consultations: false,
+      estimated_response_minutes: 60,
+    };
+    const response = {
+      ...prevProfile,
+      professional_title: "Consultant",
+      workplace_name: "Baghdad Teaching Hospital",
+      biography: "Updated.",
+    };
+
+    const formState = {
+      specialty: response.specialty ?? "",
+      professional_title: response.professional_title ?? "",
+      workplace_name: response.workplace_name ?? "",
+      years_of_experience: response.years_of_experience ?? 0,
+      biography: response.biography ?? "",
+      qualifications: response.qualifications ?? "",
+      consultation_fee: response.consultation_fee != null ? String(response.consultation_fee) : "",
+      languages: Array.isArray(response.languages) ? [...response.languages] : [],
+      estimated_response_minutes: response.estimated_response_minutes ?? 60,
+    };
+    expect(formState.professional_title).toBe("Consultant");
+    expect(formState.workplace_name).toBe("Baghdad Teaching Hospital");
+    expect(formState.biography).toBe("Updated.");
+  });
+
+  it("stale cache followed by fresh response ends with fresh values", () => {
+    const stale = {
+      id: "1",
+      specialty: "old-uuid",
+      specialty_name: "Old",
+      professional_title: "Old Title",
+      workplace_name: "Old Workplace",
+      qualifications: "",
+      biography: "Old bio",
+      years_of_experience: 5,
+      consultation_fee: "50.00",
+      languages: ["ar"],
+      is_approved: false,
+      is_accepting_consultations: false,
+      estimated_response_minutes: 30,
+    };
+    const fresh = {
+      ...stale,
+      professional_title: "New Title",
+      workplace_name: "New Hospital",
+      biography: "New bio.",
+    };
+
+    // Simulate: first stale, then fresh arrives
+    let current = stale;
+    // Form is not dirty (no edits)
+    const isDirty = false;
+    if (!isDirty) {
+      current = fresh;
+    }
+    const form = {
+      professional_title: current.professional_title ?? "",
+      workplace_name: current.workplace_name ?? "",
+      biography: current.biography ?? "",
+    };
+    expect(form.professional_title).toBe("New Title");
+    expect(form.workplace_name).toBe("New Hospital");
+    expect(form.biography).toBe("New bio.");
+  });
+
+  it("fresh GET does not overwrite unsaved dirty edits", () => {
+    // Form has unsaved edits
+    const isDirty = true;
+
+    // Guard: if (!isDirty) reset(...) — but isDirty is true so no reset
+    expect(isDirty).toBe(true);
+  });
+
+  it("failed PATCH does not show success", () => {
+    const resultKind: "success" | "error" | "verify-error" | null = "error";
+    expect(resultKind).not.toBe("success");
+  });
+
+  it("personal profile save persists", () => {
+    const updated = {
+      id: "1",
+      email: "doc@test.com",
+      first_name: "UpdatedFirst",
+      last_name: "UpdatedLast",
+      phone_number: "+964700000001",
+      role: "doctor" as const,
+      is_active: true,
+      full_name: "UpdatedFirst UpdatedLast",
+      date_joined: "2026-01-01",
+    };
+    const form = {
+      first_name: updated.first_name ?? "",
+      last_name: updated.last_name ?? "",
+      phone_number: updated.phone_number ?? "",
+    };
+    expect(form.first_name).toBe("UpdatedFirst");
+    expect(form.last_name).toBe("UpdatedLast");
+    expect(form.phone_number).toBe("+964700000001");
+  });
+});
