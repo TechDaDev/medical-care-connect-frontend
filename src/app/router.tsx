@@ -68,6 +68,8 @@ const DoctorWorkloadPage = lazy(() => import("../pages/staff/DoctorWorkloadPage"
 const OperationsStatusPage = lazy(() => import("../pages/staff/OperationsStatusPage").then(m => ({ default: m.OperationsStatusPage })));
 const DoctorApplicationListPage = lazy(() => import("../pages/staff/DoctorApplicationListPage").then(m => ({ default: m.DoctorApplicationListPage })));
 const DoctorApplicationDetailPage = lazy(() => import("../pages/staff/DoctorApplicationDetailPage").then(m => ({ default: m.DoctorApplicationDetailPage })));
+const AdminUserListPage = lazy(() => import("../pages/staff/AdminUserListPage").then(m => ({ default: m.AdminUserListPage })));
+const AdminUserDetailPage = lazy(() => import("../pages/staff/AdminUserDetailPage").then(m => ({ default: m.AdminUserDetailPage })));
 const PrivacyPage = lazy(() => import("../pages/privacy/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
 const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPage").then(m => ({ default: m.PrivacyExportsPage })));
 const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
@@ -134,6 +136,8 @@ export const router = createBrowserRouter([
               { path: "doctors", element: <DoctorWorkloadPage /> },
               { path: "doctor-applications", element: <DoctorApplicationListPage /> },
               { path: "doctor-applications/:profileId", element: <DoctorApplicationDetailPage /> },
+              { path: "users", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AdminUserListPage /></RequireRole> },
+              { path: "users/:userId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AdminUserDetailPage /></RequireRole> },
               { path: "operations", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><OperationsStatusPage /></RequireRole> },
             ],
           },

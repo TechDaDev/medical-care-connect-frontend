@@ -200,3 +200,70 @@ export interface DoctorApplicationFilters {
   search?: string;
   ordering?: string;
 }
+
+// ── Admin User Management Types (Phase C) ──────────────────────────────────
+
+export type AdminUserRole = "patient" | "doctor" | "coordinator" | "administrator";
+export type AdminUserAction = "deactivate" | "activate" | "revoke_sessions" | "promote_to_administrator" | "demote_to_coordinator";
+
+export interface AdminUserListItem {
+  id: string;
+  full_name: string;
+  email: string;
+  role: AdminUserRole;
+  is_active: boolean;
+  is_staff: boolean;
+  date_joined: string;
+  last_login: string | null;
+  profile_type: string | null;
+  doctor_approval_status: string | null;
+  available_actions: AdminUserAction[];
+}
+
+export interface AdminUserDetail {
+  id: string;
+  full_name: string;
+  email: string;
+  role: AdminUserRole;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  date_joined: string;
+  last_login: string | null;
+  profile_type: string | null;
+  doctor_approval_status: string | null;
+  has_patient_profile: boolean;
+  has_doctor_profile: boolean;
+  available_actions: AdminUserAction[];
+  active_refresh_tokens: number;
+  last_token_created_at: string | null;
+}
+
+export interface AdminUserFilters {
+  page?: number;
+  page_size?: number;
+  role?: AdminUserRole;
+  active?: string;
+  search?: string;
+  created_after?: string;
+  created_before?: string;
+  last_login_after?: string;
+  last_login_before?: string;
+  ordering?: string;
+}
+
+export interface AdminUserStatusInput {
+  is_active: boolean;
+  reason: string;
+  expected_is_active?: boolean;
+}
+
+export interface AdminUserRoleInput {
+  role: "coordinator" | "administrator";
+  reason: string;
+  expected_role?: string;
+}
+
+export interface AdminUserSessionRevokeInput {
+  reason: string;
+}

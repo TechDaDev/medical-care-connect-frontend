@@ -12,6 +12,7 @@ import {
   Shield,
   Activity,
   Star,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
@@ -50,6 +51,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.dashboard"), path: "/app/staff" },
             { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
             { label: t("nav.doctorApplications"), path: "/app/staff/doctor-applications" },
+            { label: t("nav.users"), path: "/app/staff/users" },
             { label: t("nav.staffReviews"), path: "/app/staff/reviews" },
             { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
             { label: t("nav.privacy"), path: "/app/privacy" },
@@ -73,6 +75,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ? <LayoutDashboard className="h-5 w-5" />
           : item.path.includes("doctor") || item.path.includes("workload") || item.path.includes("doctor-applications")
           ? <Stethoscope className="h-5 w-5" />
+          : item.path.includes("users")
+          ? <Users className="h-5 w-5" />
           : item.path.includes("review")
           ? <Star className="h-5 w-5" />
           : item.path.includes("consultation")

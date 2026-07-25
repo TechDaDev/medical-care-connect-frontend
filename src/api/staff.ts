@@ -14,6 +14,12 @@ import {
   DoctorApplicationDetail,
   DoctorApplicationReviewInput,
   DoctorApplicationFilters,
+  AdminUserListItem,
+  AdminUserDetail,
+  AdminUserFilters,
+  AdminUserStatusInput,
+  AdminUserRoleInput,
+  AdminUserSessionRevokeInput,
 } from "../types/staff";
 
 export const staffApi = {
@@ -111,5 +117,46 @@ export const staffApi = {
       { responseType: "blob" }
     );
     return response;
+  },
+
+  // ── Admin User Management ──
+
+  adminUsers: async (params?: AdminUserFilters) => {
+    const { data } = await client.get<PaginatedResponse<AdminUserListItem>>(
+      "/staff/users/",
+      { params }
+    );
+    return data;
+  },
+
+  adminUserDetail: async (userId: string) => {
+    const { data } = await client.get<AdminUserDetail>(
+      `/staff/users/${userId}/`
+    );
+    return data;
+  },
+
+  updateAdminUserStatus: async (userId: string, payload: AdminUserStatusInput) => {
+    const { data } = await client.patch(
+      `/staff/users/${userId}/status/`,
+      payload
+    );
+    return data;
+  },
+
+  revokeAdminUserSessions: async (userId: string, payload: AdminUserSessionRevokeInput) => {
+    const { data } = await client.post(
+      `/staff/users/${userId}/revoke-sessions/`,
+      payload
+    );
+    return data;
+  },
+
+  updateAdminUserRole: async (userId: string, payload: AdminUserRoleInput) => {
+    const { data } = await client.patch(
+      `/staff/users/${userId}/role/`,
+      payload
+    );
+    return data;
   },
 };
