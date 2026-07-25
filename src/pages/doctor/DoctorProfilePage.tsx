@@ -187,13 +187,15 @@ export function DoctorProfilePage() {
         last_name: updated.last_name ?? "",
         phone_number: updated.phone_number ?? "",
       });
+      // Invalidate doctor profile cache — it includes first_name / last_name / phone_number
+      await queryClient.invalidateQueries({ queryKey: ["my-doctor-profile"] });
       setPersonalSuccess(t("doctorProfile.personalSaved"));
     } catch (err: unknown) {
       setPersonalErrors(parseDrfErrors(err));
     } finally {
       setPersonalSaving(false);
     }
-  }, [personal, updateCurrentUser, t]);
+  }, [personal, updateCurrentUser, t, queryClient]);
 
   // ── Professional save ──────────────────────────────────────────────
   const profMutation = useMutation({
