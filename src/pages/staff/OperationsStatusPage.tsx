@@ -1,32 +1,12 @@
-import { useState, useEffect } from "react";
+import { useQueries } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useI18n } from "../../i18n";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
-
-
-interface StatusData {
-  version: string;
-  release: string;
-  environment: string;
-  database_available: boolean;
-  attachment_backend_provider: string;
-  attachment_root_writable: boolean;
-  attachment_scan_mode: string;
-  ai_enabled: boolean;
-  error_monitor_provider: string;
-  retention_candidates: number;
-  degraded_components: string[];
-}
-
-interface MetricsData {
-  uptime_seconds: number;
-  users: Record<string, number>;
-  consultations: Record<string, number>;
-  attachments: { by_status: Record<string, number>; total_bytes: number };
-  notifications_pending: number;
-  retention_candidates: number;
-}
+import { ErrorState } from "../../components/common/ErrorState";
+import { RefreshButton } from "../../components/common/RefreshButton";
+import { getErrorMessage } from "../../utils/errors";
+import { staffApi } from "../../api/staff";
 
 const labelMap: Record<string, string> = {
   total: "operations.total",
@@ -63,35 +43,28 @@ function translateLabel(key: string, t: (k: string) => string): string {
 
 export function OperationsStatusPage() {
   const { t } = useI18n();
-  const [status, setStatus] = useState<StatusData | null>(null);
-  const [metrics, setMetrics] = useState<MetricsData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const results = useQueries({
+    queries: [
+      { queryKey: ["operations-status"], queryFn: () => staffApi.operationsStatus() },
+      { queryKey: ["operations-metrics"], queryFn: () => staffApi.operationsMetrics() },
+    ],
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [sResp, mResp] = await Promise.all([
-          fetch("/api/staff/operations/status/", { credentials: "include" }),
-          fetch("/api/staff/operations/metrics/", { credentials: "include" }),
-        ]);
-        if (sResp.ok) setStatus(await sResp.json());
-        if (mResp.ok) setMetrics(await mResp.json());
-      } catch {
-        setError(t("error.network"));
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [t]);
+  const [statusQuery, metricsQuery] = results;
+  const isLoading = statusQuery.isLoading || metricsQuery.isLoading;
+  const error = statusQuery.error || metricsQuery.error;
+  const status = statusQuery.data ?? null;
+  const metrics = metricsQuery.data ?? null;
 
-  if (loading) return <Spinner />;
-  if (error) return <p className="text-red-600">{error}</p>;
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorState message={getErrorMessage(error)} onRetry={() => { statusQuery.refetch(); metricsQuery.refetch(); }} />;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8" dir="auto">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("operations.title")}</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">{t("operations.title")}</h1>
+        <RefreshButton onClick={() => { statusQuery.refetch(); metricsQuery.refetch(); }} />
+      </div>
 
       {/* Status cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -101,19 +74,19 @@ export function OperationsStatusPage() {
         <StatusCard label={t("operations.version")} value={status?.version} />
         <StatusCard label={t("operations.attachmentBackend")} value={status?.attachment_backend_provider} />
         <StatusCard label={t("operations.scanMode")} value={status?.attachment_scan_mode} />
-        <StatusCard label={t("operations.aiEnabled")} ok={!status?.ai_enabled} />
+        <StatusCard label={t("operations.aiEnabled")} ok={!!status?.ai_enabled} />
         <StatusCard label={t("operations.errorMonitor")} value={status?.error_monitor_provider} />
         <StatusCard label={t("operations.retentionCandidates")} value={String(status?.retention_candidates ?? "N/A")} />
       </div>
 
       {status?.degraded_components && status.degraded_components.length > 0 && (
-        <Card>
-          <div className="p-4 bg-red-50 border-l-4 border-red-400 rounded mb-6">
+        <div className="mb-6">
+          <div className="p-4 bg-red-50 border-l-4 border-red-400 rounded">
             <p className="text-sm text-red-800 font-medium">
               {t("operations.degraded")}: {status.degraded_components.join(", ")}
             </p>
           </div>
-        </Card>
+        </div>
       )}
 
       {/* Metrics */}

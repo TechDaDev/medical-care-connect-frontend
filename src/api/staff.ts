@@ -8,6 +8,8 @@ import {
   StaffConsultation,
   TransferRequest,
   PriorityUpdate,
+  OperationsStatus,
+  OperationsMetrics,
 } from "../types/staff";
 
 export const staffApi = {
@@ -61,6 +63,16 @@ export const staffApi = {
       "/staff/doctors/workload/",
       { params }
     );
+    return data;
+  },
+
+  operationsStatus: async () => {
+    const { data } = await client.get<OperationsStatus>("/staff/operations/status/");
+    return data;
+  },
+
+  operationsMetrics: async () => {
+    const { data } = await client.get<OperationsMetrics>("/staff/operations/metrics/");
     return data;
   },
 };

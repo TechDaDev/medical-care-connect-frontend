@@ -45,6 +45,17 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/doctor/profile" },
           ]
+        : role === UserRole.ADMINISTRATOR
+        ? [
+            { label: t("nav.dashboard"), path: "/app/staff" },
+            { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
+            { label: t("nav.staffReviews"), path: "/app/staff/reviews" },
+            { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
+            { label: t("nav.privacy"), path: "/app/privacy" },
+            { label: t("nav.operations"), path: "/app/staff/operations" },
+            { label: t("nav.notifications"), path: "/app/notifications" },
+            { label: t("nav.profile"), path: "/app/profile" },
+          ]
         : [
             { label: t("nav.dashboard"), path: "/app/staff" },
             { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
@@ -52,8 +63,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
-            { label: t("nav.privacy"), path: "/app/privacy" },
-            { label: t("nav.operations"), path: "/app/staff/operations" },
           ];
     return items.map((item) => ({
       ...item,

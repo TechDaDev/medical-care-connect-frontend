@@ -1,11 +1,19 @@
 export interface StaffDashboard {
   consultations: {
     total: number;
+    draft: number;
     submitted: number;
     accepted: number;
     intake_in_progress: number;
     intake_completed: number;
     doctor_review: number;
+    awaiting_patient_response: number;
+    awaiting_doctor_response: number;
+    under_review: number;
+    follow_up_required: number;
+    physical_visit_required: number;
+    transferred: number;
+    completed: number;
     cancelled: number;
     emergency_escalated: number;
     urgent: number;
@@ -16,7 +24,45 @@ export interface StaffDashboard {
     accepting: number;
     non_accepting: number;
   };
+  users: {
+    total: number;
+    patient: number;
+    doctor: number;
+    coordinator: number;
+    administrator: number;
+  };
+  queues: {
+    pending_applications: number;
+    pending_deletions: number;
+    pending_reports: number;
+  };
   unread_messages: number;
+  generated_at: string;
+}
+
+export interface OperationsStatus {
+  version: string;
+  release: string;
+  commit: string;
+  environment: string;
+  database_available: boolean;
+  attachment_backend_provider: string;
+  attachment_root_writable: boolean;
+  attachment_scan_mode: string;
+  ai_enabled: boolean;
+  error_monitor_provider: string;
+  latest_migration: string;
+  retention_candidates: number;
+  degraded_components: string[];
+}
+
+export interface OperationsMetrics {
+  uptime_seconds: number;
+  users: Record<string, number>;
+  consultations: Record<string, number>;
+  attachments: { by_status: Record<string, number>; total_bytes: number };
+  notifications_pending: number;
+  retention_candidates: number;
 }
 
 export interface DoctorWorkload {
