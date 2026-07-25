@@ -23,7 +23,7 @@ export function StaffDashboard() {
   if (error) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
   if (!data) return null;
 
-  const { consultations, doctors, users, queues, messages } = data;
+  const { consultations, doctors, users, queues, operations, messages } = data;
   const isAdmin = user?.role === UserRole.ADMINISTRATOR;
 
   return (
@@ -66,10 +66,6 @@ export function StaffDashboard() {
         <Card>
           <p className="text-sm text-gray-500">{t("consultation.cancelled")}</p>
           <p className="text-lg font-semibold text-gray-900">{consultations.cancelled}</p>
-        </Card>
-        <Card>
-          <p className="text-sm text-gray-500">{t("consultation.unassigned")}</p>
-          <p className="text-lg font-semibold text-gray-900">{consultations.unassigned}</p>
         </Card>
       </div>
 
@@ -139,7 +135,7 @@ export function StaffDashboard() {
       {isAdmin && (
         <>
           <h2 className="text-lg font-semibold text-gray-800 mb-3">{t("dashboard.queues")}</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <Card>
               <p className="text-sm text-gray-500">{t("dashboard.pendingApplications")}</p>
               <p className="text-xl font-bold text-gray-900">{queues.pending_applications}</p>
@@ -156,26 +152,28 @@ export function StaffDashboard() {
               <p className="text-sm text-gray-500">{t("dashboard.quarantinedAttachments")}</p>
               <p className="text-xl font-bold text-gray-900">{queues.quarantined_attachments}</p>
             </Card>
-            <Card>
-              <p className="text-sm text-gray-500">{t("dashboard.pendingNotifications")}</p>
-              <p className="text-xl font-bold text-gray-900">{queues.pending_notifications}</p>
-            </Card>
           </div>
         </>
       )}
 
-      {/* ── Messages ── */}
-      <Card>
-        <div className="p-4 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-500">{t("message.unreadMessages")}</p>
-            <p className="text-2xl font-bold text-primary-600">{messages.unread_messages}</p>
+      {/* ── Operations & Messages (visible to all staff) ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <Card>
+          <p className="text-sm text-gray-500">{t("dashboard.totalNotifications")}</p>
+          <p className="text-xl font-bold text-gray-900">{operations?.total_notifications ?? 0}</p>
+        </Card>
+        <Card>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-500">{t("message.unreadMessages")}</p>
+              <p className="text-2xl font-bold text-primary-600">{messages.unread_messages}</p>
+            </div>
+            <Link to="/app/notifications">
+              <Button variant="secondary" size="sm">{t("nav.notifications")}</Button>
+            </Link>
           </div>
-          <Link to="/app/notifications">
-            <Button variant="secondary" size="sm">{t("nav.notifications")}</Button>
-          </Link>
-        </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* ── Quick links ── */}
       <div className="flex gap-4 mt-6 mb-6">

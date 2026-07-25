@@ -17,7 +17,6 @@ export interface StaffDashboard {
     cancelled: number;
     emergency_escalated: number;
     urgent: number;
-    unassigned: number;
   };
   doctors: {
     total: number;
@@ -41,7 +40,9 @@ export interface StaffDashboard {
     pending_deletions: number;
     pending_reports: number;
     quarantined_attachments: number;
-    pending_notifications: number;
+  };
+  operations: {
+    total_notifications: number;
   };
   messages: {
     unread_messages: number;

@@ -74,7 +74,7 @@ export function OperationsStatusPage() {
         <StatusCard label={t("operations.version")} value={status?.version} />
         <StatusCard label={t("operations.attachmentBackend")} value={status?.attachment_backend_provider} />
         <StatusCard label={t("operations.scanMode")} value={status?.attachment_scan_mode} />
-        <StatusCard label={t("operations.aiEnabled")} ok={!!status?.ai_enabled} />
+        <StatusCard label={t("operations.aiEnabled")} value={status?.ai_enabled ? t("common.enabled") : t("common.disabled")} />
         <StatusCard label={t("operations.errorMonitor")} value={status?.error_monitor_provider} />
         <StatusCard label={t("operations.retentionCandidates")} value={String(status?.retention_candidates ?? "N/A")} />
       </div>
