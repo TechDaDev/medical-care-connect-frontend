@@ -20,7 +20,11 @@ export interface StaffDashboard {
     unassigned: number;
   };
   doctors: {
+    total: number;
+    pending: number;
     approved: number;
+    rejected: number;
+    suspended: number;
     accepting: number;
     non_accepting: number;
   };
@@ -30,13 +34,18 @@ export interface StaffDashboard {
     doctor: number;
     coordinator: number;
     administrator: number;
+    inactive: number;
   };
   queues: {
     pending_applications: number;
     pending_deletions: number;
     pending_reports: number;
+    quarantined_attachments: number;
+    pending_notifications: number;
   };
-  unread_messages: number;
+  messages: {
+    unread_messages: number;
+  };
   generated_at: string;
 }
 
