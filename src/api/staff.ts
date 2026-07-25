@@ -10,6 +10,10 @@ import {
   PriorityUpdate,
   OperationsStatus,
   OperationsMetrics,
+  DoctorApplicationListItem,
+  DoctorApplicationDetail,
+  DoctorApplicationReviewInput,
+  DoctorApplicationFilters,
 } from "../types/staff";
 
 export const staffApi = {
@@ -74,5 +78,38 @@ export const staffApi = {
   operationsMetrics: async () => {
     const { data } = await client.get<OperationsMetrics>("/staff/operations/metrics/");
     return data;
+  },
+
+  // ── Doctor Applications ──
+
+  doctorApplications: async (params?: DoctorApplicationFilters) => {
+    const { data } = await client.get<PaginatedResponse<DoctorApplicationListItem>>(
+      "/staff/doctors/applications/",
+      { params }
+    );
+    return data;
+  },
+
+  doctorApplicationDetail: async (profileId: string) => {
+    const { data } = await client.get<DoctorApplicationDetail>(
+      `/staff/doctors/applications/${profileId}/`
+    );
+    return data;
+  },
+
+  reviewDoctorApplication: async (profileId: string, payload: DoctorApplicationReviewInput) => {
+    const { data } = await client.post<DoctorApplicationDetail>(
+      `/staff/doctors/applications/${profileId}/review/`,
+      payload
+    );
+    return data;
+  },
+
+  downloadDoctorLicense: async (profileId: string) => {
+    const response = await client.get(
+      `/staff/doctors/applications/${profileId}/license/`,
+      { responseType: "blob" }
+    );
+    return response;
   },
 };

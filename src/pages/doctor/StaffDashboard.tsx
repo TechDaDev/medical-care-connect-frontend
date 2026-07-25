@@ -131,15 +131,17 @@ export function StaffDashboard() {
         </Card>
       </div>
 
-      {/* ── Queue counters (admin only) ── */}
-      {isAdmin && (
-        <>
-          <h2 className="text-lg font-semibold text-gray-800 mb-3">{t("dashboard.queues")}</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <Card>
-              <p className="text-sm text-gray-500">{t("dashboard.pendingApplications")}</p>
-              <p className="text-xl font-bold text-gray-900">{queues.pending_applications}</p>
-            </Card>
+      {/* ── Queue counters ── */}
+      <h2 className="text-lg font-semibold text-gray-800 mb-3">{t("dashboard.queues")}</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <Link to="/app/staff/doctor-applications?status=pending" className="block">
+          <Card>
+            <p className="text-sm text-gray-500">{t("dashboard.pendingApplications")}</p>
+            <p className="text-xl font-bold text-gray-900">{queues.pending_applications}</p>
+          </Card>
+        </Link>
+        {isAdmin && (
+          <>
             <Card>
               <p className="text-sm text-gray-500">{t("dashboard.pendingDeletions")}</p>
               <p className="text-xl font-bold text-gray-900">{queues.pending_deletions}</p>
@@ -152,9 +154,9 @@ export function StaffDashboard() {
               <p className="text-sm text-gray-500">{t("dashboard.quarantinedAttachments")}</p>
               <p className="text-xl font-bold text-gray-900">{queues.quarantined_attachments}</p>
             </Card>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
 
       {/* ── Operations & Messages (visible to all staff) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -176,9 +178,12 @@ export function StaffDashboard() {
       </div>
 
       {/* ── Quick links ── */}
-      <div className="flex gap-4 mt-6 mb-6">
+      <div className="flex gap-4 mt-6 mb-6 flex-wrap">
         <Link to="/app/staff/consultations">
           <Button>{t("nav.staffConsultations")}</Button>
+        </Link>
+        <Link to="/app/staff/doctor-applications">
+          <Button variant="secondary">{t("nav.doctorApplications")}</Button>
         </Link>
         <Link to="/app/staff/doctors">
           <Button variant="secondary">{t("nav.doctorWorkload")}</Button>

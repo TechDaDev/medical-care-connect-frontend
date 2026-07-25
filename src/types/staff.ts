@@ -138,3 +138,65 @@ export interface PriorityUpdate {
   priority: "routine" | "urgent" | "emergency";
   reason?: string;
 }
+
+// ── Doctor Application Types ───────────────────────────────────────────────
+
+export type DoctorApplicationStatus = "pending" | "approved" | "rejected" | "suspended";
+
+export interface DoctorApplicationListItem {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  specialty_name: string | null;
+  professional_title: string;
+  years_of_experience: number;
+  workplace_name: string;
+  approval_status: DoctorApplicationStatus;
+  created_at: string;
+  updated_at: string;
+  has_license_document: boolean;
+  license_document_verified: boolean;
+}
+
+export interface DoctorApplicationDetail {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  phone_number: string;
+  specialty_name: string | null;
+  professional_title: string;
+  workplace_name: string;
+  biography: string;
+  qualifications: string;
+  years_of_experience: number;
+  consultation_fee: string;
+  languages: string[];
+  estimated_response_minutes: number;
+  approval_status: DoctorApplicationStatus;
+  approval_note: string;
+  created_at: string;
+  updated_at: string;
+  license_number_masked: string;
+  has_license_document: boolean;
+  license_document_verified: boolean;
+  available_actions: string[];
+}
+
+export interface DoctorApplicationReviewInput {
+  action: "approve" | "reject" | "suspend" | "reactivate";
+  reason?: string;
+  expected_status?: DoctorApplicationStatus;
+}
+
+export interface DoctorApplicationFilters {
+  page?: number;
+  page_size?: number;
+  status?: DoctorApplicationStatus;
+  specialty?: string;
+  created_after?: string;
+  created_before?: string;
+  search?: string;
+  ordering?: string;
+}
