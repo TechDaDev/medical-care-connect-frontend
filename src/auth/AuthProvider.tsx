@@ -8,6 +8,7 @@ import {
 } from "react";
 import { DoctorRegistrationInput, DoctorRegistrationResponse, User } from "../types";
 import { authApi, accountsApi } from "../api/auth";
+import { ensureCsrfToken } from "../api/client";
 
 interface AuthContextType {
   user: User | null;
@@ -43,6 +44,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Prime CSRF cookie on mount (non-blocking)
+  useEffect(() => { ensureCsrfToken().catch(() => {}); }, []);
+
   useEffect(() => {
     let active = true;
     (async () => {
@@ -59,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
+    await ensureCsrfToken();
     const res = await authApi.login(email, password);
     setUser(res.user);
     return res.user;
@@ -75,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }) => {
       const res = await authApi.registerPatient(data);
       setUser(res.user);
+      await ensureCsrfToken().catch(() => {});
     },
     []
   );
@@ -82,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const registerDoctor = useCallback(async (data: DoctorRegistrationInput) => {
     const res = await authApi.registerDoctor(data);
     await refreshCurrentUser();
+    await ensureCsrfToken().catch(() => {});
     return res;
   }, [refreshCurrentUser]);
 

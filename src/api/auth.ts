@@ -60,8 +60,9 @@ export const authApi = {
     await client.post("/auth/token/refresh/");
   },
 
+  /** @deprecated Use `ensureCsrfToken()` from `client.ts` instead. */
   getCsrfToken: async () => {
-    const { data } = await client.get<{ csrfToken: string }>("/auth/csrf/");
+    const { data } = await client.get<{ detail: string }>("/auth/csrf/");
     return data;
   },
 };
