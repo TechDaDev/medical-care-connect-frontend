@@ -44,6 +44,17 @@ export interface StaffDashboard {
   operations: {
     total_notifications: number;
   };
+  specialties: {
+    total: number;
+    active: number;
+    inactive: number;
+  };
+  attachments: {
+    pending: number;
+    quarantined: number;
+    rejected: number;
+    retention_eligible: number;
+  };
   messages: {
     unread_messages: number;
   };
@@ -71,7 +82,7 @@ export interface OperationsMetrics {
   users: Record<string, number>;
   consultations: Record<string, number>;
   attachments: { by_status: Record<string, number>; total_bytes: number };
-  notifications_pending: number;
+  notifications_total_in_app: number;
   retention_candidates: number;
 }
 

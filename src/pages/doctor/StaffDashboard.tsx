@@ -23,7 +23,7 @@ export function StaffDashboard() {
   if (error) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
   if (!data) return null;
 
-  const { consultations, doctors, users, queues, operations, messages } = data;
+  const { consultations, doctors, users, queues, operations, messages, specialties, attachments } = data;
   const isAdmin = user?.role === UserRole.ADMINISTRATOR;
 
   return (
@@ -157,6 +157,39 @@ export function StaffDashboard() {
           </>
         )}
       </div>
+
+      {isAdmin && (
+        <>
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">{t("dashboard.phaseEAdministration")}</h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <Link to="/app/staff/specialties">
+              <Card>
+                <p className="text-sm text-gray-500">{t("dashboard.activeSpecialties")}</p>
+                <p className="text-xl font-bold text-gray-900">{specialties.active}</p>
+                <p className="text-xs text-gray-500">{specialties.inactive} {t("specialtyAdmin.inactive")}</p>
+              </Card>
+            </Link>
+            <Link to="/app/staff/attachments?status=quarantined">
+              <Card>
+                <p className="text-sm text-gray-500">{t("dashboard.quarantinedAttachments")}</p>
+                <p className="text-xl font-bold text-red-700">{attachments.quarantined}</p>
+              </Card>
+            </Link>
+            <Link to="/app/staff/attachments?status=pending">
+              <Card>
+                <p className="text-sm text-gray-500">{t("attachmentAdmin.status.pending")}</p>
+                <p className="text-xl font-bold text-amber-700">{attachments.pending}</p>
+              </Card>
+            </Link>
+            <Link to="/app/staff/attachments?status=deleted">
+              <Card>
+                <p className="text-sm text-gray-500">{t("attachmentAdmin.retentionEligible")}</p>
+                <p className="text-xl font-bold text-gray-900">{attachments.retention_eligible}</p>
+              </Card>
+            </Link>
+          </div>
+        </>
+      )}
 
       {/* ── Operations & Messages (visible to all staff) ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">

@@ -6,6 +6,7 @@ import { useI18n } from "../../i18n";
 import { privacyAdminApi } from "../../api/privacyAdmin";
 import type { PrivacyDeletionAction } from "../../types/staff";
 import { clsx } from "../../utils/clsx";
+import { ApiRequestError } from "../../utils/errors";
 
 const statusBadgeColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -110,13 +111,17 @@ export function PrivacyRequestDetailPage() {
       setReason("");
       setDialogError(null);
     },
-    onError: (err: any) => {
-      const code = err?.response?.data?.code;
+    onError: (err: unknown) => {
+      const code = err instanceof ApiRequestError ? err.data.code : undefined;
       if (code === "request_state_changed" || code === "invalid_privacy_request_transition") {
         setDialogError(t("privacyRequests.stateChangedConcurrently"));
         queryClient.invalidateQueries({ queryKey: ["privacy-deletion-request", requestId] });
       } else {
-        setDialogError(err?.response?.data?.detail || t("privacyRequests.errorUpdating"));
+        setDialogError(
+          err instanceof ApiRequestError
+            ? err.data.detail || t("privacyRequests.errorUpdating")
+            : t("privacyRequests.errorUpdating"),
+        );
       }
     },
   });

@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Activity, AlertTriangle, Info, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Activity } from "lucide-react";
 import { useI18n } from "../../i18n";
 import { auditApi } from "../../api/audit";
-import type { AuditEventSeverity, AuditEventResult } from "../../types/staff";
+import type { AuditEventSeverity } from "../../types/staff";
 import { clsx } from "../../utils/clsx";
 
 const severityColors: Record<AuditEventSeverity, string> = {

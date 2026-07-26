@@ -74,6 +74,10 @@ const PrivacyRequestListPage = lazy(() => import("../pages/staff/PrivacyRequestL
 const PrivacyRequestDetailPage = lazy(() => import("../pages/staff/PrivacyRequestDetailPage").then(m => ({ default: m.PrivacyRequestDetailPage })));
 const AuditEventListPage = lazy(() => import("../pages/staff/AuditEventListPage").then(m => ({ default: m.AuditEventListPage })));
 const AuditEventDetailPage = lazy(() => import("../pages/staff/AuditEventDetailPage").then(m => ({ default: m.AuditEventDetailPage })));
+const SpecialtyAdminListPage = lazy(() => import("../pages/staff/SpecialtyAdminListPage").then(m => ({ default: m.SpecialtyAdminListPage })));
+const SpecialtyAdminDetailPage = lazy(() => import("../pages/staff/SpecialtyAdminDetailPage").then(m => ({ default: m.SpecialtyAdminDetailPage })));
+const AttachmentAdminListPage = lazy(() => import("../pages/staff/AttachmentAdminListPage").then(m => ({ default: m.AttachmentAdminListPage })));
+const AttachmentAdminDetailPage = lazy(() => import("../pages/staff/AttachmentAdminDetailPage").then(m => ({ default: m.AttachmentAdminDetailPage })));
 const PrivacyPage = lazy(() => import("../pages/privacy/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
 const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPage").then(m => ({ default: m.PrivacyExportsPage })));
 const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
@@ -147,6 +151,10 @@ export const router = createBrowserRouter([
               { path: "privacy-requests/:requestId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><PrivacyRequestDetailPage /></RequireRole> },
               { path: "audit", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AuditEventListPage /></RequireRole> },
               { path: "audit/:eventId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AuditEventDetailPage /></RequireRole> },
+              { path: "specialties", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><SpecialtyAdminListPage /></RequireRole> },
+              { path: "specialties/:specialtyId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><SpecialtyAdminDetailPage /></RequireRole> },
+              { path: "attachments", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AttachmentAdminListPage /></RequireRole> },
+              { path: "attachments/:attachmentId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AttachmentAdminDetailPage /></RequireRole> },
             ],
           },
           {

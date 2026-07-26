@@ -6,15 +6,12 @@ import {
   ChevronLeft,
   ChevronRight,
   User as UserIcon,
-  Shield,
-  Stethoscope,
-  ClipboardList,
 } from "lucide-react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useI18n } from "../../i18n";
 import { staffApi } from "../../api/staff";
 import { UserRole } from "../../types";
-import type { AdminUserRole, AdminUserAction } from "../../types/staff";
+import type { AdminUserRole } from "../../types/staff";
 import { clsx } from "../../utils/clsx";
 
 const roleBadgeColors: Record<AdminUserRole, string> = {

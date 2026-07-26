@@ -13,6 +13,8 @@ import {
   Activity,
   Star,
   Users,
+  Tags,
+  Paperclip,
 } from "lucide-react";
 import { useAuth } from "../../auth";
 import { UserRole } from "../../types";
@@ -56,6 +58,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
             { label: t("nav.privacyRequests"), path: "/app/staff/privacy-requests" },
             { label: t("nav.audit"), path: "/app/staff/audit" },
+            { label: t("nav.specialties"), path: "/app/staff/specialties" },
+            { label: t("nav.attachmentAdmin"), path: "/app/staff/attachments" },
             { label: t("nav.operations"), path: "/app/staff/operations" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
@@ -88,6 +92,10 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ? <Shield className="h-5 w-5" />
           : item.path.includes("audit")
           ? <Activity className="h-5 w-5" />
+          : item.path.includes("specialties")
+          ? <Tags className="h-5 w-5" />
+          : item.path.includes("attachments")
+          ? <Paperclip className="h-5 w-5" />
           : item.path.includes("operation")
           ? <Activity className="h-5 w-5" />
           : <User className="h-5 w-5" />,

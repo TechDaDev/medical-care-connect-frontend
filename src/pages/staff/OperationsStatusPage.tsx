@@ -149,8 +149,8 @@ export function OperationsStatusPage() {
             </Card>
             <Card>
               <div className="p-4 text-center">
-                <p className="text-2xl font-bold">{metrics.notifications_pending}</p>
-                <p className="text-xs text-gray-500">{t("operations.pendingNotifications")}</p>
+                <p className="text-2xl font-bold">{metrics.notifications_total_in_app}</p>
+                <p className="text-xs text-gray-500">{t("operations.totalInAppNotifications")}</p>
               </div>
             </Card>
             <Card>

@@ -3,18 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
-  Shield,
-  User as UserIcon,
-  Stethoscope,
-  AlertTriangle,
   CheckCircle,
   XCircle,
-  Clock,
 } from "lucide-react";
 import { useI18n } from "../../i18n";
 import { staffApi } from "../../api/staff";
 import type { AdminUserAction } from "../../types/staff";
 import { clsx } from "../../utils/clsx";
+import { ApiRequestError } from "../../utils/errors";
 
 function ActionButton({
   action,
@@ -55,7 +51,6 @@ function ActionDialog({
   open,
   title,
   warning,
-  action,
   onClose,
   onSubmit,
   isSubmitting,
@@ -64,7 +59,6 @@ function ActionDialog({
   open: boolean;
   title: string;
   warning: string;
-  action: "activate" | "deactivate" | "revoke_sessions" | "change_role";
   onClose: () => void;
   onSubmit: (reason: string) => void;
   isSubmitting: boolean;
@@ -175,8 +169,8 @@ export function AdminUserDetailPage() {
       setDialogAction(null);
       setDialogError(null);
     },
-    onError: (err: any) => {
-      const code = err?.response?.data?.code;
+    onError: (err: unknown) => {
+      const code = err instanceof ApiRequestError ? err.data.code : undefined;
       if (code === "self_action_forbidden") setDialogError(t("adminUsers.selfActionError"));
       else if (code === "final_administrator_protected") setDialogError(t("adminUsers.finalAdminError"));
       else if (code === "account_state_changed") setDialogError(t("adminUsers.accountChangedConcurrently"));
@@ -191,8 +185,8 @@ export function AdminUserDetailPage() {
       setDialogAction(null);
       setDialogError(null);
     },
-    onError: (err: any) => {
-      const code = err?.response?.data?.code;
+    onError: (err: unknown) => {
+      const code = err instanceof ApiRequestError ? err.data.code : undefined;
       if (code === "self_action_forbidden") setDialogError(t("adminUsers.selfActionError"));
       else setDialogError(t("adminUsers.errorUpdating"));
     },
@@ -209,8 +203,8 @@ export function AdminUserDetailPage() {
       setDialogAction(null);
       setDialogError(null);
     },
-    onError: (err: any) => {
-      const code = err?.response?.data?.code;
+    onError: (err: unknown) => {
+      const code = err instanceof ApiRequestError ? err.data.code : undefined;
       if (code === "self_action_forbidden") setDialogError(t("adminUsers.selfActionError"));
       else if (code === "final_administrator_protected") setDialogError(t("adminUsers.finalAdminError"));
       else if (code === "account_role_changed") setDialogError(t("adminUsers.roleChangedConcurrently"));
@@ -403,7 +397,6 @@ export function AdminUserDetailPage() {
         open={dialogAction === "deactivate"}
         title={t("adminUsers.deactivateDialogTitle")}
         warning={t("adminUsers.deactivateWarning")}
-        action="deactivate"
         onClose={() => { setDialogAction(null); setDialogError(null); }}
         onSubmit={handleDialogSubmit}
         isSubmitting={updateStatus.isPending}
@@ -414,7 +407,6 @@ export function AdminUserDetailPage() {
         open={dialogAction === "activate"}
         title={t("adminUsers.activateDialogTitle")}
         warning={t("adminUsers.activateWarning")}
-        action="activate"
         onClose={() => { setDialogAction(null); setDialogError(null); }}
         onSubmit={handleDialogSubmit}
         isSubmitting={updateStatus.isPending}
@@ -425,7 +417,6 @@ export function AdminUserDetailPage() {
         open={dialogAction === "revoke_sessions"}
         title={t("adminUsers.revokeDialogTitle")}
         warning={t("adminUsers.revokeWarning")}
-        action="revoke_sessions"
         onClose={() => { setDialogAction(null); setDialogError(null); }}
         onSubmit={handleDialogSubmit}
         isSubmitting={revokeSessions.isPending}
@@ -436,7 +427,6 @@ export function AdminUserDetailPage() {
         open={dialogAction === "change_role"}
         title={t("adminUsers.roleDialogTitle")}
         warning={t("adminUsers.roleWarning")}
-        action="change_role"
         onClose={() => { setDialogAction(null); setDialogError(null); }}
         onSubmit={handleDialogSubmit}
         isSubmitting={updateRole.isPending}

@@ -7,6 +7,7 @@ import { useI18n } from "../../i18n";
 import { auditApi } from "../../api/audit";
 import type { AuditEventSeverity, AuditEventResult, AuditEventCategory } from "../../types/staff";
 import { clsx } from "../../utils/clsx";
+import { ApiRequestError } from "../../utils/errors";
 
 const severityIcons: Record<AuditEventSeverity, React.ReactNode> = {
   info: <Info className="h-4 w-4 text-blue-500" />,
@@ -83,8 +84,8 @@ export function AuditEventListPage() {
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-    } catch (err: any) {
-      if (err?.response?.status === 400) {
+    } catch (err: unknown) {
+      if (err instanceof ApiRequestError && err.status === 400) {
         setCsvError(t("audit.dateRangeRequired"));
       } else {
         setCsvError(t("audit.csvExportError"));

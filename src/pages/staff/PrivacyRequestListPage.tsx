@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Search, Shield, ChevronLeft, ChevronRight, Clock, CheckCircle, XCircle, AlertCircle, RotateCw } from "lucide-react";
+import { Search, Shield, ChevronLeft, ChevronRight, Clock, CheckCircle, XCircle, AlertCircle } from "lucide-react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { useI18n } from "../../i18n";
 import { privacyAdminApi } from "../../api/privacyAdmin";

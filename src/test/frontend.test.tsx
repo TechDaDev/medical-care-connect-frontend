@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import arLocale from "../locales/ar.json";
 import enLocale from "../locales/en.json";
 import ckbLocale from "../locales/ckb.json";
+import arBase from "../utils/ar.json";
+import enBase from "../utils/en.json";
 
 // ── 1. Patient dashboard renders backend summary values ──────────────────
 
@@ -348,8 +350,8 @@ describe("Locale key parity", () => {
   }
 
   // Flatten imported locales
-  const ar = flattenKeys(arLocale as Record<string, unknown>);
-  const en = flattenKeys(enLocale as Record<string, unknown>);
+  const ar = flattenKeys({ ...arBase, ...arLocale } as Record<string, unknown>);
+  const en = flattenKeys({ ...enBase, ...enLocale } as Record<string, unknown>);
   const ckb = flattenKeys(ckbLocale as Record<string, unknown>);
 
   it("ar and en have same keys", () => {

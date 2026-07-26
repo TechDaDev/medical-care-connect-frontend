@@ -7,7 +7,7 @@ import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
 import { Button } from "../../components/common/Button";
 import { Card } from "../../components/common/Card";
-import { getErrorMessage } from "../../utils/errors";
+import { ApiRequestError, getErrorMessage } from "../../utils/errors";
 import type { DoctorApplicationDetail } from "../../types/staff";
 
 function ReviewDialog({
@@ -85,7 +85,7 @@ function ReviewDialog({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
               rows={3}
               maxLength={maxLength}
-              placeholder={t(`reviewDialog.${action}.reasonHint` || "")}
+              placeholder={t(`reviewDialog.${action}.reasonHint`)}
               aria-required={requiresReason}
             />
             <div className="flex justify-between mt-1">
@@ -174,10 +174,10 @@ export function DoctorApplicationDetailPage() {
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
       setDownloadState("idle");
-    } catch (err: any) {
+    } catch (err: unknown) {
       setDownloadState("error");
-      const status = err?.response?.status;
-      const code = err?.response?.data?.code;
+      const status = err instanceof ApiRequestError ? err.status : undefined;
+      const code = err instanceof ApiRequestError ? err.data.code : undefined;
       if (code === "document_quarantined") {
         setDownloadError(t("doctorApplication.detail.documentQuarantined"));
       } else if (status === 404 || code === "document_unavailable") {
@@ -476,7 +476,8 @@ export function DoctorApplicationDetailPage() {
           role="alert"
         >
           <p className="text-sm font-medium">
-            {(reviewMutation.error as any)?.response?.data?.code === "application_state_changed"
+            {reviewMutation.error instanceof ApiRequestError &&
+            reviewMutation.error.data.code === "application_state_changed"
               ? t("reviewDialog.conflict")
               : t("reviewDialog.error")}
           </p>
