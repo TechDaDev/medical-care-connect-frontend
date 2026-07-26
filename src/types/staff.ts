@@ -267,3 +267,143 @@ export interface AdminUserRoleInput {
 export interface AdminUserSessionRevokeInput {
   reason: string;
 }
+
+// ── Privacy Deletion Admin Types (Phase D) ────────────────────────────────
+
+export type PrivacyDeletionStatus = "pending" | "approved" | "rejected" | "processing" | "completed" | "failed" | "cancelled";
+export type PrivacyDeletionAction = "approve" | "reject";
+
+export interface PrivacyDeletionRequester {
+  id: string;
+  full_name: string;
+  email: string;
+  role: string;
+}
+
+export interface PrivacyDeletionReviewer {
+  id: string;
+  full_name: string;
+}
+
+export interface PrivacyRelatedDataSummary {
+  consultations: number;
+  messages: number;
+  attachments: number;
+  notifications: number;
+}
+
+export interface PrivacyExportRequest {
+  id: string;
+  status: string;
+  requested_at: string | null;
+  completed_at: string | null;
+  size_bytes: number | null;
+}
+
+export interface PrivacyDeletionListItem {
+  id: string;
+  requester: PrivacyDeletionRequester;
+  status: PrivacyDeletionStatus;
+  request_reason_summary: string | null;
+  requested_at: string;
+  reviewed_at: string | null;
+  completed_at: string | null;
+  reviewed_by_info: PrivacyDeletionReviewer | null;
+  available_actions: PrivacyDeletionAction[];
+  related_data_summary: PrivacyRelatedDataSummary;
+}
+
+export interface PrivacyDeletionDetail {
+  id: string;
+  requester: PrivacyDeletionRequester;
+  status: PrivacyDeletionStatus;
+  request_reason_summary: string | null;
+  requested_at: string;
+  reviewed_at: string | null;
+  completed_at: string | null;
+  reviewed_by_info: PrivacyDeletionReviewer | null;
+  rejection_reason: string;
+  available_actions: PrivacyDeletionAction[];
+  related_data_summary: PrivacyRelatedDataSummary;
+  export_request: PrivacyExportRequest | null;
+  failure_code: string;
+}
+
+export interface PrivacyDeletionFilters {
+  page?: number;
+  page_size?: number;
+  status?: PrivacyDeletionStatus;
+  requester_role?: string;
+  created_after?: string;
+  created_before?: string;
+  decided_after?: string;
+  decided_before?: string;
+  search?: string;
+  ordering?: string;
+}
+
+export interface PrivacyDeletionReviewInput {
+  action: PrivacyDeletionAction;
+  reason?: string;
+  expected_status?: string;
+}
+
+// ── Audit Event Types (Phase D) ───────────────────────────────────────────
+
+export type AuditEventCategory = "account" | "privacy" | "doctor" | "consultation" | "security" | "system";
+export type AuditEventSeverity = "info" | "warning" | "critical";
+export type AuditEventResult = "success" | "denied" | "failed";
+
+export interface AuditEventActor {
+  id: string;
+  full_name: string;
+  role: string;
+}
+
+export interface AuditEventListItem {
+  id: string;
+  event_type: string;
+  category: AuditEventCategory;
+  severity: AuditEventSeverity;
+  result: AuditEventResult;
+  actor: AuditEventActor | null;
+  target_type: string;
+  target_id: string;
+  request_id: string;
+  occurred_at: string;
+  summary: string;
+}
+
+export interface AuditEventDetail {
+  id: string;
+  event_type: string;
+  category: AuditEventCategory;
+  severity: AuditEventSeverity;
+  result: AuditEventResult;
+  actor: AuditEventActor | null;
+  target_type: string;
+  target_id: string;
+  request_id: string;
+  occurred_at: string;
+  summary: string;
+  metadata_safe: Record<string, unknown> | null;
+  source: string;
+  retention_class: string;
+}
+
+export interface AuditEventFilters {
+  page?: number;
+  page_size?: number;
+  event_type?: string;
+  category?: AuditEventCategory;
+  severity?: AuditEventSeverity;
+  result?: AuditEventResult;
+  actor_id?: string;
+  target_type?: string;
+  target_id?: string;
+  created_after?: string;
+  created_before?: string;
+  request_id?: string;
+  search?: string;
+  ordering?: string;
+}

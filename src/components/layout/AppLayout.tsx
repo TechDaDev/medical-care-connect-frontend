@@ -54,7 +54,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             { label: t("nav.users"), path: "/app/staff/users" },
             { label: t("nav.staffReviews"), path: "/app/staff/reviews" },
             { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
-            { label: t("nav.privacy"), path: "/app/privacy" },
+            { label: t("nav.privacyRequests"), path: "/app/staff/privacy-requests" },
+            { label: t("nav.audit"), path: "/app/staff/audit" },
             { label: t("nav.operations"), path: "/app/staff/operations" },
             { label: t("nav.notifications"), path: "/app/notifications" },
             { label: t("nav.profile"), path: "/app/profile" },
@@ -85,6 +86,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           ? <Bell className="h-5 w-5" />
           : item.path.includes("privacy")
           ? <Shield className="h-5 w-5" />
+          : item.path.includes("audit")
+          ? <Activity className="h-5 w-5" />
           : item.path.includes("operation")
           ? <Activity className="h-5 w-5" />
           : <User className="h-5 w-5" />,

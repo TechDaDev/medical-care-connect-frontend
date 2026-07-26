@@ -70,6 +70,10 @@ const DoctorApplicationListPage = lazy(() => import("../pages/staff/DoctorApplic
 const DoctorApplicationDetailPage = lazy(() => import("../pages/staff/DoctorApplicationDetailPage").then(m => ({ default: m.DoctorApplicationDetailPage })));
 const AdminUserListPage = lazy(() => import("../pages/staff/AdminUserListPage").then(m => ({ default: m.AdminUserListPage })));
 const AdminUserDetailPage = lazy(() => import("../pages/staff/AdminUserDetailPage").then(m => ({ default: m.AdminUserDetailPage })));
+const PrivacyRequestListPage = lazy(() => import("../pages/staff/PrivacyRequestListPage").then(m => ({ default: m.PrivacyRequestListPage })));
+const PrivacyRequestDetailPage = lazy(() => import("../pages/staff/PrivacyRequestDetailPage").then(m => ({ default: m.PrivacyRequestDetailPage })));
+const AuditEventListPage = lazy(() => import("../pages/staff/AuditEventListPage").then(m => ({ default: m.AuditEventListPage })));
+const AuditEventDetailPage = lazy(() => import("../pages/staff/AuditEventDetailPage").then(m => ({ default: m.AuditEventDetailPage })));
 const PrivacyPage = lazy(() => import("../pages/privacy/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
 const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPage").then(m => ({ default: m.PrivacyExportsPage })));
 const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
@@ -139,6 +143,10 @@ export const router = createBrowserRouter([
               { path: "users", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AdminUserListPage /></RequireRole> },
               { path: "users/:userId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AdminUserDetailPage /></RequireRole> },
               { path: "operations", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><OperationsStatusPage /></RequireRole> },
+              { path: "privacy-requests", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><PrivacyRequestListPage /></RequireRole> },
+              { path: "privacy-requests/:requestId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><PrivacyRequestDetailPage /></RequireRole> },
+              { path: "audit", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AuditEventListPage /></RequireRole> },
+              { path: "audit/:eventId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AuditEventDetailPage /></RequireRole> },
             ],
           },
           {
