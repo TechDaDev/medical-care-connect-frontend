@@ -1,66 +1,28 @@
-# E2E Testing
+# Local E2E Testing
 
-## Setup
+Install Chromium once:
 
 ```bash
-npx playwright install chromium
+npx playwright install --with-deps chromium
 ```
 
-## Environment
-
-Create `e2e/.env` (not committed):
-
-```
-E2E_BASE_URL=http://localhost:5173
-E2E_PATIENT_EMAIL=patient@test.com
-E2E_PATIENT_PASSWORD=testpass123
-E2E_DOCTOR_EMAIL=doctor@test.com
-E2E_DOCTOR_PASSWORD=testpass123
-E2E_COORDINATOR_EMAIL=coordinator@test.com
-E2E_COORDINATOR_PASSWORD=testpass123
-```
-
-## Run
+Copy `.env.e2e.example` to `.env.e2e`, set `E2E_TEST_PASSWORD`, keep local file untracked, then run:
 
 ```bash
 npm run test:e2e
 ```
 
-## Structure
+Default topology:
 
-```
-e2e/
-  auth.spec.ts              — login, logout, role-based access
-  consultation.spec.ts       — create and view consultations
-  privacy.spec.ts            — data export, deactivation, deletion request
-  operations.spec.ts         — admin operations dashboard and metrics
-  .env                       — credentials (gitignored)
-```
+- Frontend: `http://127.0.0.1:4173`
+- Backend: `http://127.0.0.1:8000`
+- Database: local Docker PostgreSQL
+- Projects: desktop Chromium and mobile Chromium
 
-### Phase 8C Tests
+Playwright refuses non-local targets unless isolated hostname is explicitly listed in `E2E_APPROVED_HOSTS`. Local tests ignore explicit account variables by default and use unique run-scoped synthetic accounts. Set `E2E_USE_EXPLICIT_ACCOUNTS=true` only for an approved isolated environment.
 
-| Test File | Coverage |
-|-----------|----------|
-| `privacy.spec.ts` | Request data export, verify status transitions, attempt download |
-| `privacy.spec.ts` | Deactivate account, verify login blocked, admin reactivation? |
-| `privacy.spec.ts` | Submit deletion request, cancel pending request |
-| `operations.spec.ts` | Admin views status page, verifies components reported |
-| `operations.spec.ts` | Admin views metrics, verifies counts displayed |
-| `operations.spec.ts` | Non-admin access to admin operations returns 403 |
+Global setup calls backend `seed_e2e_data`; teardown calls `cleanup_e2e_data` and fails if artifacts remain. Backend refuses seeding unless DEBUG, local database host, and local attachment storage are active.
 
-## Artifacts
+Trace appears on first retry. Screenshots/video remain only for failures. All result directories are ignored and must be removed before final Git review.
 
-- `playwright-report/` — HTML report
-- `test-results/` — failure traces
-- `screenshots/` — visual captures
-- `videos/` — recording of failed tests
-- `traces/` — Playwright trace viewer data
-
-All gitignored.
-
-## CI
-
-Requires:
-- Frontend dev server running
-- Backend API running
-- Test users seeded
+Current Phase F permission spec checks anonymous, patient, doctor, coordinator, and administrator against staff/admin APIs and frontend routes. Existing feature specs remain part of full suite; hard-coded or stale fixture assumptions must be treated as failures, never silently skipped.

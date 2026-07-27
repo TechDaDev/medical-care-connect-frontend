@@ -70,10 +70,28 @@ export interface OperationsStatus {
   attachment_backend_provider: string;
   attachment_root_writable: boolean;
   attachment_scan_mode: string;
+  scanner: {
+    mode: string;
+    available: boolean;
+    last_successful_check: string | null;
+    required: boolean;
+  };
   ai_enabled: boolean;
   error_monitor_provider: string;
   latest_migration: string;
   retention_candidates: number;
+  notifications_total_in_app: number;
+  health_status: "healthy";
+  readiness_status: "ready" | "degraded";
+  background_tasks: {
+    configured: boolean;
+    status: string;
+  };
+  backup: {
+    storage_available: boolean;
+    max_age_hours: number;
+    degraded: boolean;
+  };
   degraded_components: string[];
 }
 

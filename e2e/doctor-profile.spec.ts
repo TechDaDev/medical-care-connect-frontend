@@ -1,9 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { getBaseUrl, login, getDoctorCreds, getPatientCreds, setLocale } from "./helpers";
+import { getBaseUrl, login, getDoctorCreds, getPatientCreds, getPendingDoctorCreds, setLocale } from "./helpers";
 
 test.describe("Doctor profile flow", () => {
   test("Pending doctor lands on pending page and can access profile", async ({ page }) => {
-    const creds = getDoctorCreds();
+    const creds = getPendingDoctorCreds();
     await login(page, creds.email, creds.password);
 
     // Should land on pending-approval after login redirect
@@ -18,7 +18,7 @@ test.describe("Doctor profile flow", () => {
   });
 
   test("Doctor can update workplace and biography", async ({ page }) => {
-    const creds = getDoctorCreds();
+    const creds = getPendingDoctorCreds();
     await login(page, creds.email, creds.password);
     await page.waitForURL(/\/app\/doctor/, { timeout: 15000 });
 
@@ -27,12 +27,12 @@ test.describe("Doctor profile flow", () => {
     await page.waitForSelector("text=Doctor Profile", { timeout: 10000 });
 
     // Change workplace
-    const workplaceInput = page.locator("#workplace");
+    const workplaceInput = page.getByLabel("Workplace");
     await workplaceInput.fill("Updated Hospital Name");
 
     // Save professional profile
-    await page.click("text=Save Professional Profile");
-    await page.waitForSelector("text=Professional profile updated", { timeout: 10000 });
+    await page.getByRole("button", { name: "Save Professional Profile" }).click();
+    await expect(page.getByText("Professional profile updated.")).toBeVisible();
   });
 
   test("License data is not editable through normal fields", async ({ page }) => {
@@ -58,16 +58,16 @@ test.describe("Doctor profile flow", () => {
 
   test("Arabic doctor profile flow", async ({ page }) => {
     const creds = getDoctorCreds();
-    await setLocale(page, "ar");
     await login(page, creds.email, creds.password);
+    await setLocale(page, "ar");
     await page.goto(getBaseUrl() + "/app/doctor/profile", { waitUntil: "networkidle" });
     await page.waitForSelector("text=الملف الطبي", { timeout: 10000 });
   });
 
   test("Kurdish doctor profile flow", async ({ page }) => {
     const creds = getDoctorCreds();
-    await setLocale(page, "ckb");
     await login(page, creds.email, creds.password);
+    await setLocale(page, "ckb");
     await page.goto(getBaseUrl() + "/app/doctor/profile", { waitUntil: "networkidle" });
     await page.waitForSelector("text=پڕۆفایلی پزیشک", { timeout: 10000 });
   });

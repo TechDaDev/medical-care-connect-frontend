@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 .env
+.env.e2e
+!.env.e2e.example
 coverage
 playwright-report
 test-results

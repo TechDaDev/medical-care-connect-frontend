@@ -1,7 +1,7 @@
 import { useEffect, useCallback, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { doctorsApi, specialtiesApi } from "../../api/doctors";
 import { useAuth } from "../../auth";
 import { useI18n } from "../../i18n";
@@ -93,9 +93,9 @@ export function DoctorProfilePage() {
     register,
     handleSubmit,
     reset,
-    watch,
     setValue,
     getValues,
+    control,
     formState: { errors: rhfErrors, isDirty },
   } = useForm<ProfFormValues>({
     defaultValues: {
@@ -111,8 +111,8 @@ export function DoctorProfilePage() {
     },
   });
 
-  const watchedLanguages = watch("languages");
-  const watchedBio = watch("biography");
+  const watchedLanguages = useWatch({ control, name: "languages" }) ?? [];
+  const watchedBio = useWatch({ control, name: "biography" }) ?? "";
 
   // ── Track whether form has been initialized from server ──────────────
   const initializedRef = useRef(false);

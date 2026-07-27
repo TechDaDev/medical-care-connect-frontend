@@ -1,7 +1,7 @@
 import { Page } from "@playwright/test";
 
 export function getBaseUrl(): string {
-  return process.env.E2E_BASE_URL || "http://localhost:5173";
+  return process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:4173";
 }
 
 function requireEnv(key: string): string {
@@ -11,23 +11,50 @@ function requireEnv(key: string): string {
 }
 
 export function getPatientCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
   return {
-    email: requireEnv("E2E_PATIENT_EMAIL"),
-    password: requireEnv("E2E_PATIENT_PASSWORD"),
+    email: process.env.E2E_PATIENT_EMAIL || `e2e+${runId}+patient@example.invalid`,
+    password: process.env.E2E_PATIENT_PASSWORD || requireEnv("E2E_TEST_PASSWORD"),
   };
 }
 
 export function getDoctorCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
   return {
-    email: requireEnv("E2E_DOCTOR_EMAIL"),
-    password: requireEnv("E2E_DOCTOR_PASSWORD"),
+    email: process.env.E2E_DOCTOR_EMAIL || `e2e+${runId}+approved@example.invalid`,
+    password: process.env.E2E_DOCTOR_PASSWORD || requireEnv("E2E_TEST_PASSWORD"),
+  };
+}
+
+export function getPendingDoctorCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
+  return {
+    email: `e2e+${runId}+pending@example.invalid`,
+    password: requireEnv("E2E_TEST_PASSWORD"),
+  };
+}
+
+export function getSecondPatientCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
+  return {
+    email: `e2e+${runId}+patient-reject@example.invalid`,
+    password: requireEnv("E2E_TEST_PASSWORD"),
   };
 }
 
 export function getCoordinatorCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
   return {
-    email: requireEnv("E2E_COORDINATOR_EMAIL"),
-    password: requireEnv("E2E_COORDINATOR_PASSWORD"),
+    email: process.env.E2E_COORDINATOR_EMAIL || `e2e+${runId}+coordinator@example.invalid`,
+    password: process.env.E2E_COORDINATOR_PASSWORD || requireEnv("E2E_TEST_PASSWORD"),
+  };
+}
+
+export function getAdminCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
+  return {
+    email: process.env.E2E_ADMIN_EMAIL || `e2e+${runId}+admin@example.invalid`,
+    password: process.env.E2E_ADMIN_PASSWORD || requireEnv("E2E_TEST_PASSWORD"),
   };
 }
 
@@ -53,4 +80,5 @@ export async function login(
   await page.fill('input[type="email"]', email);
   await page.fill('input[type="password"]', password);
   await page.click('button[type="submit"]');
+  await page.waitForURL(/\/app(?:\/|$)/, { timeout: 15_000 });
 }

@@ -185,6 +185,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
               onClick={logout}
               className="text-slate-500 hover:text-slate-700 p-1"
               title={t("nav.logout")}
+              aria-label={t("nav.logout")}
             >
               <LogOut className="h-5 w-5" />
             </button>

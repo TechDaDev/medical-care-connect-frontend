@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { getBaseUrl, login, getPatientCreds, getCoordinatorCreds } from "./helpers";
+import { getBaseUrl, login, getPatientCreds, getAdminCreds, setLocale } from "./helpers";
 
 test.describe("Phase 8C — Privacy", () => {
   test("Patient requests privacy export", async ({ page }) => {
@@ -44,16 +44,17 @@ test.describe("Phase 8C — Privacy", () => {
   });
 
   test("Administrator can access operations page", async ({ page }) => {
-    const creds = getCoordinatorCreds();
+    const creds = getAdminCreds();
     await login(page, creds.email, creds.password);
-    await page.goto(getBaseUrl() + "/app/staff");
-    await expect(page.locator("body")).toBeVisible({ timeout: 5000 });
+    await page.goto(getBaseUrl() + "/app/staff/operations");
+    await expect(page.getByRole("heading", { name: "Operational Status" })).toBeVisible();
   });
 
   test("Arabic English Kurdish privacy pages preserve direction", async ({ page }) => {
     // Test Arabic (default)
     const creds = getPatientCreds();
     await login(page, creds.email, creds.password);
+    await setLocale(page, "ar");
     await page.goto(getBaseUrl() + "/app/privacy");
     await expect(page.locator("html")).toHaveAttribute("dir", "rtl", { timeout: 5000 });
   });

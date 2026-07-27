@@ -43,10 +43,7 @@ test.describe("Authentication", () => {
     const creds = getPatientCreds();
     await login(page, creds.email, creds.password);
     // Find and click logout button
-    const logoutBtn = page.locator("button, a").filter({ hasText: /log\s*out|logout|sign\s*out/i }).first();
-    if (await logoutBtn.isVisible()) {
-      await logoutBtn.click();
-    }
+    await page.getByRole("button", { name: "Logout" }).click();
     // Should redirect to login
     await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
     // Protected page should redirect to login

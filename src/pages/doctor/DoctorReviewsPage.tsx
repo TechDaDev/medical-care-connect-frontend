@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useI18n } from "../../i18n";
 import { useAuth } from "../../auth";
 import { reviewsApi } from "../../api/reviews";
+import { doctorsApi } from "../../api/doctors";
 import { Card } from "../../components/common/Card";
 import { Spinner } from "../../components/common/Spinner";
 import { ErrorState } from "../../components/common/ErrorState";
@@ -21,16 +22,27 @@ export function DoctorReviewsPage() {
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseText, setResponseText] = useState("");
 
+  const {
+    data: profile,
+    isLoading: profileLoading,
+    error: profileError,
+    refetch: refetchProfile,
+  } = useQuery({
+    queryKey: ["my-doctor-profile"],
+    queryFn: doctorsApi.getProfile,
+    enabled: user?.role === "doctor",
+  });
+
   const { data: reputation, isLoading: repLoading } = useQuery({
-    queryKey: ["doctor-reputation", user?.id],
-    queryFn: () => reviewsApi.getDoctorReputation(user?.id || ""),
-    enabled: !!user?.id,
+    queryKey: ["doctor-reputation", profile?.id],
+    queryFn: () => reviewsApi.getDoctorReputation(profile?.id || ""),
+    enabled: !!profile?.id,
   });
 
   const { data: reviewsData, isLoading, error, refetch } = useQuery({
-    queryKey: ["doctor-reviews", user?.id],
-    queryFn: () => reviewsApi.getDoctorReviews(user?.id || ""),
-    enabled: !!user?.id,
+    queryKey: ["doctor-reviews", profile?.id],
+    queryFn: () => reviewsApi.getDoctorReviews(profile?.id || ""),
+    enabled: !!profile?.id,
   });
 
   const respondMut = useMutation({
@@ -44,7 +56,10 @@ export function DoctorReviewsPage() {
     },
   });
 
-  if (isLoading || repLoading) return <Spinner />;
+  if (profileLoading || isLoading || repLoading) return <Spinner />;
+  if (profileError) {
+    return <ErrorState message={getErrorMessage(profileError)} onRetry={refetchProfile} />;
+  }
   if (error) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
 
   const reviews = reviewsData?.results || [];

@@ -4,12 +4,16 @@ import {
   login,
   getPatientCreds,
   getDoctorCreds,
+  getSecondPatientCreds,
+  setLocale,
 } from "./helpers";
 
 test.describe("Attachment flow", () => {
   test("Arabic default — page loads with RTL dir", async ({ page }) => {
     const creds = getPatientCreds();
     await login(page, creds.email, creds.password);
+    await setLocale(page, "ar");
+    await page.goto(getBaseUrl() + "/app/patient");
     await expect(page).toHaveURL(/\/app\/(patient|dashboard)/, { timeout: 10000 });
 
     // Default locale is Arabic → dir="rtl"
@@ -71,7 +75,8 @@ test.describe("Attachment flow", () => {
 
   test("Unrelated patient denied — cannot access another patient's attachment", async ({ page }) => {
     // Login as jane (second patient)
-    await login(page, "jane.smith@mcc.dev", "Development123!");
+    const creds = getSecondPatientCreds();
+    await login(page, creds.email, creds.password);
     await expect(page).toHaveURL(/\/app\/(patient|dashboard)/, { timeout: 10000 });
 
     // Try to access a consultation that might belong to john

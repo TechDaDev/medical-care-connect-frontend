@@ -70,6 +70,11 @@ export function OperationsStatusPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         <StatusCard label={t("operations.database")} ok={status?.database_available} />
         <StatusCard label={t("operations.attachmentStorage")} ok={status?.attachment_root_writable} />
+        <StatusCard label={t("operations.health")} value={status?.health_status} />
+        <StatusCard label={t("operations.readiness")} value={status?.readiness_status} />
+        <StatusCard label={t("operations.scanner")} ok={status?.scanner.available} />
+        <StatusCard label={t("operations.backupStorage")} ok={status?.backup.storage_available} />
+        <StatusCard label={t("operations.backgroundTasks")} value={status?.background_tasks.status} />
         <StatusCard label={t("operations.environment")} value={status?.environment} />
         <StatusCard label={t("operations.version")} value={status?.version} />
         <StatusCard label={t("operations.attachmentBackend")} value={status?.attachment_backend_provider} />
@@ -77,6 +82,7 @@ export function OperationsStatusPage() {
         <StatusCard label={t("operations.aiEnabled")} value={status?.ai_enabled ? t("common.enabled") : t("common.disabled")} />
         <StatusCard label={t("operations.errorMonitor")} value={status?.error_monitor_provider} />
         <StatusCard label={t("operations.retentionCandidates")} value={String(status?.retention_candidates ?? "N/A")} />
+        <StatusCard label={t("operations.totalInAppNotifications")} value={String(status?.notifications_total_in_app ?? "N/A")} />
       </div>
 
       {status?.degraded_components && status.degraded_components.length > 0 && (

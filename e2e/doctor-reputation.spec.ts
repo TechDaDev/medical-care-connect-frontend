@@ -28,8 +28,8 @@ test.describe("Doctor Reputation & Reviews", () => {
     await page.goto(getBaseUrl() + "/app/doctor/reviews");
     await page.waitForLoadState("networkidle");
 
-    // Check for star display
-    const stars = page.locator("body").filter({ hasText: /out of|star/i });
-    await expect(stars.first()).toBeVisible({ timeout: 5000 });
+    // Check exact rating-distribution output.
+    await expect(page.getByText("5★", { exact: true })).toBeVisible();
+    await expect(page.getByText("5.0", { exact: true })).toBeVisible();
   });
 });
