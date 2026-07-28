@@ -157,10 +157,6 @@ export const router = createBrowserRouter([
               { path: "attachments/:attachmentId", element: <RequireRole roles={[UserRole.ADMINISTRATOR]}><AttachmentAdminDetailPage /></RequireRole> },
             ],
           },
-          {
-            path: "medical-records/:recordId",
-            element: <LazyLoad><MedicalRecordPage /></LazyLoad>,
-          },
         ],
       },
     ],

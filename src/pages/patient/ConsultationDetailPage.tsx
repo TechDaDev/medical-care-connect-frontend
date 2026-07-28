@@ -1,337 +1,126 @@
-import { useState, useCallback } from "react";
-import { useParams, Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { consultationsApi } from "../../api/consultations";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, useParams } from "react-router-dom";
+import { useState } from "react";
 import { attachmentsApi } from "../../api/attachments";
+import { consultationsApi } from "../../api/consultations";
 import { reviewsApi } from "../../api/reviews";
-import { useI18n } from "../../i18n";
-import { Card } from "../../components/common/Card";
-import { Button } from "../../components/common/Button";
-import { Badge } from "../../components/common/Badge";
 import { AttachmentList } from "../../components/attachments/AttachmentList";
-import { ReviewForm } from "../../components/reviews/ReviewForm";
-import { ReviewCard } from "../../components/reviews/ReviewCard";
-
+import { Button } from "../../components/common/Button";
+import { Card } from "../../components/common/Card";
+import { ErrorState } from "../../components/common/ErrorState";
 import { Modal } from "../../components/common/Modal";
-import { AvatarFallback } from "../../components/common/AvatarFallback";
-import { useAuth } from "../../auth";
-import { UserRole, ConsultationStatus } from "../../types";
-
-const statusLabels: Record<string, string> = {
-  draft: "Draft",
-  submitted: "Submitted",
-  accepted: "Accepted",
-  intake_in_progress: "Intake in Progress",
-  intake_completed: "Intake Completed",
-  doctor_review: "Doctor Review",
-  awaiting_patient_response: "Awaiting Your Response",
-  awaiting_doctor_response: "Awaiting Doctor Response",
-  under_review: "Under Review",
-  follow_up_required: "Follow-up Required",
-  physical_visit_required: "Physical Visit Required",
-  transferred: "Transferred",
-  completed: "Completed",
-  cancelled: "Cancelled",
-  emergency_escalated: "Emergency Escalated",
-};
+import { Spinner } from "../../components/common/Spinner";
+import { ConsultationStatusBadge } from "../../components/consultations/ConsultationStatusBadge";
+import { ConsultationTimeline } from "../../components/consultations/ConsultationTimeline";
+import { PatientConsultationActions } from "../../components/consultations/PatientConsultationActions";
+import { ReviewCard } from "../../components/reviews/ReviewCard";
+import { ReviewForm } from "../../components/reviews/ReviewForm";
+import { useI18n } from "../../i18n";
 
 export function ConsultationDetailPage() {
+  const { consultationId = "" } = useParams<{ consultationId: string }>();
   const { t } = useI18n();
-  const { consultationId } = useParams<{ consultationId: string }>();
-  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
-
-  const { data: consultation } = useQuery({
+  const [cancelError, setCancelError] = useState("");
+  const detail = useQuery({
     queryKey: ["consultation", consultationId],
-    queryFn: () => consultationsApi.getById(consultationId!),
-    enabled: !!consultationId,
+    queryFn: () => consultationsApi.getPatientById(consultationId),
+    enabled: Boolean(consultationId),
   });
-
-  const cancelMutation = useMutation({
-    mutationFn: () =>
-      consultationsApi.cancel(consultationId!, cancelReason),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["consultation", consultationId] });
+  const cancel = useMutation({
+    mutationFn: () => consultationsApi.cancel(
+      consultationId, cancelReason, detail.data!.status,
+    ),
+    onSuccess: (data) => {
+      queryClient.setQueryData(["consultation", consultationId], data);
+      queryClient.invalidateQueries({ queryKey: ["patient-consultations"] });
+      queryClient.invalidateQueries({ queryKey: ["patient-dashboard"] });
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
       setCancelOpen(false);
+      setCancelReason("");
+    },
+    onError: async (error: { response?: { status?: number; data?: { code?: string } } }) => {
+      setCancelError(t(`phaseC.error.${error.response?.data?.code || "generic"}`));
+      if (error.response?.status === 409) await detail.refetch();
     },
   });
-
-  const isPatient = user?.role === UserRole.PATIENT;
-  const isDoctor = user?.role === UserRole.DOCTOR;
-
-  if (!consultation) return null;
+  const status = (detail.error as { response?: { status?: number } } | null)?.response?.status;
+  if (detail.isLoading) return <div role="status" aria-label={t("common.loading")}><Spinner /></div>;
+  if (detail.error) return <ErrorState message={status === 403 ? t("error.forbidden") : status === 404 ? t("error.notFound") : undefined} onRetry={() => detail.refetch()} />;
+  if (!detail.data) return null;
+  const consultation = detail.data;
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          {t("consultation.title")}
-        </h1>
-        <Badge variant="info">
-          {statusLabels[consultation.status] || consultation.status}
-        </Badge>
-      </div>
-
-      <Card className="mb-6">
-        {isPatient && consultation.doctor && (
-          <div className="flex items-center gap-3 mb-4">
-            <AvatarFallback
-              name={consultation.doctor.user.full_name}
-              size="md"
-            />
-            <div>
-              <p className="font-medium text-gray-900">
-                Dr. {consultation.doctor.user.full_name}
-              </p>
-              {consultation.doctor.specialty_name && (
-                <p className="text-sm text-gray-500">
-                  {consultation.doctor.specialty_name}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {isDoctor && consultation.patient && (
-          <div className="flex items-center gap-3 mb-4">
-            <AvatarFallback
-              name={consultation.patient.user.full_name}
-              size="md"
-            />
-            <div>
-              <p className="font-medium text-gray-900">
-                {consultation.patient.user.full_name}
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-3 text-sm">
-          <div>
-            <span className="text-gray-500">
-              {t("consultation.chiefComplaint")}:
-            </span>{" "}
-            <span className="text-gray-900">
-              {consultation.description || t("consultation.noDescription")}
-            </span>
-          </div>
-          {consultation.submitted_at && (
-            <p className="text-gray-400 text-xs">
-              Submitted:{" "}
-              {new Date(consultation.submitted_at).toLocaleString()}
-            </p>
-          )}
+    <main className="mx-auto max-w-5xl space-y-6" aria-busy={detail.isFetching}>
+      <header className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div><h1 className="text-2xl font-bold">{t("phaseC.detail.title")}</h1>
+          <p className="text-sm text-slate-500">{t("phaseC.updated", { date: new Date(consultation.updated_at).toLocaleString() })}</p>
         </div>
+        <ConsultationStatusBadge status={consultation.status} />
+      </header>
+      <Card>
+        <h2 className="text-lg font-semibold">{consultation.doctor?.full_name || t("phaseC.doctor.unassigned")}</h2>
+        <p className="text-sm text-slate-500">{consultation.doctor?.professional_title}</p>
+        <p className="text-sm text-slate-500">{consultation.specialty?.name}</p>
+        <p className="mt-4 whitespace-pre-wrap">{consultation.description}</p>
       </Card>
-
-      {/* Actions — based on backend action flags */}
-      <div className="flex flex-wrap gap-3">
-        {consultation.actions?.can_start_intake && (
-          <Link to={`/app/patient/consultations/${consultationId}/intake`}>
-            <Button>{t("intake.start")}</Button>
-          </Link>
-        )}
-
-        {consultation.actions?.can_view_record && consultation.has_medical_record && (
-          <Link to={`/app/medical-records/${consultation.id}`}>
-            <Button variant="secondary">{t("intake.viewRecord")}</Button>
-          </Link>
-        )}
-
-        {consultation.actions?.can_accept && isDoctor && (
-          <Button
-            onClick={async () => {
-              await consultationsApi.accept(consultationId!);
-              queryClient.invalidateQueries({
-                queryKey: ["consultation", consultationId],
-              });
-            }}
-          >
-            {t("consultation.accept")}
-          </Button>
-        )}
-
-        {consultation.actions?.can_message && (
-          <Link to={`/app/${isPatient ? "patient" : "doctor"}/messages/${consultationId}`}>
-            <Button variant="secondary">{t("message.title")}</Button>
-          </Link>
-        )}
-
-        {consultation.actions?.can_cancel && (
-          <Button variant="danger" onClick={() => setCancelOpen(true)}>
-            {t("consultation.cancel")}
-          </Button>
-        )}
-      </div>
-
-      <Modal
-        open={cancelOpen}
-        onClose={() => setCancelOpen(false)}
-        title={t("consultation.cancel")}
-      >
-        <textarea
-          className="w-full border rounded-lg p-2 text-sm"
-          rows={3}
-          placeholder={t("consultation.cancelReason")}
-          value={cancelReason}
-          onChange={(e) => setCancelReason(e.target.value)}
-        />
-        <div className="flex gap-2 mt-4 justify-end">
-          <Button
-            variant="secondary"
-            onClick={() => setCancelOpen(false)}
-          >
-            {t("common.cancel")}
-          </Button>
-          <Button
-            variant="danger"
-            loading={cancelMutation.isPending}
-            onClick={() => cancelMutation.mutate()}
-          >
-            {t("consultation.cancel")}
-          </Button>
+      <Card><h2 className="mb-4 text-lg font-semibold">{t("phaseC.actions")}</h2>
+        <PatientConsultationActions consultation={consultation} onCancel={() => { setCancelError(""); setCancelOpen(true); }} />
+      </Card>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Card><h2 className="mb-4 text-lg font-semibold">{t("phaseC.timeline")}</h2><ConsultationTimeline items={consultation.timeline} /></Card>
+        <div className="space-y-4">
+          <Summary title={t("intake.start")} value={`${consultation.intake_summary.question_count}`} action={
+            consultation.actions.can_continue_intake ? <Link to={`/app/patient/consultations/${consultationId}/intake`}>{t("intake.continue")}</Link> : null} />
+          <Summary title={t("message.title")} value={t("phaseC.unread", { count: consultation.messages_summary.unread_count })} action={
+            consultation.actions.can_message ? <Link to={`/app/patient/messages/${consultationId}`}>{t("phaseC.open")}</Link> : null} />
+          <Summary title={t("record.title")} value={consultation.medical_record_summary.status || t("record.noRecord")} action={
+            consultation.medical_record_summary.id ? <Link to={`/app/patient/medical-records/${consultation.medical_record_summary.id}`}>{t("phaseC.open")}</Link> : null} />
         </div>
+      </div>
+      <AttachmentSection consultationId={consultationId} canUpload={consultation.actions.can_upload_attachment} />
+      {(consultation.actions.can_write_review || consultation.review_summary.exists) && <ReviewSection consultationId={consultationId} canWrite={consultation.actions.can_write_review} />}
+      <Card><h2 className="mb-3 text-lg font-semibold">{t("phaseC.metadata")}</h2>
+        <dl className="grid gap-3 text-sm sm:grid-cols-2"><div><dt className="text-slate-500">ID</dt><dd>{consultation.id}</dd></div>
+          <div><dt className="text-slate-500">{t("consultation.createdAt")}</dt><dd>{new Date(consultation.created_at).toLocaleString()}</dd></div></dl>
+      </Card>
+      <Modal open={cancelOpen} onClose={() => setCancelOpen(false)} title={t("consultation.cancel")}>
+        <label className="text-sm" htmlFor="cancel-reason">{t("consultation.cancelReason")}</label>
+        <textarea id="cancel-reason" value={cancelReason} onChange={(e) => setCancelReason(e.target.value)}
+          aria-invalid={Boolean(cancelError)} aria-describedby="cancel-error" rows={4} maxLength={500}
+          className="mt-1 w-full rounded-lg border p-2" />
+        <p className="text-xs text-slate-500">{cancelReason.length}/500</p>
+        {cancelError && <p id="cancel-error" role="alert" className="text-sm text-red-700">{cancelError}</p>}
+        <div className="mt-4 flex justify-end gap-2"><Button variant="secondary" onClick={() => setCancelOpen(false)}>{t("common.cancel")}</Button>
+          <Button variant="danger" disabled={cancelReason.trim().length < 10} loading={cancel.isPending} onClick={() => cancel.mutate()}>{t("common.confirm")}</Button></div>
       </Modal>
-
-      {/* ── Attachments ─────────────────────────────────────────── */}
-      {consultationId && (
-        <div className="mt-8">
-          <ConsultationAttachments
-            consultationId={consultationId}
-            isPatient={isPatient}
-            isDoctor={isDoctor}
-          />
-        </div>
-      )}
-
-      {/* ── Review Section (patient, completed consultation) ──────── */}
-      {consultation && consultation.status === ConsultationStatus.COMPLETED && isPatient && (
-        <ReviewSection consultationId={consultationId!} />
-      )}
-    </div>
+    </main>
   );
 }
 
-function ReviewSection({ consultationId }: { consultationId: string }) {
-  const { t } = useI18n();
-  const qc = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
-
-  const { data: review, isLoading } = useQuery({
-    queryKey: ["review", consultationId],
-    queryFn: () => reviewsApi.getReview(consultationId),
-    retry: false,
-  });
-
-  const createMut = useMutation({
-    mutationFn: (payload: Parameters<typeof reviewsApi.createReview>[1]) =>
-      reviewsApi.createReview(consultationId, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["review", consultationId] });
-      setShowForm(false);
-    },
-  });
-
-  if (isLoading) return null;
-
-  // Existing review — show it
-  if (review) {
-    return (
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">
-          {t("review.yourReview")}
-        </h2>
-        <ReviewCard review={review} />
-      </div>
-    );
-  }
-
-  // No review yet — show create button or form
-  if (!showForm) {
-    return (
-      <div className="mt-8">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">
-          {t("review.title")}
-        </h2>
-        <p className="text-sm text-slate-500 mb-3">{t("review.shareExperience")}</p>
-        <Button onClick={() => setShowForm(true)}>{t("review.writeReview")}</Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-8">
-      <h2 className="text-lg font-semibold text-slate-900 mb-4">
-        {t("review.writeReview")}
-      </h2>
-      <Card className="p-4">
-        <ReviewForm
-          onSubmit={(data) => createMut.mutate(data)}
-          onCancel={() => setShowForm(false)}
-          isSubmitting={createMut.isPending}
-        />
-      </Card>
-    </div>
-  );
+function Summary({ title, value, action }: { title: string; value: string; action: React.ReactNode }) {
+  return <Card><h2 className="font-semibold">{title}</h2><p className="text-sm text-slate-500">{value}</p>{action && <div className="mt-2 text-sm font-medium text-blue-700">{action}</div>}</Card>;
 }
 
-function ConsultationAttachments({ consultationId, isPatient, isDoctor }: { consultationId: string; isPatient: boolean; isDoctor: boolean }) {
-  const { t } = useI18n();
-  const queryClient = useQueryClient();
-  const [error, setError] = useState("");
+function AttachmentSection({ consultationId, canUpload }: { consultationId: string; canUpload: boolean }) {
+  const { t } = useI18n(); const queryClient = useQueryClient();
+  const query = useQuery({ queryKey: ["attachments", consultationId], queryFn: () => attachmentsApi.list(consultationId) });
+  return <Card><h2 className="mb-4 text-lg font-semibold">{t("attachment.title")}</h2>
+    <AttachmentList attachments={query.data?.results || []} loading={query.isLoading} showUpload={canUpload}
+      onUpload={async (file, category, description, signal) => { await attachmentsApi.upload(consultationId, file, category, description, undefined, signal); await queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] }); await queryClient.invalidateQueries({ queryKey: ["consultation", consultationId] }); }}
+      onDownload={async (id) => { const { blob, filename } = await attachmentsApi.download(id); const url = URL.createObjectURL(blob); const anchor = document.createElement("a"); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url); }}
+      onDelete={async (id) => { await attachmentsApi.delete(id); await queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] }); }} />
+  </Card>;
+}
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["attachments", consultationId],
-    queryFn: () => attachmentsApi.list(consultationId),
-  });
-
-  const triggerDownload = useCallback(async (id: string) => {
-    try {
-      const { blob, filename } = await attachmentsApi.download(id);
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      setError(t("attachment.error.not_available"));
-    }
-  }, [t]);
-
-  const handleDelete = useCallback(async (id: string) => {
-    if (!confirm(t("attachment.deleteConfirm"))) return;
-    try {
-      await attachmentsApi.delete(id);
-      queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
-    } catch {
-      setError(t("attachment.error.permission"));
-    }
-  }, [consultationId, queryClient, t]);
-
-  const handleUpload = useCallback(async (file: File, category: string, description: string, signal: AbortSignal) => {
-    await attachmentsApi.upload(consultationId, file, category, description, undefined, signal);
-    queryClient.invalidateQueries({ queryKey: ["attachments", consultationId] });
-  }, [consultationId, queryClient]);
-
-  return (
-    <div>
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">
-        {t("attachment.title")}
-      </h2>
-      {error && (
-        <p className="text-sm text-red-600 mb-2">{error}</p>
-      )}
-      <AttachmentList
-        attachments={data?.results || []}
-        loading={isLoading}
-        onUpload={handleUpload}
-        onDownload={triggerDownload}
-        onDelete={handleDelete}
-        showUpload={isPatient || isDoctor}
-      />
-    </div>
-  );
+function ReviewSection({ consultationId, canWrite }: { consultationId: string; canWrite: boolean }) {
+  const { t } = useI18n(); const queryClient = useQueryClient(); const [open, setOpen] = useState(false);
+  const review = useQuery({ queryKey: ["review", consultationId], queryFn: () => reviewsApi.getReview(consultationId), retry: false });
+  const create = useMutation({ mutationFn: (payload: Parameters<typeof reviewsApi.createReview>[1]) => reviewsApi.createReview(consultationId, payload),
+    onSuccess: async () => { setOpen(false); await queryClient.invalidateQueries({ queryKey: ["review", consultationId] }); await queryClient.invalidateQueries({ queryKey: ["consultation", consultationId] }); } });
+  return <Card><h2 className="mb-4 text-lg font-semibold">{t("review.title")}</h2>
+    {review.data ? <ReviewCard review={review.data} /> : canWrite && (open ? <ReviewForm onSubmit={(payload) => create.mutate(payload)} onCancel={() => setOpen(false)} isSubmitting={create.isPending} /> : <Button onClick={() => setOpen(true)}>{t("review.writeReview")}</Button>)}
+  </Card>;
 }

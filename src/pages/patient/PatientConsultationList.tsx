@@ -1,90 +1,149 @@
-import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { consultationsApi } from "../../api/consultations";
-import type { Consultation } from "../../types";
-import { useI18n } from "../../i18n";
-import { PageHeader } from "../../components/common/PageHeader";
-import { Card } from "../../components/common/Card";
+import { Link, useSearchParams } from "react-router-dom";
+import { consultationsApi, PatientConsultationFilters } from "../../api/consultations";
+import { doctorsApi, specialtiesApi } from "../../api/doctors";
+import { ConsultationStatusBadge } from "../../components/consultations/ConsultationStatusBadge";
 import { Button } from "../../components/common/Button";
-import { Badge } from "../../components/common/Badge";
-import { Spinner } from "../../components/common/Spinner";
+import { Card } from "../../components/common/Card";
 import { EmptyState } from "../../components/common/EmptyState";
 import { ErrorState } from "../../components/common/ErrorState";
-import { AvatarFallback } from "../../components/common/AvatarFallback";
+import { PageHeader } from "../../components/common/PageHeader";
+import { Spinner } from "../../components/common/Spinner";
+import { useI18n } from "../../i18n";
 
-const statusColors: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
-  submitted: "info",
-  accepted: "success",
-  intake_in_progress: "warning",
-  intake_completed: "info",
-  doctor_review: "info",
-  completed: "success",
-  cancelled: "danger",
-  emergency_escalated: "danger",
-};
+const tabs = [
+  ["active", "active"],
+  ["needs_action", "needsAction"],
+  ["completed", "completed"],
+  ["cancelled", "cancelled"],
+  ["all", "all"],
+] as const;
 
 export function PatientConsultationList() {
   const { t } = useI18n();
-  const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["patient-consultations"],
-    queryFn: () => consultationsApi.list(),
+  const [params, setParams] = useSearchParams();
+  const group = params.get("group") || "active";
+  const filters: PatientConsultationFilters = {
+    status_group: group === "all" ? undefined : group as PatientConsultationFilters["status_group"],
+    search: params.get("search") || undefined,
+    doctor: params.get("doctor") || undefined,
+    specialty: params.get("specialty") || undefined,
+    created_after: params.get("from") || undefined,
+    created_before: params.get("to") || undefined,
+    has_unread_messages: params.get("unread") === "true" || undefined,
+    ordering: params.get("ordering") || undefined,
+    page: Number(params.get("page") || 1),
+    page_size: 20,
+  };
+  const query = useQuery({
+    queryKey: ["patient-consultations", filters],
+    queryFn: () => consultationsApi.listPatient(filters),
   });
+  const doctors = useQuery({
+    queryKey: ["doctors", "phase-c-filter"],
+    queryFn: () => doctorsApi.list({ page_size: 100 }),
+  });
+  const specialties = useQuery({
+    queryKey: ["specialties"],
+    queryFn: specialtiesApi.list,
+  });
+  const update = (key: string, value: string) => {
+    const next = new URLSearchParams(params);
+    if (value) next.set(key, value);
+    else next.delete(key);
+    if (key !== "page") next.delete("page");
+    setParams(next);
+  };
 
   return (
-    <div>
-      <PageHeader
-        title={t("consultation.title")}
-        actions={
-          <Link to="/app/patient/consultations/new">
-            <Button>{t("consultation.new")}</Button>
-          </Link>
-        }
-      />
+    <main aria-busy={query.isLoading}>
+      <PageHeader title={t("phaseC.list.title")} actions={
+        <Link to="/app/patient/consultations/new"><Button>{t("consultation.new")}</Button></Link>
+      } />
+      <div role="tablist" aria-label={t("phaseC.list.tabs")} className="mb-4 flex gap-2 overflow-x-auto">
+        {tabs.map(([value, label]) => (
+          <button key={value} role="tab" aria-selected={group === value}
+            onClick={() => update("group", value)}
+            className={`rounded-full px-4 py-2 text-sm ${group === value ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700"}`}>
+            {t(`phaseC.tab.${label}`)}
+          </button>
+        ))}
+      </div>
+      <section aria-label={t("phaseC.list.filters")} className="mb-5 grid gap-3 rounded-xl bg-white p-4 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+        <label className="text-sm">{t("common.search")}
+          <input value={params.get("search") || ""} onChange={(e) => update("search", e.target.value)}
+            className="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <label className="text-sm">{t("phaseC.filter.doctor")}
+          <select value={params.get("doctor") || ""} onChange={(e) => update("doctor", e.target.value)}
+            className="mt-1 w-full rounded-lg border p-2">
+            <option value="">{t("phaseC.filter.allDoctors")}</option>
+            {doctors.data?.results.map((doctor) => (
+              <option key={doctor.id} value={doctor.id}>{doctor.full_name}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm">{t("phaseC.filter.specialty")}
+          <select value={params.get("specialty") || ""} onChange={(e) => update("specialty", e.target.value)}
+            className="mt-1 w-full rounded-lg border p-2">
+            <option value="">{t("doctor.allSpecialties")}</option>
+            {specialties.data?.map((specialty) => (
+              <option key={specialty.id} value={specialty.id}>{specialty.name}</option>
+            ))}
+          </select>
+        </label>
+        <label className="text-sm">{t("phaseC.filter.from")}
+          <input type="date" value={params.get("from") || ""} onChange={(e) => update("from", e.target.value)}
+            className="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <label className="text-sm">{t("phaseC.filter.to")}
+          <input type="date" value={params.get("to") || ""} onChange={(e) => update("to", e.target.value)}
+            className="mt-1 w-full rounded-lg border p-2" />
+        </label>
+        <label className="text-sm">{t("phaseC.filter.ordering")}
+          <select value={params.get("ordering") || ""} onChange={(e) => update("ordering", e.target.value)}
+            className="mt-1 w-full rounded-lg border p-2">
+            <option value="">{t("phaseC.order.action")}</option>
+            <option value="-updated_at">{t("phaseC.order.updated")}</option>
+            <option value="-created_at">{t("phaseC.order.created")}</option>
+          </select>
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" checked={params.get("unread") === "true"}
+            onChange={(e) => update("unread", e.target.checked ? "true" : "")} />
+          {t("phaseC.filter.unread")}
+        </label>
+      </section>
 
-      {isLoading && <Spinner />}
-      {error && <ErrorState onRetry={() => refetch()} />}
-      {data && (Array.isArray(data) ? data : data.results).length === 0 && (
-        <EmptyState message={t("consultation.noResults")} />
-      )}
-      {data && (
-        <div className="space-y-3">
-          {(Array.isArray(data) ? data : data.results).map((c: Consultation) => (
-            <Link
-              key={c.id}
-              to={`/app/patient/consultations/${c.id}`}
-            >
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <AvatarFallback
-                      name={c.doctor?.user.full_name || "Dr"}
-                      size="md"
-                    />
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {c.doctor?.user.full_name || "Doctor"}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {c.specialty?.name || ""}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <Badge
-                      variant={statusColors[c.status] || "neutral"}
-                    >
-                      {c.status.replace(/_/g, " ")}
-                    </Badge>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(c.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
+      {query.isLoading && <div role="status"><Spinner /></div>}
+      {query.error && <ErrorState onRetry={() => query.refetch()} />}
+      {query.data?.results.length === 0 && <EmptyState message={t("consultation.noResults")} />}
+      <div className="grid gap-3">
+        {query.data?.results.map((item) => (
+          <Card key={item.id}>
+            <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <h2 className="font-semibold">{item.doctor?.full_name || t("phaseC.doctor.unassigned")}</h2>
+                <p className="text-sm text-slate-500">{item.specialty?.name || item.doctor?.specialty_name}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <ConsultationStatusBadge status={item.status} />
+                  {item.needs_patient_action && <span className="text-sm font-medium text-amber-700">{t("phaseC.needsAction")}</span>}
+                  {item.unread_messages > 0 && <span className="text-sm text-blue-700">{t("phaseC.unread", { count: item.unread_messages })}</span>}
                 </div>
-              </Card>
-            </Link>
-          ))}
-        </div>
+                <p className="mt-2 text-xs text-slate-500">{t("phaseC.updated", { date: new Date(item.updated_at).toLocaleDateString() })}</p>
+              </div>
+              <Link to={`/app/patient/consultations/${item.id}`}><Button variant="secondary">{t("common.view")}</Button></Link>
+            </div>
+          </Card>
+        ))}
+      </div>
+      {query.data && (
+        <nav className="mt-5 flex justify-between" aria-label={t("phaseC.pagination")}>
+          <Button variant="secondary" disabled={!query.data.previous} onClick={() => update("page", String(Math.max(1, filters.page! - 1)))}>{t("common.previous")}</Button>
+          <span>{t("common.page", { page: filters.page || 1 })}</span>
+          <Button variant="secondary" disabled={!query.data.next} onClick={() => update("page", String(filters.page! + 1))}>{t("common.next")}</Button>
+        </nav>
       )}
-    </div>
+    </main>
   );
 }

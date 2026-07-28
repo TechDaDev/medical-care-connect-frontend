@@ -15,7 +15,7 @@ import { UserRole } from "../../types";
 
 interface FieldProps {
   label: string;
-  value: string;
+  value: string | string[] | number | null;
 }
 
 function Field({ label, value }: FieldProps) {
@@ -23,7 +23,9 @@ function Field({ label, value }: FieldProps) {
   return (
     <div>
       <p className="text-sm text-gray-500 font-medium">{label}</p>
-      <p className="text-sm text-gray-900 mt-0.5">{value}</p>
+      <p className="text-sm text-gray-900 mt-0.5">
+        {Array.isArray(value) ? value.join(", ") : value}
+      </p>
     </div>
   );
 }
@@ -87,31 +89,21 @@ export function MedicalRecordPage() {
 
       <Card className="mt-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Field label="Chief Complaint" value={record.chief_complaint} />
-          <Field label="Symptoms" value={record.symptoms} />
-          <Field label="Duration" value={record.duration} />
-          <Field label="Severity" value={record.severity} />
-          <Field label="Associated Symptoms" value={record.associated_symptoms} />
-          <Field label="Chronic Conditions" value={record.chronic_conditions} />
-          <Field label="Current Medications" value={record.current_medications} />
-          <Field label="Allergies" value={record.allergies} />
-          <Field label="Surgical History" value={record.surgical_history} />
-          <Field label="Family History" value={record.family_history} />
-          <Field label="Pregnancy Status" value={record.pregnancy_status} />
-          <Field label="Test Results" value={record.relevant_test_results} />
-          {record.missing_information && (
-            <div className="md:col-span-2">
-              <Field
-                label="Missing Information"
-                value={record.missing_information}
-              />
-            </div>
-          )}
-          {record.emergency_summary && (
-            <div className="md:col-span-2">
-              <Alert variant="warning">{record.emergency_summary}</Alert>
-            </div>
-          )}
+          <Field label={t("record.field.chiefComplaint")} value={record.chief_complaint} />
+          <Field label={t("record.field.history")} value={record.history_of_present_illness} />
+          <Field label={t("record.field.symptoms")} value={record.symptoms} />
+          <Field label={t("record.field.duration")} value={record.duration} />
+          <Field label={t("record.field.severity")} value={record.severity} />
+          <Field label={t("record.field.onset")} value={record.onset_date} />
+          <Field label={t("record.field.location")} value={record.location} />
+          <Field label={t("record.field.triggers")} value={record.triggers} />
+          <Field label={t("record.field.relief")} value={record.relieving_factors} />
+          <Field label={t("record.field.pastHistory")} value={record.past_medical_history} />
+          <Field label={t("record.field.medications")} value={record.medications} />
+          <Field label={t("record.field.allergies")} value={record.allergies} />
+          <Field label={t("record.field.familyHistory")} value={record.family_history} />
+          <Field label={t("record.field.socialHistory")} value={record.social_history} />
+          <Field label={t("record.field.reviewSystems")} value={record.review_of_systems} />
         </div>
       </Card>
 

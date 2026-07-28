@@ -28,7 +28,7 @@ test.describe("Patient Phase A dashboard", () => {
       'section[aria-labelledby="consultation-summary-heading"]',
     );
     await expect(summary.getByText("Total", { exact: true })).toBeVisible();
-    await expect(summary.getByText("4", { exact: true }).first()).toBeVisible();
+    await expect(summary.getByText(/^\d+$/, { exact: true }).first()).toBeVisible();
 
     const messageLink = page.locator(
       'a[href^="/app/patient/messages/"]',

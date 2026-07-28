@@ -1,5 +1,23 @@
 import client from "./client";
-import { Consultation, PaginatedResponse } from "../types";
+import {
+  Consultation, PaginatedResponse, PatientConsultationDetail,
+  PatientConsultationListItem,
+} from "../types";
+
+export interface PatientConsultationFilters {
+  status?: string;
+  status_group?: "active" | "needs_action" | "completed" | "cancelled";
+  doctor?: string;
+  specialty?: string;
+  needs_patient_action?: boolean;
+  has_unread_messages?: boolean;
+  created_after?: string;
+  created_before?: string;
+  search?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
+}
 
 export interface CreateConsultationInput {
   doctor: string;
@@ -32,6 +50,20 @@ export const consultationsApi = {
     return data;
   },
 
+  listPatient: async (params: PatientConsultationFilters) => {
+    const { data } = await client.get<PaginatedResponse<PatientConsultationListItem>>(
+      "/consultations/", { params }
+    );
+    return data;
+  },
+
+  getPatientById: async (id: string) => {
+    const { data } = await client.get<PatientConsultationDetail>(
+      `/consultations/${id}/`
+    );
+    return data;
+  },
+
   create: async (payload: CreateConsultationInput) => {
     const { data } = await client.post<CreatedConsultation>(
       "/consultations/",
@@ -47,10 +79,10 @@ export const consultationsApi = {
     return data;
   },
 
-  cancel: async (id: string, reason: string) => {
-    const { data } = await client.post<Consultation>(
+  cancel: async (id: string, reason: string, expectedStatus: string) => {
+    const { data } = await client.post<PatientConsultationDetail>(
       `/consultations/${id}/cancel/`,
-      { cancellation_reason: reason }
+      { reason, expected_status: expectedStatus }
     );
     return data;
   },

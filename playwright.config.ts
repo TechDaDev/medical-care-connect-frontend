@@ -65,6 +65,8 @@ export default defineConfig({
         AUTH_LOGIN_RATE: "10000/hour",
         AUTH_REGISTER_RATE: "10000/hour",
         AUTH_REFRESH_RATE: "10000/hour",
+        API_ANON_RATE: "10000/hour",
+        API_USER_RATE: "10000/hour",
         CORS_ALLOWED_ORIGINS: baseURL,
       },
     },
@@ -99,7 +101,7 @@ export default defineConfig({
     },
     {
       name: "chromium-mobile",
-      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b)\.spec\.ts/,
+      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c)\.spec\.ts/,
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },

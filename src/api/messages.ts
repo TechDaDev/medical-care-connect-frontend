@@ -1,18 +1,20 @@
 import client from "./client";
-import { ConsultationMessage, DoctorInternalNote, UnreadCount } from "../types";
+import {
+  ConsultationMessage, DoctorInternalNote, PaginatedResponse, UnreadCount,
+} from "../types";
 
 export const messagesApi = {
   list: async (consultationId: string) => {
-    const { data } = await client.get<ConsultationMessage[]>(
+    const { data } = await client.get<PaginatedResponse<ConsultationMessage>>(
       `/messaging/${consultationId}/messages/`
     );
     return data;
   },
 
-  send: async (consultationId: string, content: string) => {
+  send: async (consultationId: string, content: string, clientRequestId: string) => {
     const { data } = await client.post<ConsultationMessage>(
       `/messaging/${consultationId}/messages/`,
-      { content }
+      { content, client_request_id: clientRequestId }
     );
     return data;
   },

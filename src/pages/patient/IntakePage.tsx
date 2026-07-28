@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { intakeApi } from "../../api/intake";
 import { consultationsApi } from "../../api/consultations";
 import { useI18n } from "../../i18n";
@@ -15,6 +15,7 @@ export function IntakePage() {
   const { t } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [answer, setAnswer] = useState("");
   const [error, setError] = useState("");
@@ -36,7 +37,7 @@ export function IntakePage() {
   const startMutation = useMutation({
     mutationFn: () => intakeApi.start(consultationId!),
     onSuccess: (data) => {
-      setSessionId(data.id);
+      setSessionId(data.session_id);
     },
     onError: (err) => {
       if (err instanceof ApiRequestError && err.status === 503) {
@@ -48,11 +49,13 @@ export function IntakePage() {
   });
 
   const answerMutation = useMutation({
-    mutationFn: (ans: string) => intakeApi.answer(sessionId!, ans),
+    mutationFn: (ans: string) => intakeApi.answer(sessionId!, ans, crypto.randomUUID()),
     onSuccess: (data) => {
       setAnswer("");
       refetchSession();
-      if (data.ready_for_review) {
+      queryClient.invalidateQueries({ queryKey: ["consultation", consultationId] });
+      queryClient.invalidateQueries({ queryKey: ["patient-dashboard"] });
+      if (data.record_ready) {
         // Intake complete - navigate to medical records
         navigate(`/app/patient/consultations/${consultationId}`);
       }

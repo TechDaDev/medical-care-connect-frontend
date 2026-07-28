@@ -38,11 +38,13 @@ export function MessagingPage() {
   });
 
   const sendMutation = useMutation({
-    mutationFn: () => messagesApi.send(consultationId!, content),
+    mutationFn: () => messagesApi.send(consultationId!, content.trim(), crypto.randomUUID()),
     onSuccess: () => {
       setContent("");
       setSendError("");
       queryClient.invalidateQueries({ queryKey: ["messages", consultationId] });
+      queryClient.invalidateQueries({ queryKey: ["consultation", consultationId] });
+      queryClient.invalidateQueries({ queryKey: ["patient-dashboard"] });
     },
     onError: (err: Error) => {
       setSendError(err.message);
@@ -51,18 +53,22 @@ export function MessagingPage() {
 
   // Mark unread messages as read
   useEffect(() => {
-    if (!messages || !user) return;
-    const unreadIds = messages
+    if (!messages?.results || !user) return;
+    const unreadIds = messages.results
       .filter(
         (m) =>
           m.sender !== user.id &&
-          !m.read_by?.some((r) => r.user_id === user.id)
+          !m.is_read_by_current_user
       )
       .map((m) => m.id);
     if (unreadIds.length > 0) {
-      messagesApi.markRead(consultationId!, unreadIds);
+      messagesApi.markRead(consultationId!, unreadIds).then(() => {
+        queryClient.invalidateQueries({ queryKey: ["consultation", consultationId] });
+        queryClient.invalidateQueries({ queryKey: ["patient-dashboard"] });
+        queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      });
     }
-  }, [messages, user, consultationId]);
+  }, [messages, user, consultationId, queryClient]);
 
   // Auto-scroll
   useEffect(() => {
@@ -103,10 +109,10 @@ export function MessagingPage() {
           className="flex-1 overflow-y-auto p-4 space-y-3"
           onScroll={handleScroll}
         >
-          {messages && messages.length === 0 ? (
+          {messages && messages.results.length === 0 ? (
             <EmptyState message={t("message.empty")} />
           ) : (
-            messages?.map((msg) => {
+            messages?.results.map((msg) => {
               const isMine = msg.sender === user?.id;
               return (
                 <div
@@ -156,11 +162,13 @@ export function MessagingPage() {
           <div className="p-4 border-t border-gray-200">
             <div className="flex gap-2">
               <Textarea
+                aria-label={t("message.input")}
                 placeholder={t("message.placeholder")}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="flex-1"
                 rows={2}
+                maxLength={5000}
               />
               <Button
                 onClick={() => {
@@ -173,8 +181,9 @@ export function MessagingPage() {
               </Button>
             </div>
             {sendError && (
-              <p className="text-sm text-red-600 mt-1">{sendError}</p>
+              <p role="alert" className="text-sm text-red-600 mt-1">{sendError}</p>
             )}
+            <p className="text-xs text-slate-500">{content.length}/5000</p>
           </div>
         )}
       </Card>

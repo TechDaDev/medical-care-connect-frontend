@@ -234,6 +234,80 @@ export enum ConsultationStatus {
   EMERGENCY_ESCALATED = "emergency_escalated",
 }
 
+export interface PatientConsultationDoctor {
+  id: string;
+  full_name: string;
+  professional_title: string;
+  specialty_name: string;
+  is_accepting_consultations?: boolean;
+}
+
+export interface PatientConsultationListItem {
+  id: string;
+  status: ConsultationStatus;
+  priority: string;
+  doctor: PatientConsultationDoctor | null;
+  specialty: { id: string; name: string } | null;
+  created_at: string;
+  updated_at: string;
+  submitted_at: string | null;
+  unread_messages: number;
+  needs_patient_action: boolean;
+  has_active_intake: boolean;
+  has_medical_record: boolean;
+  has_review: boolean;
+  available_actions: string[];
+}
+
+export interface ConsultationTimelineItem {
+  key: string;
+  status: "completed" | "current" | "upcoming" | "terminal";
+  occurred_at: string | null;
+  title_key: string;
+  description_key: string;
+}
+
+export interface PatientConsultationActions {
+  can_cancel: boolean;
+  can_message: boolean;
+  can_start_intake: boolean;
+  can_continue_intake: boolean;
+  can_view_record: boolean;
+  can_write_review: boolean;
+  can_upload_attachment: boolean;
+}
+
+export interface PatientConsultationDetail {
+  id: string;
+  status: ConsultationStatus;
+  priority: string;
+  doctor: PatientConsultationDoctor | null;
+  specialty: { id: string; name: string } | null;
+  description: string;
+  created_at: string;
+  updated_at: string;
+  submitted_at: string | null;
+  accepted_at: string | null;
+  cancelled_at: string | null;
+  cancellation_reason: string | null;
+  timeline: ConsultationTimelineItem[];
+  actions: PatientConsultationActions;
+  action_reasons: Record<string, string | null>;
+  intake_summary: {
+    exists: boolean; status: string | null; question_count: number;
+    is_complete: boolean; emergency_detected: boolean; updated_at: string | null;
+  };
+  messages_summary: { unread_count: number; last_message_at: string | null };
+  attachments_summary: {
+    total: number; available: number; pending_scan: number; quarantined: number;
+  };
+  medical_record_summary: {
+    exists: boolean; id: string | null; status: string | null; updated_at: string | null;
+  };
+  review_summary: { exists: boolean; status: string | null; can_edit: boolean };
+  generated_at: string;
+}
+
 export interface AIIntakeSession {
   id: string;
   consultation: string;
@@ -249,7 +323,7 @@ export interface AIIntakeSession {
 
 export interface AIIntakeMessage {
   id: string;
-  role: "ai" | "patient" | "system";
+  role: "assistant" | "patient" | "system";
   content: string;
   created_at: string;
 }
@@ -259,22 +333,22 @@ export interface MedicalRecordDraft {
   consultation: string;
   status: string;
   chief_complaint: string;
-  symptoms: string;
+  history_of_present_illness: string;
+  symptoms: string[];
   duration: string;
-  severity: string;
-  associated_symptoms: string;
-  chronic_conditions: string;
-  current_medications: string;
-  allergies: string;
-  surgical_history: string;
+  severity: number | null;
+  onset_date: string | null;
+  location: string;
+  triggers: string;
+  relieving_factors: string;
+  past_medical_history: string;
+  medications: string[];
+  allergies: string[];
   family_history: string;
-  pregnancy_status: string;
-  relevant_test_results: string;
-  additional_information: string;
-  missing_information: string;
-  emergency_summary: string;
-  doctor_notes: string;
-  ai_generated_summary: string;
+  social_history: string;
+  review_of_systems: string;
+  additional_notes?: string;
+  doctor_notes?: string;
   created_at: string;
   updated_at: string;
   finalized_at: string | null;
@@ -284,14 +358,13 @@ export interface ConsultationMessage {
   id: string;
   consultation: string;
   sender: string;
-  sender_email: string;
   sender_name: string;
   message_type: "text" | "system";
   content: string;
   is_system_message: boolean;
   sent_at: string;
   edited_at: string | null;
-  read_by: { user_id: string; read_at: string }[];
+  is_read_by_current_user: boolean;
 }
 
 export interface DoctorInternalNote {
