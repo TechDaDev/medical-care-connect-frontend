@@ -133,6 +133,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
           <div className="flex items-center gap-3 ml-auto">
             <select
+              aria-label={t("common.language")}
               value={locale}
               onChange={(e) => setLocale(e.target.value as SupportedLocale)}
               className="text-sm border-slate-300 rounded px-2 py-1 bg-white focus:border-primary-500 focus:ring-primary-500/20"

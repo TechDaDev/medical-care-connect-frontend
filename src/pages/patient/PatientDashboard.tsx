@@ -293,7 +293,7 @@ export function PatientDashboard() {
                             t("patientDashboard.specialtyUnavailable")}
                         </p>
                         {thread.last_message_at && (
-                          <p className="mt-1 text-xs text-slate-400">
+                          <p className="mt-1 text-xs text-slate-500">
                             {formatDateTime(thread.last_message_at)}
                           </p>
                         )}
@@ -353,7 +353,7 @@ export function PatientDashboard() {
                           <p className="mt-1 line-clamp-2 text-sm text-slate-600">
                             {notification.body}
                           </p>
-                          <p className="mt-1 text-xs text-slate-400">
+                          <p className="mt-1 text-xs text-slate-500">
                             {formatDateTime(notification.created_at)}
                           </p>
                         </div>
@@ -405,7 +405,7 @@ export function PatientDashboard() {
                       {consultation.specialty_name ||
                         t("patientDashboard.specialtyUnavailable")}
                     </p>
-                    <p className="mt-1 text-xs text-slate-400">
+                    <p className="mt-1 text-xs text-slate-500">
                       {formatDateTime(consultation.created_at)}
                     </p>
                   </div>

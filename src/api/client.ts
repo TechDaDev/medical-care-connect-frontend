@@ -100,7 +100,16 @@ client.interceptors.response.use(
 
       isRefreshing = true;
       try {
-        await axios.post(`${API_BASE}/auth/token/refresh/`, {}, { withCredentials: true });
+        await ensureCsrfToken();
+        const csrf = readCookie("mcc_csrftoken");
+        await axios.post(
+          `${API_BASE}/auth/token/refresh/`,
+          {},
+          {
+            withCredentials: true,
+            headers: csrf ? { "X-CSRFToken": csrf } : undefined,
+          },
+        );
         refreshQueue.forEach((q) => q.resolve());
         refreshQueue = [];
         return client(originalRequest);

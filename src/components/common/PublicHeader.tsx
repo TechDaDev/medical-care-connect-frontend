@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { useI18n, type SupportedLocale } from "../../i18n";
 import { useTheme } from "../../hooks/useTheme";
-import { Button } from "./Button";
 import { Sun, Moon } from "lucide-react";
 
 export function PublicHeader() {
@@ -17,21 +16,24 @@ export function PublicHeader() {
           </Link>
 
           <nav className="flex items-center gap-4">
-            <Link to="/doctors" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text-secondary)" }}>
+            <Link to="/doctors" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text)" }}>
               {t("nav.findDoctor")}
             </Link>
-            <Link to="/login" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text-secondary)" }}>
+            <Link to="/login" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text)" }}>
               {t("nav.login")}
             </Link>
-            <Link to="/register">
-              <Button size="sm" className="!border-0" style={{ backgroundColor: "var(--lp-accent)", color: "#fff" }}>
-                {t("nav.register")}
-              </Button>
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2"
+              style={{ backgroundColor: "var(--lp-accent)", color: "#fff" }}
+            >
+              {t("nav.register")}
             </Link>
 
             <div className="w-px h-6" style={{ backgroundColor: "var(--lp-card-border)" }} />
 
             <select
+              aria-label={t("common.language")}
               value={locale}
               onChange={(e) => setLocale(e.target.value as SupportedLocale)}
               className="text-sm rounded px-2 py-1 border cursor-pointer"

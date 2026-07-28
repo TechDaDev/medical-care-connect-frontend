@@ -9,20 +9,17 @@ process.env.E2E_RUN_ID = runId;
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:4173";
 const apiURL = process.env.PLAYWRIGHT_API_URL || "http://127.0.0.1:8000";
-const approvedHosts = new Set(
-  (process.env.E2E_APPROVED_HOSTS || "")
-    .split(",")
-    .map((host) => host.trim().toLowerCase())
-    .filter(Boolean),
-);
 const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
 
 function assertSafeTarget(label: string, value: string): void {
+  if (!value.trim()) {
+    throw new Error(`${label} refuses an empty destructive E2E target.`);
+  }
   const url = new URL(value);
-  if (!localHosts.has(url.hostname) && !approvedHosts.has(url.hostname.toLowerCase())) {
+  if (!localHosts.has(url.hostname)) {
     throw new Error(
       `${label} refuses destructive E2E target "${url.hostname}". ` +
-      "Use localhost/127.0.0.1 or explicitly list an isolated host in E2E_APPROVED_HOSTS.",
+      "Only localhost, 127.0.0.1, or ::1 is permitted.",
     );
   }
 }
@@ -101,7 +98,7 @@ export default defineConfig({
     },
     {
       name: "chromium-mobile",
-      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c|patient-phase-d)\.spec\.ts/,
+      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c|patient-phase-d|patient-phase-e)\.spec\.ts/,
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },

@@ -50,7 +50,7 @@ export function LoginPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "var(--page-bg)" }}>
       <PublicHeader />
-      <div className="min-h-screen flex items-center justify-center px-4 pt-16">
+      <main className="min-h-screen flex items-center justify-center px-4 pt-16">
         <Card className="w-full max-w-md">
           <h1 className="text-2xl font-bold mb-6 text-center" style={{ color: "var(--page-text)" }}>
             {t("auth.login")}
@@ -81,12 +81,16 @@ export function LoginPage() {
           </form>
           <p className="mt-4 text-sm text-center" style={{ color: "var(--page-text-secondary)" }}>
             {t("auth.noAccount")}{" "}
-          <Link to="/register" style={{ color: "var(--lp-accent)" }} className="hover:underline">
+          <Link
+            to="/register"
+            style={{ color: "var(--lp-accent)" }}
+            className="underline underline-offset-2"
+          >
             {t("auth.register")}
           </Link>
         </p>
       </Card>
-      </div>
+      </main>
     </div>
   );
 }
