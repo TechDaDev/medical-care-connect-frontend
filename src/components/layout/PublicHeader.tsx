@@ -34,6 +34,22 @@ export function PublicHeader() {
             {t("app.name")}
           </Link>
 
+          <select
+            aria-label={t("common.language")}
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as SupportedLocale)}
+            className="rounded border px-2 py-1 text-sm md:hidden"
+            style={{
+              backgroundColor: "var(--lp-glass-bg)",
+              color: "var(--lp-text)",
+              borderColor: "var(--lp-card-border)",
+            }}
+          >
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+            <option value="ckb">کوردی</option>
+          </select>
+
           {/* Desktop nav + controls */}
           <nav className="hidden md:flex items-center gap-4">
             <Link to="/doctors" className="font-medium transition-colors text-sm" style={{ color: "var(--lp-text-secondary)" }}>

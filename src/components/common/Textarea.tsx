@@ -27,10 +27,12 @@ export function Textarea({ label, error, className, id, ...props }: Props) {
             : "border-gray-300 text-gray-900",
           className
         )}
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? `${inputId}-error` : undefined}
         rows={4}
         {...props}
       />
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p id={`${inputId}-error`} className="text-sm text-red-600" role="alert">{error}</p>}
     </div>
   );
 }

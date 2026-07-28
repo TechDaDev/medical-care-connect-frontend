@@ -24,7 +24,7 @@ export function TransferModal({ consultationId, onClose, onSuccess }: Props) {
 
   const { data: doctors } = useQuery({
     queryKey: ["approved-doctors"],
-    queryFn: () => doctorsApi.list({ page_size: 100 }),
+    queryFn: () => doctorsApi.list({ page_size: 50 }),
   });
 
   const mutation = useMutation({
@@ -65,7 +65,7 @@ export function TransferModal({ consultationId, onClose, onSuccess }: Props) {
 
   const doctorOptions = (doctors?.results || []).map((d) => ({
     value: d.id,
-    label: `${d.full_name} - ${d.specialty_name}`,
+    label: `${d.full_name} - ${d.specialty.name}`,
   }));
 
   return (

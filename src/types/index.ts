@@ -94,20 +94,74 @@ export interface DoctorProfileUpdateInput {
   estimated_response_minutes?: number;
 }
 
-export interface DoctorPublicProfile {
+export interface MoneyAmount {
+  amount: string;
+  currency: string;
+}
+
+export interface DoctorSpecialtySummary {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+export type DoctorAvailableAction = "view" | "start_consultation";
+export type DoctorUnavailableReason =
+  | "not_accepting_consultations"
+  | "specialty_inactive"
+  | "account_inactive"
+  | "profile_not_approved";
+export type DoctorListOrdering =
+  | "relevance"
+  | "name"
+  | "experience_desc"
+  | "fee_asc"
+  | "fee_desc"
+  | "response_time_asc"
+  | "newest";
+
+export interface DoctorListItem {
   id: string;
   full_name: string;
-  specialty: string;
-  specialty_name: string;
+  specialty: DoctorSpecialtySummary;
   professional_title: string;
-  qualifications: string;
-  biography: string;
+  workplace_name: string;
   years_of_experience: number;
-  consultation_fee: string;
+  consultation_fee: MoneyAmount;
   languages: string[];
   is_accepting_consultations: boolean;
   estimated_response_minutes: number;
-  created_at?: string;
+  average_rating: number;
+  total_reviews: number;
+  profile_summary: string;
+  available_actions: DoctorAvailableAction[];
+}
+
+export interface DoctorDetail extends DoctorListItem {
+  qualifications: string;
+  biography: string;
+  unavailable_reason: DoctorUnavailableReason | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Compatibility alias for older imports. */
+export type DoctorPublicProfile = DoctorDetail;
+
+export interface DoctorSearchFilters {
+  search?: string;
+  specialty?: string;
+  specialty_slug?: string;
+  language?: "en" | "ar" | "ckb";
+  accepting?: boolean;
+  min_experience?: number;
+  min_fee?: string;
+  max_fee?: string;
+  max_response_minutes?: number;
+  ordering?: DoctorListOrdering;
+  page?: number;
+  page_size?: number;
+  locale?: "en" | "ar" | "ckb";
 }
 
 export interface Specialty {

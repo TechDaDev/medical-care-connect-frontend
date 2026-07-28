@@ -1,41 +1,26 @@
 import client from "./client";
-import { DoctorPublicProfile, PaginatedResponse, Specialty, DoctorProfile, DoctorProfileUpdateInput, DoctorDashboardData } from "../types";
+import {
+  DoctorDashboardData,
+  DoctorDetail,
+  DoctorListItem,
+  DoctorProfile,
+  DoctorProfileUpdateInput,
+  DoctorSearchFilters,
+  PaginatedResponse,
+  Specialty,
+} from "../types";
 
 export const doctorsApi = {
-  list: async (params?: {
-    search?: string;
-    specialty?: string;
-    accepting?: boolean;
-    language?: string;
-    ordering?: string;
-    page?: number;
-    page_size?: number;
-  }) => {
-    const { data } = await client.get<PaginatedResponse<DoctorPublicProfile>>(
+  list: async (params?: DoctorSearchFilters) => {
+    const { data } = await client.get<PaginatedResponse<DoctorListItem>>(
       "/doctors/",
       { params }
     );
     return data;
   },
 
-  /** Normalized list — always returns an array regardless of API shape. */
-  listNormalized: async (params?: {
-    search?: string;
-    specialty?: string;
-    accepting?: boolean;
-    language?: string;
-    ordering?: string;
-    page?: number;
-    page_size?: number;
-  }) => {
-    const raw = await doctorsApi.list(params);
-    if (Array.isArray(raw)) return raw;
-    if (raw && Array.isArray(raw.results)) return raw.results;
-    return [];
-  },
-
   getById: async (id: string) => {
-    const { data } = await client.get<DoctorPublicProfile>(`/doctors/${id}/`);
+    const { data } = await client.get<DoctorDetail>(`/doctors/${id}/`);
     return data;
   },
 

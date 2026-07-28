@@ -1,6 +1,23 @@
 import client from "./client";
 import { Consultation, PaginatedResponse } from "../types";
 
+export interface CreateConsultationInput {
+  doctor: string;
+  description: string;
+  client_request_id: string;
+  expected_doctor_updated_at?: string;
+}
+
+export interface CreatedConsultation {
+  id: string;
+  status: string;
+  submitted_at: string;
+  created_at: string;
+  doctor: { id: string; full_name: string };
+  specialty: { id: string; name: string };
+  next_path: string;
+}
+
 export const consultationsApi = {
   list: async (params?: { page?: number; status?: string }) => {
     const { data } = await client.get<Consultation[] | PaginatedResponse<Consultation>>(
@@ -15,13 +32,8 @@ export const consultationsApi = {
     return data;
   },
 
-  create: async (payload: {
-    doctor: string;
-    specialty?: string;
-    priority?: string;
-    description?: string;
-  }) => {
-    const { data } = await client.post<Consultation>(
+  create: async (payload: CreateConsultationInput) => {
+    const { data } = await client.post<CreatedConsultation>(
       "/consultations/",
       payload
     );
