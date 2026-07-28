@@ -34,6 +34,30 @@ export function getPendingDoctorCreds() {
   };
 }
 
+export function getRejectedDoctorCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
+  return {
+    email: `e2e+${runId}+rejected@example.invalid`,
+    password: requireEnv("E2E_TEST_PASSWORD"),
+  };
+}
+
+export function getSuspendedDoctorCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
+  return {
+    email: `e2e+${runId}+suspended@example.invalid`,
+    password: requireEnv("E2E_TEST_PASSWORD"),
+  };
+}
+
+export function getMissingProfileDoctorCreds() {
+  const runId = requireEnv("E2E_RUN_ID");
+  return {
+    email: `e2e+${runId}+missing-profile@example.invalid`,
+    password: requireEnv("E2E_TEST_PASSWORD"),
+  };
+}
+
 export function getSecondPatientCreds() {
   const runId = requireEnv("E2E_RUN_ID");
   return {

@@ -16,7 +16,7 @@ import { MessageSquare } from "lucide-react";
 import type { ConsultationReview } from "../../types";
 
 export function DoctorReviewsPage() {
-  const { t } = useI18n();
+  const { t, formatDate } = useI18n();
   const { user } = useAuth();
   const qc = useQueryClient();
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
@@ -99,7 +99,7 @@ export function DoctorReviewsPage() {
                   )}
                 </div>
                 <span className="text-xs text-slate-400">
-                  {new Date(review.created_at).toLocaleDateString()}
+                  {formatDate(review.created_at)}
                 </span>
               </div>
 

@@ -325,7 +325,7 @@ describe("Patient navigation", () => {
     expect(paths).toContain("/app/patient/privacy");
   });
 
-  it("leaves doctor, coordinator, and administrator navigation unchanged", () => {
+  it("keeps role-specific doctor, coordinator, and administrator navigation", () => {
     expect(
       buildNavigationItems(UserRole.DOCTOR, translate).map(
         (item) => item.path,
@@ -333,6 +333,7 @@ describe("Patient navigation", () => {
     ).toEqual([
       "/app/doctor",
       "/app/doctor/consultations",
+      "/app/doctor/availability",
       "/app/doctor/reviews",
       "/app/notifications",
       "/app/doctor/profile",

@@ -15,7 +15,7 @@ import { AttachmentList } from "../../components/attachments/AttachmentList";
 import { attachmentsApi } from "../../api/attachments";
 
 export function DoctorConsultationDetail() {
-  const { t } = useI18n();
+  const { t, formatDateTime } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const queryClient = useQueryClient();
   const [noteContent, setNoteContent] = useState("");
@@ -57,7 +57,7 @@ export function DoctorConsultationDetail() {
           {t("consultation.title")}
         </h1>
         <Badge variant="info">
-          {consultation.status.replace(/_/g, " ")}
+          {t(`consultation.status.${consultation.status}`)}
         </Badge>
       </div>
 
@@ -100,11 +100,6 @@ export function DoctorConsultationDetail() {
             <Button variant="secondary">{t("message.title")}</Button>
           </Link>
         )}
-        {consultation.actions?.can_view_record && consultation.has_medical_record && (
-          <Link to={`/app/medical-records/${consultation.id}`}>
-            <Button variant="secondary">{t("record.title")}</Button>
-          </Link>
-        )}
       </div>
 
       {consultation.actions?.can_add_internal_note && (
@@ -123,7 +118,7 @@ export function DoctorConsultationDetail() {
                   <p className="text-sm text-yellow-900">{note.content}</p>
                   <p className="text-xs text-yellow-700 mt-1">
                     {note.author_name} —{" "}
-                    {new Date(note.created_at).toLocaleString()}
+                    {formatDateTime(note.created_at)}
                   </p>
                 </div>
               ))}

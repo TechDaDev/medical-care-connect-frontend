@@ -33,8 +33,8 @@ export function LoginPage() {
     try {
       const user = await login(data.email, data.password);
       if (user.role === "doctor") {
-        const profile = await doctorsApi.getProfile();
-        navigate(profile.is_approved ? "/app/doctor" : "/app/doctor/pending-approval");
+        const access = await doctorsApi.getAccessState();
+        navigate(access.next_path);
       }
       else if (user.role === "coordinator" || user.role === "administrator") navigate("/app/staff");
       else navigate("/app/patient");

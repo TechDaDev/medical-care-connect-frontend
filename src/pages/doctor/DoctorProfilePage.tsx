@@ -212,7 +212,7 @@ export function DoctorProfilePage() {
       if (missing.length > 0) {
         setProfSaveResult({
           kind: "verify-error",
-          message: "Server response incomplete. Try again.",
+          message: t("doctorProfile.responseIncomplete"),
         });
         return;
       }

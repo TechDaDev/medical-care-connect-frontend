@@ -48,7 +48,7 @@ export function DoctorConsultationList() {
                     </div>
                   </div>
                   <Badge variant="info">
-                    {c.status.replace(/_/g, " ")}
+                    {t(`consultation.status.${c.status}`)}
                   </Badge>
                 </div>
               </Card>

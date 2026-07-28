@@ -3,11 +3,15 @@ import { lazy } from "react";
 import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 import { RequireAuth, RequireRole, useAuth } from "../auth";
 import { UserRole } from "../types";
-import { I18nProvider } from "../i18n";
+import { I18nProvider, useI18n } from "../i18n";
 import { AppLayout } from "../components/layout/AppLayout";
 import { LazyLoad } from "../components/common/LazyLoad";
 import { useQuery } from "@tanstack/react-query";
 import { doctorsApi } from "../api/doctors";
+import { DoctorAccessGate } from "../components/doctor/DoctorAccessGate";
+import { ErrorState } from "../components/common/ErrorState";
+import { Spinner } from "../components/common/Spinner";
+import { getErrorMessage } from "../utils/errors";
 
 function RoleBasedRedirect() {
   const { user } = useAuth();
@@ -26,15 +30,15 @@ function RoleBasedRedirect() {
 }
 
 function DoctorRoleRedirect() {
-  const { data: profile, isLoading } = useQuery({ queryKey: ["my-doctor-profile"], queryFn: doctorsApi.getProfile });
-  if (isLoading) return null;
-  return <Navigate to={profile?.is_approved ? "/app/doctor" : "/app/doctor/pending-approval"} replace />;
+  const { t } = useI18n();
+  const query = useQuery({ queryKey: ["doctor-access-state"], queryFn: doctorsApi.getAccessState });
+  if (query.isLoading) return <div role="status" aria-label={t("doctor.access.loading")}><Spinner /></div>;
+  if (query.error) return <ErrorState message={getErrorMessage(query.error)} onRetry={() => query.refetch()} />;
+  return <Navigate to={query.data?.next_path || "/login"} replace />;
 }
 
 function DoctorHome() {
-  const { data: profile, isLoading } = useQuery({ queryKey: ["my-doctor-profile"], queryFn: doctorsApi.getProfile });
-  if (isLoading) return null;
-  return profile?.is_approved ? <DoctorDashboard /> : <Navigate to="/app/doctor/pending-approval" replace />;
+  return <DoctorAccessGate><DoctorDashboard /></DoctorAccessGate>;
 }
 
 const LandingPage = lazy(() => import("../pages/public/LandingPage").then(m => ({ default: m.LandingPage })));
@@ -64,7 +68,8 @@ const DoctorConsultationList = lazy(() => import("../pages/doctor/DoctorConsulta
 const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsultationDetail").then(m => ({ default: m.DoctorConsultationDetail })));
 const DoctorReviewsPage = lazy(() => import("../pages/doctor/DoctorReviewsPage").then(m => ({ default: m.DoctorReviewsPage })));
 const DoctorProfilePage = lazy(() => import("../pages/doctor/DoctorProfilePage").then(m => ({ default: m.DoctorProfilePage })));
-const PendingApprovalPage = lazy(() => import("../pages/doctor/PendingApprovalPage").then(m => ({ default: m.PendingApprovalPage })));
+const DoctorAccessStatePage = lazy(() => import("../pages/doctor/DoctorAccessStatePage").then(m => ({ default: m.DoctorAccessStatePage })));
+const DoctorAvailabilityPage = lazy(() => import("../pages/doctor/DoctorAvailabilityPage").then(m => ({ default: m.DoctorAvailabilityPage })));
 const StaffDashboard = lazy(() => import("../pages/doctor/StaffDashboard").then(m => ({ default: m.StaffDashboard })));
 const StaffConsultationList = lazy(() => import("../pages/staff/StaffConsultationList").then(m => ({ default: m.StaffConsultationList })));
 const StaffConsultationDetail = lazy(() => import("../pages/staff/StaffConsultationDetail").then(m => ({ default: m.StaffConsultationDetail })));
@@ -137,12 +142,16 @@ export const router = createBrowserRouter([
             element: <RequireRole roles={[UserRole.DOCTOR]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
             children: [
               { index: true, element: <DoctorHome /> },
-              { path: "pending-approval", element: <PendingApprovalPage /> },
-              { path: "profile", element: <LazyLoad><DoctorProfilePage /></LazyLoad> },
-              { path: "consultations", element: <DoctorConsultationList /> },
-              { path: "consultations/:consultationId", element: <DoctorConsultationDetail /> },
-              { path: "reviews", element: <DoctorReviewsPage /> },
-              { path: "messages/:consultationId", element: <MessagingPage /> },
+              { path: "pending-approval", element: <DoctorAccessStatePage state="pending" /> },
+              { path: "application-rejected", element: <DoctorAccessStatePage state="rejected" /> },
+              { path: "suspended", element: <DoctorAccessStatePage state="suspended" /> },
+              { path: "profile-missing", element: <DoctorAccessStatePage state="missing_profile" /> },
+              { path: "profile", element: <DoctorAccessGate capability="profile"><LazyLoad><DoctorProfilePage /></LazyLoad></DoctorAccessGate> },
+              { path: "availability", element: <DoctorAccessGate capability="availability"><DoctorAvailabilityPage /></DoctorAccessGate> },
+              { path: "consultations", element: <DoctorAccessGate><DoctorConsultationList /></DoctorAccessGate> },
+              { path: "consultations/:consultationId", element: <DoctorAccessGate><DoctorConsultationDetail /></DoctorAccessGate> },
+              { path: "reviews", element: <DoctorAccessGate><DoctorReviewsPage /></DoctorAccessGate> },
+              { path: "messages/:consultationId", element: <DoctorAccessGate><MessagingPage /></DoctorAccessGate> },
             ],
           },
           {

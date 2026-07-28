@@ -649,21 +649,173 @@ export interface PatientDashboardData {
 }
 
 export interface DoctorDashboardData {
+  access: DoctorAccessState;
+  profile: {
+    id: string;
+    full_name: string;
+    professional_title: string;
+    specialty_name: string | null;
+    approval_status: DoctorApplicationStatus;
+    is_approved: boolean;
+    is_accepting_consultations: boolean;
+    completion_percent: number;
+    missing_fields: string[];
+  };
   consultations: {
     total_active: number;
     submitted: number;
     accepted: number;
+    intake_in_progress: number;
     intake_completed: number;
     doctor_review: number;
     awaiting_patient: number;
     awaiting_doctor: number;
+    under_review: number;
+    follow_up_required: number;
+    physical_visit_required: number;
+    transferred: number;
+    emergency_escalated: number;
+    completed: number;
+    cancelled: number;
   };
+  attention: {
+    total: number;
+    items: DoctorAttentionItem[];
+  };
+  messages: {
+    unread_total: number;
+    recent_threads: DoctorMessageThread[];
+  };
+  notifications: {
+    unread_total: number;
+    recent: DoctorDashboardNotification[];
+  };
+  reviews: {
+    total_reviews: number;
+    average_rating: number;
+    awaiting_response: number;
+    recent: DoctorDashboardReview[];
+  };
+  availability: DoctorAvailabilitySummary;
+  recent_consultations: DoctorDashboardConsultation[];
+  generated_at: string;
+}
+
+export type DoctorAccessStateName =
+  | "approved"
+  | "pending"
+  | "rejected"
+  | "suspended"
+  | "missing_profile"
+  | "inactive";
+
+export interface DoctorAccessState {
+  state: DoctorAccessStateName;
+  can_access_dashboard: boolean;
+  can_manage_availability: boolean;
+  can_accept_consultations: boolean;
+  can_edit_profile: boolean;
+  reason_code: string | null;
+  approval_status: DoctorApplicationStatus | null;
+  is_approved: boolean;
+  is_accepting_consultations: boolean;
+  profile_id: string | null;
+  updated_at: string | null;
+  next_path: string;
+}
+
+export interface DoctorAttentionItem {
+  type: string;
+  consultation_id: string | null;
+  review_id: string | null;
+  count: number;
+  severity: "info" | "warning" | "danger";
+  title_key: string;
+  description_key: string;
+  created_at: string | null;
+  action_path: string | null;
+}
+
+export interface DoctorMessageThread {
+  consultation_id: string;
+  patient_display_name: string;
+  consultation_status: string;
+  unread_count: number;
+  last_message_at: string | null;
+  action_path: string;
+}
+
+export interface DoctorDashboardNotification {
+  id: string;
+  notification_type: string;
+  title: string;
+  body: string;
+  is_read: boolean;
+  created_at: string;
+  action_path: string | null;
+}
+
+export interface DoctorDashboardReview {
+  id: string;
+  consultation_id: string;
+  rating: number;
+  is_anonymous: boolean;
+  has_response: boolean;
+  created_at: string;
+  action_path: string;
+}
+
+export interface DoctorAvailabilitySummary {
+  timezone: string | null;
+  is_accepting_consultations: boolean;
+  can_toggle_accepting: boolean;
+  toggle_unavailable_reason: string | null;
+  active_slot_count: number;
+  next_available_start: string | null;
+}
+
+export interface DoctorDashboardConsultation {
+  id: string;
+  patient_display_name: string;
+  specialty: { id: string; name: string } | null;
+  status: string;
+  priority: string;
   unread_messages: number;
-  unread_notifications: number;
-  profile: {
-    is_approved: boolean;
-    is_accepting_consultations: boolean;
-  };
+  needs_doctor_action: boolean;
+  updated_at: string;
+  action_path: string;
+}
+
+export interface DoctorAvailabilitySlot {
+  id: string;
+  day_of_week: string;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+  updated_at: string;
+  version: string;
+}
+
+export interface DoctorAvailabilityData {
+  timezone: string;
+  is_accepting_consultations: boolean;
+  can_manage: boolean;
+  slots: DoctorAvailabilitySlot[];
+  generated_at: string;
+}
+
+export interface DoctorAvailabilityInput {
+  day_of_week?: string;
+  start_time?: string;
+  end_time?: string;
+  is_active?: boolean;
+  expected_updated_at?: string;
+}
+
+export interface DoctorAcceptingStatusResponse extends DoctorAvailabilitySummary {
+  changed: boolean;
+  reason: string;
+  profile_updated_at: string;
 }
 
 export interface UnreadCount {

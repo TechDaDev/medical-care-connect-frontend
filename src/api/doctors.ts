@@ -1,6 +1,11 @@
 import client from "./client";
 import {
   DoctorDashboardData,
+  DoctorAccessState,
+  DoctorAcceptingStatusResponse,
+  DoctorAvailabilityData,
+  DoctorAvailabilityInput,
+  DoctorAvailabilitySlot,
   DoctorDetail,
   DoctorListItem,
   DoctorProfile,
@@ -39,10 +44,42 @@ export const doctorsApi = {
     return data;
   },
 
-  toggleAccepting: async (accepting: boolean) => {
-    const { data } = await client.patch<{ is_accepting_consultations: boolean }>(
+  getAccessState: async () => {
+    const { data } = await client.get<DoctorAccessState>("/doctors/me/access-state/");
+    return data;
+  },
+
+  getAvailability: async () => {
+    const { data } = await client.get<DoctorAvailabilityData>("/doctors/me/availability/");
+    return data;
+  },
+
+  createAvailability: async (payload: DoctorAvailabilityInput) => {
+    const { data } = await client.post<DoctorAvailabilitySlot>("/doctors/me/availability/", payload);
+    return data;
+  },
+
+  updateAvailability: async (id: string, payload: DoctorAvailabilityInput) => {
+    const { data } = await client.patch<DoctorAvailabilitySlot>(
+      `/doctors/me/availability/${id}/`,
+      payload
+    );
+    return data;
+  },
+
+  deleteAvailability: async (id: string, expectedUpdatedAt?: string) => {
+    await client.delete(`/doctors/me/availability/${id}/`, {
+      params: expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : undefined,
+    });
+  },
+
+  toggleAccepting: async (accepting: boolean, expectedUpdatedAt?: string) => {
+    const { data } = await client.patch<DoctorAcceptingStatusResponse>(
       "/doctors/me/availability-status/",
-      { is_accepting_consultations: accepting }
+      {
+        is_accepting_consultations: accepting,
+        ...(expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {}),
+      }
     );
     return data;
   },
