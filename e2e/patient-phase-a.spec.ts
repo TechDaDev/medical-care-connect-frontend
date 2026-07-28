@@ -44,7 +44,7 @@ test.describe("Patient Phase A dashboard", () => {
       .first();
     await expect(notificationLink).toBeVisible();
     await notificationLink.click();
-    await expect(page).toHaveURL(/\/app\/patient\/consultations\//);
+    await expect(page).toHaveURL(/\/app\/patient\/notifications$/);
 
     await page.goto(getBaseUrl() + "/app/patient");
     const recentConsultation = page
@@ -52,15 +52,17 @@ test.describe("Patient Phase A dashboard", () => {
       .first();
     await expect(recentConsultation).toBeVisible();
     await recentConsultation.click();
-    await expect(page).toHaveURL(/\/app\/patient\/consultations\//);
+    await expect(page).toHaveURL(
+      /\/app\/patient\/(?:consultations|medical-records)\//,
+    );
 
     await page.goto(getBaseUrl() + "/app/patient");
     await expect(
       page.getByRole("link", { name: "Complete profile" }).first(),
-    ).toHaveAttribute("href", "/app/profile");
+    ).toHaveAttribute("href", "/app/patient/profile");
     await expect(
       page.getByRole("link", { name: "Privacy", exact: true }),
-    ).toHaveAttribute("href", "/app/privacy");
+    ).toHaveAttribute("href", "/app/patient/privacy");
 
     const dashboardResponse = page.waitForResponse(
       (response) =>

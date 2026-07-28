@@ -115,6 +115,7 @@ const dashboardData: PatientDashboardData = {
       unread_messages: 3,
       needs_patient_action: true,
       has_medical_record: true,
+      medical_record_id: "record-1",
     },
   ],
   generated_at: "2026-07-28T10:10:00Z",
@@ -203,23 +204,20 @@ describe("Patient Phase A dashboard", () => {
       screen.getByRole("link", {
         name: "Open notification: Consultation update",
       }),
-    ).toHaveAttribute(
-      "href",
-      "/app/patient/consultations/consultation-1",
-    );
+    ).toHaveAttribute("href", "/app/patient/notifications");
     expect(
       screen.getByRole("link", {
         name: "Open notification: General update",
       }),
-    ).toHaveAttribute("href", "/app/notifications");
+    ).toHaveAttribute("href", "/app/patient/notifications");
     expect(
       screen
         .getAllByRole("link", { name: "Complete profile" })
-        .every((link) => link.getAttribute("href") === "/app/profile"),
+        .every((link) => link.getAttribute("href") === "/app/patient/profile"),
     ).toBe(true);
     expect(
       screen.getByRole("link", { name: "View privacy settings" }),
-    ).toHaveAttribute("href", "/app/privacy");
+    ).toHaveAttribute("href", "/app/patient/privacy");
     expect(document.body.textContent).not.toMatch(
       /patientDashboard\.|consultation\.status\./,
     );
@@ -320,11 +318,11 @@ describe("ConsultationStatusBadge", () => {
 describe("Patient navigation", () => {
   const translate = (key: string) => key;
 
-  it("shows privacy for patient", () => {
+  it("shows patient-specific privacy for patient", () => {
     const paths = buildNavigationItems(UserRole.PATIENT, translate).map(
       (item) => item.path,
     );
-    expect(paths).toContain("/app/privacy");
+    expect(paths).toContain("/app/patient/privacy");
   });
 
   it("leaves doctor, coordinator, and administrator navigation unchanged", () => {

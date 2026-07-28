@@ -50,10 +50,15 @@ const PatientConsultationList = lazy(() => import("../pages/patient/PatientConsu
 const NewConsultationPage = lazy(() => import("../pages/patient/NewConsultationPage").then(m => ({ default: m.NewConsultationPage })));
 const ConsultationDetailPage = lazy(() => import("../pages/patient/ConsultationDetailPage").then(m => ({ default: m.ConsultationDetailPage })));
 const IntakePage = lazy(() => import("../pages/patient/IntakePage").then(m => ({ default: m.IntakePage })));
-const MedicalRecordPage = lazy(() => import("../pages/patient/MedicalRecordPage").then(m => ({ default: m.MedicalRecordPage })));
 const MessagingPage = lazy(() => import("../pages/patient/MessagingPage").then(m => ({ default: m.MessagingPage })));
 const NotificationsPage = lazy(() => import("../pages/patient/NotificationsPage").then(m => ({ default: m.NotificationsPage })));
 const ProfilePage = lazy(() => import("../pages/patient/ProfilePage").then(m => ({ default: m.ProfilePage })));
+const PatientProfilePage = lazy(() => import("../pages/patient/PatientProfilePage").then(m => ({ default: m.PatientProfilePage })));
+const PatientMedicalRecordListPage = lazy(() => import("../pages/patient/PatientMedicalRecordListPage").then(m => ({ default: m.PatientMedicalRecordListPage })));
+const PatientMedicalRecordPage = lazy(() => import("../pages/patient/PatientMedicalRecordPage").then(m => ({ default: m.PatientMedicalRecordPage })));
+const PatientMessagesPage = lazy(() => import("../pages/patient/PatientMessagesPage").then(m => ({ default: m.PatientMessagesPage })));
+const PatientNotificationsPage = lazy(() => import("../pages/patient/PatientNotificationsPage").then(m => ({ default: m.PatientNotificationsPage })));
+const PatientPrivacyPage = lazy(() => import("../pages/patient/PatientPrivacyPage").then(m => ({ default: m.PatientPrivacyPage })));
 const DoctorDashboard = lazy(() => import("../pages/doctor/DoctorDashboard").then(m => ({ default: m.DoctorDashboard })));
 const DoctorConsultationList = lazy(() => import("../pages/doctor/DoctorConsultationList").then(m => ({ default: m.DoctorConsultationList })));
 const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsultationDetail").then(m => ({ default: m.DoctorConsultationDetail })));
@@ -116,8 +121,15 @@ export const router = createBrowserRouter([
               { path: "consultations/new", element: <NewConsultationPage /> },
               { path: "consultations/:consultationId", element: <ConsultationDetailPage /> },
               { path: "consultations/:consultationId/intake", element: <IntakePage /> },
+              { path: "profile", element: <PatientProfilePage /> },
+              { path: "messages", element: <PatientMessagesPage /> },
               { path: "messages/:consultationId", element: <MessagingPage /> },
-              { path: "medical-records/:recordId", element: <MedicalRecordPage /> },
+              { path: "medical-records", element: <PatientMedicalRecordListPage /> },
+              { path: "medical-records/:recordId", element: <PatientMedicalRecordPage /> },
+              { path: "notifications", element: <PatientNotificationsPage /> },
+              { path: "privacy", element: <PatientPrivacyPage /> },
+              { path: "privacy/exports", element: <PrivacyExportsPage /> },
+              { path: "privacy/deletion", element: <PrivacyDeletionPage /> },
             ],
           },
           {

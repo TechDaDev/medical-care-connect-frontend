@@ -330,11 +330,7 @@ export function PatientDashboard() {
                 {data.notifications.recent.map((notification) => (
                   <li key={notification.id}>
                     <Link
-                      to={
-                        notification.consultation_id
-                          ? `/app/patient/consultations/${notification.consultation_id}`
-                          : "/app/notifications"
-                      }
+                      to="/app/patient/notifications"
                       className="block rounded-lg px-1 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                       aria-label={t("patientDashboard.notifications.open", {
                         title: notification.title,
@@ -384,7 +380,11 @@ export function PatientDashboard() {
             {data.recent_consultations.map((consultation) => (
               <Link
                 key={consultation.id}
-                to={`/app/patient/consultations/${consultation.id}`}
+                to={
+                  consultation.medical_record_id
+                    ? `/app/patient/medical-records/${consultation.medical_record_id}`
+                    : `/app/patient/consultations/${consultation.id}`
+                }
                 className="block rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
                 aria-label={t("patientDashboard.recentConsultations.open", {
                   doctor:
@@ -493,7 +493,7 @@ export function PatientDashboard() {
               </div>
             </div>
             <Link
-              to="/app/profile"
+              to="/app/patient/profile"
               className="inline-flex items-center justify-center rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2"
             >
               <UserRound className="h-4 w-4" aria-hidden="true" />
@@ -522,12 +522,12 @@ export function PatientDashboard() {
               icon: List,
             },
             {
-              path: "/app/profile",
+              path: "/app/patient/profile",
               label: "patientDashboard.quickActions.profile",
               icon: UserRound,
             },
             {
-              path: "/app/privacy",
+              path: "/app/patient/privacy",
               label: "patientDashboard.quickActions.privacy",
               icon: LockKeyhole,
             },

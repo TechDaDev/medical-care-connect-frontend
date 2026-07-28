@@ -55,6 +55,30 @@ export interface PatientProfile {
   updated_at?: string;
 }
 
+export interface PatientProfileComposite {
+  account: Pick<
+    User,
+    | "id"
+    | "email"
+    | "first_name"
+    | "last_name"
+    | "full_name"
+    | "phone_number"
+    | "date_joined"
+    | "updated_at"
+  >;
+  profile: PatientProfile;
+  completion: {
+    percent: number;
+    missing_fields: string[];
+    personal_information_complete: boolean;
+    contact_information_complete: boolean;
+    emergency_contact_complete: boolean;
+    basic_health_complete: boolean;
+  };
+  generated_at: string;
+}
+
 export interface DoctorProfile {
   id: string;
   email?: string;
@@ -354,6 +378,63 @@ export interface MedicalRecordDraft {
   finalized_at: string | null;
 }
 
+export interface PatientDoctorSummary {
+  id: string;
+  full_name: string;
+  specialty_name: string | null;
+}
+
+export interface PatientMedicalRecordListItem {
+  id: string;
+  consultation_id: string;
+  doctor: PatientDoctorSummary;
+  status: string;
+  chief_complaint_summary: string | null;
+  created_at: string;
+  updated_at: string;
+  finalized_at: string | null;
+  available_actions: string[];
+}
+
+export interface PatientMedicalRecord {
+  id: string;
+  consultation_id: string;
+  doctor: PatientDoctorSummary;
+  specialty: { id: string; name: string } | null;
+  status: string;
+  chief_complaint: string;
+  history_of_present_illness: string;
+  symptoms: string[];
+  severity: number | null;
+  onset_date: string | null;
+  duration: string;
+  location: string;
+  triggers: string;
+  relieving_factors: string;
+  past_medical_history: string;
+  medications: string[];
+  allergies: string[];
+  family_history: string;
+  social_history: string;
+  review_of_systems: string;
+  created_at: string;
+  updated_at: string;
+  finalized_at: string | null;
+}
+
+export interface PatientMessageThread {
+  consultation_id: string;
+  doctor: PatientDoctorSummary | null;
+  consultation_status: string;
+  unread_count: number;
+  last_message_at: string | null;
+  last_message_sender_role: string | null;
+  last_message_preview: string | null;
+  messaging_available: boolean;
+  unavailable_reason: string | null;
+  available_actions: string[];
+}
+
 export interface ConsultationMessage {
   id: string;
   consultation: string;
@@ -380,15 +461,16 @@ export interface DoctorInternalNote {
 
 export interface Notification {
   id: string;
-  recipient: string;
   notification_type: string;
   title: string;
   body: string;
-  consultation: string | null;
-  related_message: string | null;
   is_read: boolean;
   read_at: string | null;
   created_at: string;
+  link: {
+    type: "consultation" | "message" | "medical_record" | "privacy" | "profile" | "none";
+    path: string | null;
+  };
 }
 
 export interface ConsultationReview {
@@ -550,6 +632,7 @@ export interface PatientDashboardRecentConsultation {
   unread_messages: number;
   needs_patient_action: boolean;
   has_medical_record: boolean;
+  medical_record_id: string | null;
 }
 
 export interface PatientDashboardData {

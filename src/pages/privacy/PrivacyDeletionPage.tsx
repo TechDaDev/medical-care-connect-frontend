@@ -14,11 +14,12 @@ interface DeletionRequest {
 }
 
 export function PrivacyDeletionPage() {
-  const { t } = useI18n();
+  const { t, formatDateTime } = useI18n();
   const [requests, setRequests] = useState<DeletionRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [reason, setReason] = useState("");
+  const [confirmation, setConfirmation] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [showDeactivateConfirm, setShowDeactivateConfirm] = useState(false);
   const [deactivatePassword, setDeactivatePassword] = useState("");
@@ -54,10 +55,24 @@ export function PrivacyDeletionPage() {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reason }),
+        body: JSON.stringify({ reason, confirmation }),
       });
-      if (!resp.ok) throw new Error();
+      if (resp.status === 409) {
+        setError(t("privacy.activeDeletionExists"));
+        await reloadRequests();
+        return;
+      }
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        setError(
+          typeof data.detail === "string"
+            ? data.detail
+            : t("privacy.validationError"),
+        );
+        return;
+      }
       setReason("");
+      setConfirmation(false);
       await reloadRequests();
     } catch {
       setError(t("error.network"));
@@ -115,7 +130,7 @@ export function PrivacyDeletionPage() {
     <div className="max-w-3xl mx-auto px-4 py-8" dir="auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("privacy.accountManagement")}</h1>
 
-      {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+      {error && <p className="text-red-600 text-sm mb-4" role="alert">{error}</p>}
 
       {/* Retention warning */}
       <Card>
@@ -168,8 +183,22 @@ export function PrivacyDeletionPage() {
             onChange={(e) => setReason(e.target.value)}
             className="w-full px-3 py-2 border rounded text-sm mb-3"
             rows={3}
+            minLength={10}
+            maxLength={1000}
           />
-          <Button onClick={submitRequest} loading={submitting} disabled={!reason.trim()}>
+          <label className="mb-3 flex items-start gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={confirmation}
+              onChange={(event) => setConfirmation(event.target.checked)}
+            />
+            {t("privacy.deletionConfirmation")}
+          </label>
+          <Button
+            onClick={submitRequest}
+            loading={submitting}
+            disabled={reason.trim().length < 10 || !confirmation || requests.some((item) => ["pending", "approved", "processing"].includes(item.status))}
+          >
             {t("privacy.requestDeletion")}
           </Button>
         </div>
@@ -183,9 +212,9 @@ export function PrivacyDeletionPage() {
             <Card key={r.id}>
               <div className="p-4 flex items-center justify-between">
                 <div>
-                  <span className={statusBadge(r.status)}>{r.status}</span>
+                  <span className={statusBadge(r.status)}>{t(`privacy.deletionStatus.${r.status}`)}</span>
                   <p className="text-xs text-gray-500 mt-1">
-                    {r.requested_at ? new Date(r.requested_at).toLocaleString() : ""}
+                    {r.requested_at ? formatDateTime(r.requested_at) : ""}
                   </p>
                   {r.rejection_reason && (
                     <p className="text-xs text-red-500 mt-1">{r.rejection_reason}</p>
@@ -203,7 +232,7 @@ export function PrivacyDeletionPage() {
       )}
 
       <div className="mt-6">
-        <Link to="/app/privacy" className="text-sm text-blue-600 hover:underline">
+        <Link to="/app/patient/privacy" className="text-sm text-blue-600 hover:underline">
           {t("common.back")}
         </Link>
       </div>

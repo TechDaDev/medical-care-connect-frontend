@@ -16,11 +16,14 @@ interface ExportRequest {
 }
 
 export function PrivacyExportsPage() {
-  const { t } = useI18n();
+  const { t, formatDateTime } = useI18n();
   const [requesting, setRequesting] = useState(false);
   const [exports, setExports] = useState<ExportRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const activeExport = exports.some((item) =>
+    item.status === "pending" || item.status === "processing"
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -54,6 +57,11 @@ export function PrivacyExportsPage() {
         headers: { "Content-Type": "application/json" },
         body: "{}",
       });
+      if (resp.status === 409) {
+        setError(t("privacy.activeExportExists"));
+        await reloadExports();
+        return;
+      }
       if (!resp.ok) throw new Error("Failed");
       await reloadExports();
     } catch {
@@ -98,10 +106,10 @@ export function PrivacyExportsPage() {
     <div className="max-w-3xl mx-auto px-4 py-8" dir="auto">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">{t("privacy.exportData")}</h1>
 
-      {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+      {error && <p className="text-red-600 text-sm mb-4" role="alert">{error}</p>}
 
       <div className="mb-6">
-        <Button onClick={requestExport} loading={requesting} disabled={requesting}>
+        <Button onClick={requestExport} loading={requesting} disabled={requesting || activeExport}>
           {t("privacy.requestExport")}
         </Button>
       </div>
@@ -118,11 +126,8 @@ export function PrivacyExportsPage() {
                     {t(`privacy.exportStatus.${exp.status}`)}
                   </span>
                   <p className="text-xs text-gray-500 mt-1">
-                    {exp.requested_at ? new Date(exp.requested_at).toLocaleString() : ""}
+                    {exp.requested_at ? formatDateTime(exp.requested_at) : ""}
                   </p>
-                  {exp.failure_code && (
-                    <p className="text-xs text-red-500 mt-1">{exp.failure_code}</p>
-                  )}
                 </div>
                 <div className="flex gap-2">
                   {exp.status === "completed" && (
@@ -138,7 +143,7 @@ export function PrivacyExportsPage() {
       )}
 
       <div className="mt-6">
-        <Link to="/app/privacy" className="text-sm text-blue-600 hover:underline">
+        <Link to="/app/patient/privacy" className="text-sm text-blue-600 hover:underline">
           {t("common.back")}
         </Link>
       </div>

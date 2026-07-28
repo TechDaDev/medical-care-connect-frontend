@@ -101,7 +101,7 @@ export default defineConfig({
     },
     {
       name: "chromium-mobile",
-      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c)\.spec\.ts/,
+      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c|patient-phase-d)\.spec\.ts/,
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },

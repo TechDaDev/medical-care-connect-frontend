@@ -8,9 +8,11 @@ export function buildNavigationItems(role: UserRole, t: Translate) {
       { label: t("nav.dashboard"), path: "/app/patient" },
       { label: t("nav.findDoctor"), path: "/app/patient/doctors" },
       { label: t("nav.consultations"), path: "/app/patient/consultations" },
-      { label: t("nav.notifications"), path: "/app/notifications" },
-      { label: t("nav.profile"), path: "/app/profile" },
-      { label: t("nav.privacy"), path: "/app/privacy" },
+      { label: t("nav.medicalRecords"), path: "/app/patient/medical-records" },
+      { label: t("nav.messages"), path: "/app/patient/messages" },
+      { label: t("nav.notifications"), path: "/app/patient/notifications" },
+      { label: t("nav.profile"), path: "/app/patient/profile" },
+      { label: t("nav.privacy"), path: "/app/patient/privacy" },
     ];
   }
   if (role === UserRole.DOCTOR) {
