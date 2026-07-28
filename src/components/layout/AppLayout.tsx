@@ -21,6 +21,7 @@ import { UserRole } from "../../types";
 import { clsx } from "../../utils/clsx";
 import { useI18n, type SupportedLocale } from "../../i18n";
 import { AvatarFallback } from "../common/AvatarFallback";
+import { buildNavigationItems } from "./navigation";
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
@@ -31,48 +32,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   const role = user?.role as UserRole;
 
   const navItems = useMemo(() => {
-    const items =
-      role === UserRole.PATIENT
-        ? [
-            { label: t("nav.dashboard"), path: "/app/patient" },
-            { label: t("nav.findDoctor"), path: "/app/patient/doctors" },
-            { label: t("nav.consultations"), path: "/app/patient/consultations" },
-            { label: t("nav.notifications"), path: "/app/notifications" },
-            { label: t("nav.profile"), path: "/app/profile" },
-          ]
-        : role === UserRole.DOCTOR
-        ? [
-            { label: t("nav.dashboard"), path: "/app/doctor" },
-            { label: t("nav.consultations"), path: "/app/doctor/consultations" },
-            { label: t("nav.reviews"), path: "/app/doctor/reviews" },
-            { label: t("nav.notifications"), path: "/app/notifications" },
-            { label: t("nav.profile"), path: "/app/doctor/profile" },
-          ]
-        : role === UserRole.ADMINISTRATOR
-        ? [
-            { label: t("nav.dashboard"), path: "/app/staff" },
-            { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
-            { label: t("nav.doctorApplications"), path: "/app/staff/doctor-applications" },
-            { label: t("nav.users"), path: "/app/staff/users" },
-            { label: t("nav.staffReviews"), path: "/app/staff/reviews" },
-            { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
-            { label: t("nav.privacyRequests"), path: "/app/staff/privacy-requests" },
-            { label: t("nav.audit"), path: "/app/staff/audit" },
-            { label: t("nav.specialties"), path: "/app/staff/specialties" },
-            { label: t("nav.attachmentAdmin"), path: "/app/staff/attachments" },
-            { label: t("nav.operations"), path: "/app/staff/operations" },
-            { label: t("nav.notifications"), path: "/app/notifications" },
-            { label: t("nav.profile"), path: "/app/profile" },
-          ]
-        : [
-            { label: t("nav.dashboard"), path: "/app/staff" },
-            { label: t("nav.staffConsultations"), path: "/app/staff/consultations" },
-            { label: t("nav.doctorApplications"), path: "/app/staff/doctor-applications" },
-            { label: t("nav.staffReviews"), path: "/app/staff/reviews" },
-            { label: t("nav.doctorWorkload"), path: "/app/staff/doctors" },
-            { label: t("nav.notifications"), path: "/app/notifications" },
-            { label: t("nav.profile"), path: "/app/profile" },
-          ];
+    const items = buildNavigationItems(role, t);
     return items.map((item) => ({
       ...item,
       icon:
@@ -107,8 +67,13 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside
         className={clsx(
-          "fixed inset-y-0 left-0 z-30 w-64 bg-white border-r border-slate-200 transform transition-transform lg:translate-x-0 lg:static lg:inset-auto",
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          "fixed inset-y-0 z-30 w-64 bg-white border-slate-200 transform transition-transform lg:translate-x-0 lg:static lg:inset-auto",
+          direction === "rtl" ? "right-0 border-l" : "left-0 border-r",
+          sidebarOpen
+            ? "translate-x-0"
+            : direction === "rtl"
+              ? "translate-x-full"
+              : "-translate-x-full",
         )}
       >
         <div className="flex items-center justify-between h-16 px-6 border-b border-slate-200">
@@ -118,6 +83,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button
             className="lg:hidden text-slate-500"
             onClick={() => setSidebarOpen(false)}
+            aria-label={t("nav.closeMenu")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -150,6 +116,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         <div
           className="fixed inset-0 z-20 bg-black/30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
 
@@ -160,6 +127,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           <button
             className="lg:hidden text-slate-500"
             onClick={() => setSidebarOpen(true)}
+            aria-label={t("nav.openMenu")}
           >
             <Menu className="h-6 w-6" />
           </button>

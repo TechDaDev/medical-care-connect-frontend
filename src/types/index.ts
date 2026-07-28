@@ -345,24 +345,97 @@ export interface RegisterResponse {
   user: User;
 }
 
-export interface PatientDashboardData {
-  consultations: {
-    total: number;
-    active: number;
-    awaiting_patient: number;
-    awaiting_doctor: number;
-    completed: number;
-  };
+export interface PatientDashboardConsultations {
+  total: number;
+  active: number;
+  awaiting_patient: number;
+  awaiting_doctor: number;
+  intake_in_progress: number;
+  doctor_review: number;
+  follow_up_required: number;
+  physical_visit_required: number;
+  emergency_escalated: number;
+  completed: number;
+  cancelled: number;
+}
+
+export type PatientAttentionType =
+  | "awaiting_patient_response"
+  | "follow_up_required"
+  | "physical_visit_required"
+  | "emergency_escalated"
+  | "intake_incomplete"
+  | "unread_messages";
+
+export interface PatientAttentionItem {
+  type: PatientAttentionType;
+  consultation_id: string | null;
+  title_key: string;
+  description_key: string;
+  count: number;
+  severity: "info" | "warning" | "danger";
+  created_at: string | null;
+  action_path: string | null;
+}
+
+export interface PatientDashboardMessageThread {
+  consultation_id: string;
+  doctor_name: string | null;
+  specialty_name: string | null;
+  unread_count: number;
+  last_message_at: string | null;
+}
+
+export interface PatientDashboardMessages {
+  unread_total: number;
+  recent_threads: PatientDashboardMessageThread[];
+}
+
+export interface PatientDashboardNotification {
+  id: string;
+  notification_type: string;
+  title: string;
+  body: string;
+  is_read: boolean;
+  created_at: string;
+  consultation_id: string | null;
+}
+
+export interface PatientDashboardNotifications {
+  unread_total: number;
+  recent: PatientDashboardNotification[];
+}
+
+export interface PatientDashboardProfile {
+  completion_percent: number;
+  missing_fields: string[];
+  emergency_contact_complete: boolean;
+  basic_health_complete: boolean;
+}
+
+export interface PatientDashboardRecentConsultation {
+  id: string;
+  status: ConsultationStatus;
+  doctor_name: string | null;
+  specialty_name: string | null;
+  created_at: string;
+  updated_at: string;
   unread_messages: number;
-  unread_notifications: number;
-  recent_consultations: Array<{
-    id: string;
-    status: string;
-    doctor_name: string;
-    specialty_name: string;
-    created_at: string;
-    updated_at: string;
-  }>;
+  needs_patient_action: boolean;
+  has_medical_record: boolean;
+}
+
+export interface PatientDashboardData {
+  consultations: PatientDashboardConsultations;
+  attention: {
+    total: number;
+    items: PatientAttentionItem[];
+  };
+  messages: PatientDashboardMessages;
+  notifications: PatientDashboardNotifications;
+  profile: PatientDashboardProfile;
+  recent_consultations: PatientDashboardRecentConsultation[];
+  generated_at: string;
 }
 
 export interface DoctorDashboardData {

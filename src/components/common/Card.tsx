@@ -1,9 +1,8 @@
-import type { ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { clsx } from "../../utils/clsx";
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
-  className?: string;
   padding?: boolean;
   hover?: boolean;
   bordered?: boolean;
@@ -15,6 +14,7 @@ export function Card({
   padding = true,
   hover = false,
   bordered = true,
+  ...props
 }: Props) {
   return (
     <div
@@ -26,6 +26,7 @@ export function Card({
         "shadow-sm",
         className
       )}
+      {...props}
     >
       {children}
     </div>
