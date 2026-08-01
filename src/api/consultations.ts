@@ -1,7 +1,8 @@
 import client from "./client";
 import {
   Consultation, PaginatedResponse, PatientConsultationDetail,
-  PatientConsultationListItem,
+  PatientConsultationListItem, DoctorConsultationDetail,
+  DoctorConsultationQueueItem, DoctorIntakeDetail,
 } from "../types";
 
 export interface PatientConsultationFilters {
@@ -24,6 +25,33 @@ export interface CreateConsultationInput {
   description: string;
   client_request_id: string;
   expected_doctor_updated_at?: string;
+}
+
+export interface DoctorConsultationFilters {
+  status?: string;
+  status_group?: string;
+  priority?: string;
+  patient?: string;
+  specialty?: string;
+  needs_doctor_action?: boolean;
+  has_unread_messages?: boolean;
+  has_completed_intake?: boolean;
+  has_medical_record?: boolean;
+  created_after?: string;
+  created_before?: string;
+  search?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export interface DoctorTransitionInput {
+  action: string;
+  reason?: string;
+  target_doctor_id?: string;
+  expected_status: string;
+  expected_updated_at?: string;
+  client_request_id: string;
 }
 
 export interface CreatedConsultation {
@@ -50,6 +78,27 @@ export const consultationsApi = {
     return data;
   },
 
+  listDoctor: async (params: DoctorConsultationFilters) => {
+    const { data } = await client.get<PaginatedResponse<DoctorConsultationQueueItem>>(
+      "/consultations/doctor/", { params }
+    );
+    return data;
+  },
+
+  getDoctorById: async (id: string) => {
+    const { data } = await client.get<DoctorConsultationDetail>(
+      `/consultations/${id}/doctor/`
+    );
+    return data;
+  },
+
+  getDoctorIntake: async (id: string) => {
+    const { data } = await client.get<DoctorIntakeDetail>(
+      `/consultations/${id}/doctor-intake/`
+    );
+    return data;
+  },
+
   listPatient: async (params: PatientConsultationFilters) => {
     const { data } = await client.get<PaginatedResponse<PatientConsultationListItem>>(
       "/consultations/", { params }
@@ -72,9 +121,20 @@ export const consultationsApi = {
     return data;
   },
 
-  accept: async (id: string) => {
-    const { data } = await client.post<Consultation>(
-      `/consultations/${id}/accept/`
+  accept: async (id: string, expectedStatus = "submitted", expectedUpdatedAt?: string) => {
+    const { data } = await client.post<DoctorConsultationDetail>(
+      `/consultations/${id}/accept/`, {
+        expected_status: expectedStatus,
+        expected_updated_at: expectedUpdatedAt,
+        client_request_id: crypto.randomUUID(),
+      }
+    );
+    return data;
+  },
+
+  transitionDoctor: async (id: string, payload: DoctorTransitionInput) => {
+    const { data } = await client.post<DoctorConsultationDetail>(
+      `/consultations/${id}/doctor-transition/`, payload
     );
     return data;
   },

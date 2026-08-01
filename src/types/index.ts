@@ -240,6 +240,90 @@ export interface Consultation {
   updated_at: string;
 }
 
+export interface DoctorConsultationQueueItem {
+  id: string;
+  status: ConsultationStatus;
+  priority: string;
+  patient: { id: string; display_name: string; age_group: string | null; gender: string | null };
+  specialty: { id: string; name: string } | null;
+  created_at: string;
+  updated_at: string;
+  submitted_at: string | null;
+  accepted_at: string | null;
+  unread_messages: number;
+  needs_doctor_action: boolean;
+  doctor_action_type: string | null;
+  has_completed_intake: boolean;
+  has_medical_record: boolean;
+  attachment_count: number;
+  available_actions: string[];
+}
+
+export interface DoctorConsultationActions {
+  can_accept: boolean;
+  can_begin_review: boolean;
+  can_request_patient_response: boolean;
+  can_mark_awaiting_doctor: boolean;
+  can_require_follow_up: boolean;
+  can_require_physical_visit: boolean;
+  can_transfer: boolean;
+  can_complete: boolean;
+  can_message: boolean;
+  can_add_internal_note: boolean;
+  can_upload_attachment: boolean;
+  can_view_record_summary: boolean;
+}
+
+export interface DoctorConsultationDetail {
+  id: string;
+  status: ConsultationStatus;
+  priority: string;
+  patient: {
+    id: string; display_name: string; date_of_birth: string | null;
+    age: number | null; gender: string | null; preferred_language: string | null;
+    blood_type: string | null;
+  };
+  specialty: { id: string; name: string } | null;
+  description: string;
+  created_at: string;
+  updated_at: string;
+  submitted_at: string | null;
+  accepted_at: string | null;
+  completed_at: string | null;
+  cancelled_at: string | null;
+  timeline: ConsultationTimelineItem[];
+  actions: DoctorConsultationActions;
+  action_reasons: Record<string, string | null>;
+  intake: {
+    exists: boolean; status: string | null; question_count: number; answered_count: number;
+    is_complete: boolean; emergency_detected: boolean; completed_at: string | null;
+    doctor_safe_summary: Record<string, unknown> | null;
+  };
+  messages: { unread_count: number; last_message_at: string | null; patient_awaiting_response: boolean };
+  attachments: {
+    total: number; available: number; pending_scan: number; quarantined: number;
+    rejected: number; can_upload: boolean; upload_unavailable_reason: string | null;
+  };
+  internal_notes: { count: number; latest_at: string | null };
+  medical_record: { exists: boolean; id: string | null; status: string | null; can_view_summary: boolean; action_path: string | null };
+  generated_at: string;
+}
+
+export interface DoctorIntakeDetail {
+  session_id: string;
+  consultation_id: string;
+  status: string;
+  started_at: string;
+  completed_at: string | null;
+  question_count: number;
+  answered_count: number;
+  emergency_detected: boolean;
+  patient_answers: Array<{ id: string; question_label: string; answer: string; created_at: string }>;
+  doctor_safe_summary: Record<string, unknown> | null;
+  missing_fields: string[];
+  can_begin_review: boolean;
+}
+
 export enum ConsultationStatus {
   DRAFT = "draft",
   SUBMITTED = "submitted",
@@ -450,10 +534,7 @@ export interface ConsultationMessage {
 
 export interface DoctorInternalNote {
   id: string;
-  consultation: string;
-  author: string;
-  author_email: string;
-  author_name: string;
+  author: { id: string; display_name: string; role: string };
   content: string;
   created_at: string;
   updated_at: string;

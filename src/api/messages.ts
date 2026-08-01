@@ -40,7 +40,7 @@ export const messagesApi = {
   },
 
   listInternalNotes: async (consultationId: string) => {
-    const { data } = await client.get<DoctorInternalNote[]>(
+    const { data } = await client.get<PaginatedResponse<DoctorInternalNote>>(
       `/messaging/${consultationId}/internal-notes/`
     );
     return data;
@@ -49,7 +49,7 @@ export const messagesApi = {
   createInternalNote: async (consultationId: string, content: string) => {
     const { data } = await client.post<DoctorInternalNote>(
       `/messaging/${consultationId}/internal-notes/`,
-      { content }
+      { content, client_request_id: crypto.randomUUID() }
     );
     return data;
   },
