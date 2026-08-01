@@ -52,6 +52,9 @@ export interface DoctorTransitionInput {
   expected_status: string;
   expected_updated_at?: string;
   client_request_id: string;
+  outcome?: string;
+  medical_record_id?: string;
+  confirmation?: boolean;
 }
 
 export interface CreatedConsultation {

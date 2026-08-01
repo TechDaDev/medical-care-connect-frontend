@@ -66,6 +66,8 @@ const PatientPrivacyPage = lazy(() => import("../pages/patient/PatientPrivacyPag
 const DoctorDashboard = lazy(() => import("../pages/doctor/DoctorDashboard").then(m => ({ default: m.DoctorDashboard })));
 const DoctorConsultationList = lazy(() => import("../pages/doctor/DoctorConsultationList").then(m => ({ default: m.DoctorConsultationList })));
 const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsultationDetail").then(m => ({ default: m.DoctorConsultationDetail })));
+const DoctorMedicalRecordListPage = lazy(() => import("../pages/doctor/DoctorMedicalRecordListPage").then(m => ({ default: m.DoctorMedicalRecordListPage })));
+const DoctorMedicalRecordPage = lazy(() => import("../pages/doctor/DoctorMedicalRecordPage").then(m => ({ default: m.DoctorMedicalRecordPage })));
 const DoctorReviewsPage = lazy(() => import("../pages/doctor/DoctorReviewsPage").then(m => ({ default: m.DoctorReviewsPage })));
 const DoctorProfilePage = lazy(() => import("../pages/doctor/DoctorProfilePage").then(m => ({ default: m.DoctorProfilePage })));
 const DoctorAccessStatePage = lazy(() => import("../pages/doctor/DoctorAccessStatePage").then(m => ({ default: m.DoctorAccessStatePage })));
@@ -150,6 +152,8 @@ export const router = createBrowserRouter([
               { path: "availability", element: <DoctorAccessGate capability="availability"><DoctorAvailabilityPage /></DoctorAccessGate> },
               { path: "consultations", element: <DoctorAccessGate><DoctorConsultationList /></DoctorAccessGate> },
               { path: "consultations/:consultationId", element: <DoctorAccessGate><DoctorConsultationDetail /></DoctorAccessGate> },
+              { path: "medical-records", element: <DoctorAccessGate><DoctorMedicalRecordListPage /></DoctorAccessGate> },
+              { path: "medical-records/:recordId", element: <DoctorAccessGate><DoctorMedicalRecordPage /></DoctorAccessGate> },
               { path: "reviews", element: <DoctorAccessGate><DoctorReviewsPage /></DoctorAccessGate> },
               { path: "messages/:consultationId", element: <DoctorAccessGate><MessagingPage /></DoctorAccessGate> },
             ],

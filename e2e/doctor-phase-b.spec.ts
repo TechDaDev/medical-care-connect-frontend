@@ -36,7 +36,7 @@ test.describe("Doctor Phase B queue and workspace", () => {
     await axe(page);
   });
 
-  test("workspace renders safe summary, timeline, intake, actions, and no record dead route", async ({ page }) => {
+  test("workspace renders safe summary, timeline, intake, actions, and Phase C record route", async ({ page }) => {
     const credentials = getDoctorCreds();
     await login(page, credentials.email, credentials.password);
     const consultation = await doctorConsultation(page, "intake_completed");
@@ -45,7 +45,7 @@ test.describe("Doctor Phase B queue and workspace", () => {
     await expect(page.getByRole("heading", { name: "Patient intake" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Consultation timeline" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Messages" })).toHaveAttribute("href", `/app/doctor/messages/${consultation.id}`);
-    await expect(page.locator('a[href*="medical-record"]')).toHaveCount(0);
+    await expect(page.locator('a[href*="medical-record"]')).toHaveCount(1);
     await page.getByRole("button", { name: "View", exact: true }).click();
     await expect(page.getByText(/synthetic completed intake response/i)).toBeVisible();
     await axe(page);

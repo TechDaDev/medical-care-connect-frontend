@@ -333,6 +333,7 @@ describe("Patient navigation", () => {
     ).toEqual([
       "/app/doctor",
       "/app/doctor/consultations",
+      "/app/doctor/medical-records",
       "/app/doctor/availability",
       "/app/doctor/reviews",
       "/app/notifications",

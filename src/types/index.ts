@@ -207,6 +207,7 @@ export interface ConsultationActions {
   can_view_record: boolean;
   can_add_internal_note: boolean;
   can_transfer: boolean;
+  can_emergency_escalate: boolean;
   can_change_priority: boolean;
 }
 
@@ -267,6 +268,7 @@ export interface DoctorConsultationActions {
   can_require_follow_up: boolean;
   can_require_physical_visit: boolean;
   can_transfer: boolean;
+  can_emergency_escalate: boolean;
   can_complete: boolean;
   can_message: boolean;
   can_add_internal_note: boolean;
@@ -305,9 +307,124 @@ export interface DoctorConsultationDetail {
     rejected: number; can_upload: boolean; upload_unavailable_reason: string | null;
   };
   internal_notes: { count: number; latest_at: string | null };
-  medical_record: { exists: boolean; id: string | null; status: string | null; can_view_summary: boolean; action_path: string | null };
+  medical_record: { exists: boolean; id: string | null; status: string | null; can_view_summary: boolean; can_create_record: boolean; action_path: string | null };
   generated_at: string;
 }
+
+export interface DoctorRecordPatientReported {
+  reported_concern: string | null;
+  symptoms: string[];
+  duration: string | null;
+  severity: number | null;
+  chronic_conditions: string | null;
+  current_medications: string[];
+  allergies: string[];
+  family_history: string | null;
+  additional_information: string | null;
+}
+
+export interface DoctorRecordAuthoredFields {
+  clinical_summary: string;
+  assessment: string;
+  working_diagnosis: string;
+  differential_considerations: string;
+  recommendations: string;
+  treatment_plan: string;
+  follow_up_plan: string;
+  physical_visit_reason: string;
+  warning_signs: string;
+  patient_instructions: string;
+  doctor_notes: string;
+}
+
+export interface DoctorRecordValidation {
+  can_finalize: boolean;
+  missing_fields: string[];
+  warnings: string[];
+  blocking_errors: string[];
+}
+
+export interface DoctorRecordActions {
+  can_edit: boolean;
+  can_finalize: boolean;
+  can_amend: boolean;
+  can_print: boolean;
+  can_complete_consultation: boolean;
+  can_require_follow_up: boolean;
+  can_require_physical_visit: boolean;
+}
+
+export interface DoctorRecordActionReasons {
+  edit: string | null;
+  finalize: string | null;
+  amend: string | null;
+  complete_consultation: string | null;
+}
+
+export interface DoctorRecordAiSuggestions {
+  available: boolean;
+  fields: Partial<DoctorRecordAuthoredFields> | null;
+  generated_at: string | null;
+  disclaimer_key: string;
+}
+
+export interface DoctorMedicalRecordListItem {
+  id: string;
+  consultation_id: string;
+  patient: { id: string; display_name: string };
+  specialty: { id: string; name: string } | null;
+  record_status: "draft" | "finalized";
+  consultation_status: ConsultationStatus;
+  created_at: string;
+  updated_at: string;
+  finalized_at: string | null;
+  needs_doctor_action: boolean;
+  completion_blocked_reason: string | null;
+  available_actions: string[];
+}
+
+export interface DoctorMedicalRecordDetail {
+  id: string;
+  consultation_id: string;
+  record_status: "draft" | "finalized";
+  version: number;
+  patient: { id: string; display_name: string; date_of_birth: string | null; gender: string | null; preferred_language: string | null; blood_type: string | null };
+  consultation: { status: ConsultationStatus; priority: string; specialty_name: string | null; description: string; created_at: string; updated_at: string };
+  patient_reported: DoctorRecordPatientReported;
+  intake_reference: { exists: boolean; is_complete: boolean; emergency_detected: boolean; summary_available: boolean; action_path: string | null };
+  doctor_authored: DoctorRecordAuthoredFields;
+  ai_suggestions: DoctorRecordAiSuggestions;
+  validation: DoctorRecordValidation;
+  actions: DoctorRecordActions;
+  action_reasons: DoctorRecordActionReasons;
+  provenance: Record<string, string>;
+  clinical_outcome: string;
+  outcome_recorded_at: string | null;
+  created_at: string;
+  updated_at: string;
+  finalized_at: string | null;
+  finalized_by: { id: string; display_name: string } | null;
+}
+
+export interface DoctorRecordListFilters {
+  record_status?: string;
+  consultation_status?: string;
+  patient?: string;
+  specialty?: string;
+  needs_doctor_action?: boolean;
+  created_after?: string;
+  created_before?: string;
+  updated_after?: string;
+  search?: string;
+  ordering?: string;
+  page?: number;
+  page_size?: number;
+}
+
+export interface CreateMedicalRecordInput { client_request_id: string }
+export interface UpdateMedicalRecordInput { doctor_authored: Partial<DoctorRecordAuthoredFields>; expected_version: number; client_request_id: string }
+export interface FinalizeMedicalRecordInput { expected_version: number; client_request_id: string; confirmation: boolean }
+export interface ClinicalOutcomeInput { action: string; outcome: string; medical_record_id: string; confirmation: boolean; reason?: string; target_doctor_id?: string; expected_status: string; expected_updated_at?: string; client_request_id: string }
 
 export interface DoctorIntakeDetail {
   session_id: string;

@@ -1,7 +1,8 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { consultationsApi } from "../../api/consultations";
+import { medicalRecordsApi } from "../../api/medicalRecords";
 import { messagesApi } from "../../api/messages";
 import { attachmentsApi } from "../../api/attachments";
 import { useI18n } from "../../i18n";
@@ -17,7 +18,7 @@ import { ConsultationStatusBadge } from "../../components/consultations/Consulta
 import { ConsultationTimeline } from "../../components/consultations/ConsultationTimeline";
 import type { DoctorConsultationDetail as DoctorDetail } from "../../types";
 
-type WorkflowAction = "begin_review" | "request_patient_response" | "mark_awaiting_doctor" | "require_follow_up" | "require_physical_visit" | "transfer" | "complete";
+type WorkflowAction = "begin_review" | "request_patient_response" | "mark_awaiting_doctor" | "require_follow_up" | "require_physical_visit" | "transfer" | "complete" | "emergency_escalate";
 
 const ACTIONS: Array<{ action: WorkflowAction; capability: keyof DoctorDetail["actions"]; reasonKey: string }> = [
   { action: "begin_review", capability: "can_begin_review", reasonKey: "begin_review" },
@@ -27,12 +28,22 @@ const ACTIONS: Array<{ action: WorkflowAction; capability: keyof DoctorDetail["a
   { action: "require_physical_visit", capability: "can_require_physical_visit", reasonKey: "physical_visit" },
   { action: "transfer", capability: "can_transfer", reasonKey: "transfer" },
   { action: "complete", capability: "can_complete", reasonKey: "complete" },
+  { action: "emergency_escalate", capability: "can_emergency_escalate", reasonKey: "emergency_escalate" },
 ];
+
+const OUTCOMES: Partial<Record<WorkflowAction, string>> = {
+  complete: "remote_care_completed",
+  require_follow_up: "follow_up_required",
+  require_physical_visit: "physical_visit_required",
+  transfer: "transferred",
+  emergency_escalate: "emergency_escalated",
+};
 
 export function DoctorConsultationDetail() {
   const { t, formatDateTime } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [dialogAction, setDialogAction] = useState<WorkflowAction | "accept" | null>(null);
   const [reason, setReason] = useState("");
   const [targetDoctorId, setTargetDoctorId] = useState("");
@@ -54,12 +65,17 @@ export function DoctorConsultationDetail() {
       queryClient.invalidateQueries({ queryKey: ["doctor-consultations"] }),
     ]);
   };
+  const createRecord = useMutation({
+    mutationFn: () => medicalRecordsApi.getOrCreateConsultationMedicalRecord(consultationId!, { client_request_id: crypto.randomUUID() }),
+    onSuccess: async (record) => { await refresh(); await queryClient.invalidateQueries({ queryKey: ["doctor-medical-records"] }); navigate(`/app/doctor/medical-records/${record.id}`); },
+  });
   const workflow = useMutation({
     mutationFn: async () => {
       const consultation = query.data!;
       if (dialogAction === "accept") {
         return consultationsApi.accept(consultation.id, consultation.status, consultation.updated_at);
       }
+      const outcome = OUTCOMES[dialogAction!];
       return consultationsApi.transitionDoctor(consultation.id, {
         action: dialogAction!,
         reason: reason.trim() || undefined,
@@ -67,6 +83,9 @@ export function DoctorConsultationDetail() {
         expected_status: consultation.status,
         expected_updated_at: consultation.updated_at,
         client_request_id: crypto.randomUUID(),
+        outcome,
+        medical_record_id: outcome ? consultation.medical_record.id || undefined : undefined,
+        confirmation: outcome ? true : undefined,
       });
     },
     onSuccess: async () => {
@@ -93,6 +112,13 @@ export function DoctorConsultationDetail() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(18rem,1fr)]">
         <div className="space-y-6">
+          <Card>
+            <h2 className="mb-3 text-lg font-semibold">{t("doctorRecords.title")}</h2>
+            {!consultation.medical_record.exists && consultation.medical_record.can_create_record && <Button className="w-full" onClick={() => createRecord.mutate()} loading={createRecord.isPending}>{t("doctorRecords.create")}</Button>}
+            {consultation.medical_record.exists && consultation.medical_record.id && <Link className="block rounded-lg border border-primary-600 px-4 py-2 text-center text-sm font-medium text-primary-700 hover:bg-primary-50" to={`/app/doctor/medical-records/${consultation.medical_record.id}`}>{consultation.medical_record.status === "finalized" ? t("doctorRecords.viewFinal") : t("doctorRecords.continue")}</Link>}
+            {!consultation.medical_record.exists && !consultation.medical_record.can_create_record && <p className="text-sm text-slate-500">{t("doctorRecords.unavailable")}</p>}
+            {createRecord.isError && <p role="alert" className="mt-2 text-sm text-red-700">{t("doctorRecords.createFailed")}</p>}
+          </Card>
           <Card>
             <h2 className="text-lg font-semibold text-slate-900">{consultation.patient.display_name}</h2>
             <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
@@ -134,7 +160,7 @@ export function DoctorConsultationDetail() {
 
       <Modal open={dialogAction !== null} onClose={() => !workflow.isPending && setDialogAction(null)} title={t(`doctorPhaseB.action.${dialogAction || "accept"}`)} closeLabel={t("common.close")}>
         <form onSubmit={(event) => { event.preventDefault(); workflow.mutate(); }} className="space-y-4">
-          {dialogAction !== "accept" && <Textarea label={t("doctorPhaseB.reason")} value={reason} onChange={(event) => setReason(event.target.value)} maxLength={1000} rows={4} required={["request_patient_response", "require_follow_up", "require_physical_visit", "transfer", "complete"].includes(dialogAction || "")} />}
+          {dialogAction !== "accept" && <Textarea label={t("doctorPhaseB.reason")} value={reason} onChange={(event) => setReason(event.target.value)} maxLength={1000} rows={4} required={["request_patient_response", "require_follow_up", "require_physical_visit", "transfer", "complete", "emergency_escalate"].includes(dialogAction || "")} />}
           {dialogAction === "transfer" && <Input label={t("doctorPhaseB.targetDoctorId")} value={targetDoctorId} onChange={(event) => setTargetDoctorId(event.target.value)} required />}
           <p className="text-sm text-slate-600">{t("doctorPhaseB.confirmAction")}</p>
           <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setDialogAction(null)} disabled={workflow.isPending}>{t("common.cancel")}</Button><Button type="submit" loading={workflow.isPending}>{t("common.confirm")}</Button></div>

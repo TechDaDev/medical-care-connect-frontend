@@ -23,7 +23,15 @@ test.describe("Patient Phase D account and records", () => {
   test("record list and detail expose patient-safe fields", async ({ page }) => {
     await page.goto(getBaseUrl() + "/app/patient/medical-records");
     await expect(page.getByRole("heading", { name: "Medical Records" })).toBeVisible();
-    await page.getByRole("link", { name: "View record" }).click();
+    const recordId = await page.evaluate(async () => {
+      const list = await fetch("/api/patients/me/medical-records/", { credentials: "include" }).then((response) => response.json());
+      for (const record of list.results) {
+        const detail = await fetch(`/api/patients/me/medical-records/${record.id}/`, { credentials: "include" }).then((response) => response.json());
+        if (JSON.stringify(detail).includes("synthetic patient-visible record")) return record.id;
+      }
+      throw new Error("Expected synthetic patient-visible record not found");
+    });
+    await page.locator(`a[href="/app/patient/medical-records/${recordId}"]`).click();
     await expect(page.getByRole("heading", { name: "Medical Record" })).toBeVisible();
     await expect(page.getByText("synthetic patient-visible record")).toBeVisible();
     await expect(page.getByText("Internal synthetic note")).toHaveCount(0);
