@@ -7,10 +7,14 @@ export default function globalSetup(): void {
   if (!runId) throw new Error("E2E_RUN_ID missing.");
   if (!password) throw new Error("E2E_TEST_PASSWORD or E2E_ADMIN_PASSWORD missing.");
 
-  const backend = path.resolve(process.cwd(), "../mcc_backend");
+  const backend = path.resolve(
+    process.cwd(),
+    process.env.E2E_BACKEND_DIR || "../mcc_backend",
+  );
+  const python = process.env.E2E_PYTHON || path.join(backend, ".venv/bin/python");
   try {
     execFileSync(
-      path.join(backend, ".venv/bin/python"),
+      python,
       ["manage.py", "seed_e2e_data", "--run-id", runId],
       {
         cwd: backend,
