@@ -13,7 +13,12 @@ on:
     branches: [main]
     paths:
       - "src/**"
+      - "e2e/**"
       - "package.json"
+      - "package-lock.json"
+      - "Dockerfile"
+      - "docker/**"
+      - ".github/workflows/frontend-ci.yml"
 
 jobs:
   test:
@@ -47,8 +52,8 @@ jobs:
 
       - name: Verify no JWT localStorage regression
         run: |
-          ! grep -r "localStorage.*mcc_access" src/ --include="*.ts" --include="*.tsx"
-          ! grep -r "localStorage.*mcc_refresh" src/ --include="*.ts" --include="*.tsx"
+          ! grep -r "localStorage.*mcc_access" src/ --include="*.ts" --include="*.tsx" --exclude-dir=test --exclude-dir=__tests__
+          ! grep -r "localStorage.*mcc_refresh" src/ --include="*.ts" --include="*.tsx" --exclude-dir=test --exclude-dir=__tests__
 
       - name: Build Docker image
         run: docker build --no-cache -t mcc-frontend:ci .

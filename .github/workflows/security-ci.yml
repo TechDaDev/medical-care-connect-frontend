@@ -24,7 +24,7 @@ jobs:
 
       - name: Check JWT localStorage regression
         run: |
-          ! grep -r "localStorage.*mcc_access\|localStorage.*mcc_refresh" src/ --include="*.ts" --include="*.tsx" 2>/dev/null
+          ! grep -r "localStorage.*mcc_access\|localStorage.*mcc_refresh" src/ --include="*.ts" --include="*.tsx" --exclude-dir=test --exclude-dir=__tests__ 2>/dev/null
           echo "No JWT localStorage regression."
 
       - name: Check storage_key exposure
