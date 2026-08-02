@@ -9,6 +9,8 @@ process.env.E2E_RUN_ID = runId;
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || "http://127.0.0.1:4173";
 const apiURL = process.env.PLAYWRIGHT_API_URL || "http://127.0.0.1:8000";
+const reuseExistingServer =
+  process.env.E2E_REUSE_EXISTING_SERVER === "true" || !process.env.CI;
 const localHosts = new Set(["localhost", "127.0.0.1", "::1"]);
 
 function assertSafeTarget(label: string, value: string): void {
@@ -58,7 +60,7 @@ export default defineConfig({
       command: ".venv/bin/python manage.py runserver 127.0.0.1:8000 --noreload",
       cwd: "../mcc_backend",
       url: `${apiURL}/api/readiness/`,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer,
       timeout: 120_000,
       env: {
         ...process.env,
@@ -73,7 +75,7 @@ export default defineConfig({
     {
       command: "npm run build && npm run preview -- --host 127.0.0.1 --port 4173",
       url: baseURL,
-      reuseExistingServer: !process.env.CI,
+      reuseExistingServer,
       timeout: 120_000,
       env: {
         ...process.env,
