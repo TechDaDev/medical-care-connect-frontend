@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { consultationsApi } from "../../api/consultations";
@@ -42,12 +42,13 @@ const OUTCOMES: Partial<Record<WorkflowAction, string>> = {
 export function DoctorConsultationDetail() {
   const { t, formatDateTime } = useI18n();
   const { consultationId } = useParams<{ consultationId: string }>();
+  const location = useLocation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [dialogAction, setDialogAction] = useState<WorkflowAction | "accept" | null>(null);
   const [reason, setReason] = useState("");
   const [targetDoctorId, setTargetDoctorId] = useState("");
-  const [showIntake, setShowIntake] = useState(false);
+  const [showIntake, setShowIntake] = useState(() => location.pathname.endsWith("/intake"));
 
   const query = useQuery({
     queryKey: ["doctor-consultation", consultationId],

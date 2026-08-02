@@ -26,6 +26,9 @@ function assertSafeTarget(label: string, value: string): void {
 
 assertSafeTarget("PLAYWRIGHT_BASE_URL", baseURL);
 assertSafeTarget("PLAYWRIGHT_API_URL", apiURL);
+if (process.env.E2E_LOCAL_ALLOWED !== "true") {
+  throw new Error("E2E_LOCAL_ALLOWED=true is required for destructive local fixtures.");
+}
 
 if (localHosts.has(new URL(baseURL).hostname) && process.env.E2E_USE_EXPLICIT_ACCOUNTS !== "true") {
   const password = process.env.E2E_TEST_PASSWORD;
@@ -98,7 +101,7 @@ export default defineConfig({
     },
     {
       name: "chromium-mobile",
-      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c|patient-phase-d|patient-phase-e|doctor-phase-a|doctor-phase-b|doctor-phase-c|doctor-phase-d)\.spec\.ts/,
+      testMatch: /(phase-f-permissions|patient-phase-a|patient-phase-b|patient-phase-c|patient-phase-d|patient-phase-e|doctor-phase-a|doctor-phase-b|doctor-phase-c|doctor-phase-d|doctor-phase-e)\.spec\.ts/,
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },

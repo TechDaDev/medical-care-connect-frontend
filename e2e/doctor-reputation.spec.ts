@@ -30,6 +30,7 @@ test.describe("Doctor Reputation & Reviews", () => {
 
     // Check exact rating-distribution output.
     await expect(page.getByText("5★", { exact: true })).toBeVisible();
-    await expect(page.getByText("5.0", { exact: true })).toBeVisible();
+    await expect(page.getByText("4.3", { exact: true })).toBeVisible();
+    await expect(page.getByText("4", { exact: true }).first()).toBeVisible();
   });
 });

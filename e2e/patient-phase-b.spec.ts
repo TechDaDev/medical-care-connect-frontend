@@ -35,7 +35,10 @@ test.describe("Patient Phase B discovery", () => {
     await expect(page.getByRole("heading", { name: /Synthetic Unavailable/ })).toBeVisible();
     await expect(page.getByRole("heading", { name: /Synthetic Approved/ })).toHaveCount(0);
 
-    await page.getByRole("link", { name: "View profile" }).click();
+    const unavailableCard = page
+      .getByRole("heading", { name: /Synthetic Unavailable/ })
+      .locator("xpath=ancestor::article");
+    await unavailableCard.getByRole("link", { name: "View profile" }).click();
     await expect(page.getByRole("heading", { name: /Synthetic Unavailable/ })).toBeVisible();
     await expect(page.getByText("Consultations unavailable")).toBeVisible();
     await expect(page.getByRole("link", { name: "Start consultation" })).toHaveCount(0);

@@ -162,6 +162,7 @@ export const router = createBrowserRouter([
               { path: "availability", element: <DoctorAccessGate capability="availability"><DoctorAvailabilityPage /></DoctorAccessGate> },
               { path: "consultations", element: <DoctorAccessGate><DoctorConsultationList /></DoctorAccessGate> },
               { path: "consultations/:consultationId", element: <DoctorAccessGate><DoctorConsultationDetail /></DoctorAccessGate> },
+              { path: "consultations/:consultationId/intake", element: <DoctorAccessGate><DoctorConsultationDetail /></DoctorAccessGate> },
               { path: "medical-records", element: <DoctorAccessGate><DoctorMedicalRecordListPage /></DoctorAccessGate> },
               { path: "medical-records/:recordId", element: <DoctorAccessGate><DoctorMedicalRecordPage /></DoctorAccessGate> },
               { path: "reviews", element: <DoctorAccessGate><DoctorReviewsPage /></DoctorAccessGate> },
