@@ -41,6 +41,14 @@ function DoctorHome() {
   return <DoctorAccessGate><DoctorDashboard /></DoctorAccessGate>;
 }
 
+function SharedRoleRedirect({ patient, doctor, staff }: { patient: string; doctor: string; staff?: string }) {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" replace />;
+  if (user.role === UserRole.DOCTOR) return <Navigate to={doctor} replace />;
+  if (user.role === UserRole.PATIENT) return <Navigate to={patient} replace />;
+  return staff ? <Navigate to={staff} replace /> : <Navigate to="/app/staff" replace />;
+}
+
 const LandingPage = lazy(() => import("../pages/public/LandingPage").then(m => ({ default: m.LandingPage })));
 const DoctorListPage = lazy(() => import("../pages/public/DoctorListPage").then(m => ({ default: m.DoctorListPage })));
 const DoctorDetailPage = lazy(() => import("../pages/public/DoctorDetailPage").then(m => ({ default: m.DoctorDetailPage })));
@@ -55,8 +63,6 @@ const NewConsultationPage = lazy(() => import("../pages/patient/NewConsultationP
 const ConsultationDetailPage = lazy(() => import("../pages/patient/ConsultationDetailPage").then(m => ({ default: m.ConsultationDetailPage })));
 const IntakePage = lazy(() => import("../pages/patient/IntakePage").then(m => ({ default: m.IntakePage })));
 const MessagingPage = lazy(() => import("../pages/patient/MessagingPage").then(m => ({ default: m.MessagingPage })));
-const NotificationsPage = lazy(() => import("../pages/patient/NotificationsPage").then(m => ({ default: m.NotificationsPage })));
-const ProfilePage = lazy(() => import("../pages/patient/ProfilePage").then(m => ({ default: m.ProfilePage })));
 const PatientProfilePage = lazy(() => import("../pages/patient/PatientProfilePage").then(m => ({ default: m.PatientProfilePage })));
 const PatientMedicalRecordListPage = lazy(() => import("../pages/patient/PatientMedicalRecordListPage").then(m => ({ default: m.PatientMedicalRecordListPage })));
 const PatientMedicalRecordPage = lazy(() => import("../pages/patient/PatientMedicalRecordPage").then(m => ({ default: m.PatientMedicalRecordPage })));
@@ -69,6 +75,11 @@ const DoctorConsultationDetail = lazy(() => import("../pages/doctor/DoctorConsul
 const DoctorMedicalRecordListPage = lazy(() => import("../pages/doctor/DoctorMedicalRecordListPage").then(m => ({ default: m.DoctorMedicalRecordListPage })));
 const DoctorMedicalRecordPage = lazy(() => import("../pages/doctor/DoctorMedicalRecordPage").then(m => ({ default: m.DoctorMedicalRecordPage })));
 const DoctorReviewsPage = lazy(() => import("../pages/doctor/DoctorReviewsPage").then(m => ({ default: m.DoctorReviewsPage })));
+const DoctorMessagesPage = lazy(() => import("../pages/doctor/DoctorMessagesPage").then(m => ({ default: m.DoctorMessagesPage })));
+const DoctorNotificationsPage = lazy(() => import("../pages/doctor/DoctorNotificationsPage").then(m => ({ default: m.DoctorNotificationsPage })));
+const DoctorPrivacyPage = lazy(() => import("../pages/doctor/DoctorPrivacyPage").then(m => ({ default: m.DoctorPrivacyPage })));
+const DoctorPrivacyExportsPage = lazy(() => import("../pages/doctor/DoctorPrivacyExportsPage").then(m => ({ default: m.DoctorPrivacyExportsPage })));
+const DoctorPrivacyDeletionPage = lazy(() => import("../pages/doctor/DoctorPrivacyDeletionPage").then(m => ({ default: m.DoctorPrivacyDeletionPage })));
 const DoctorProfilePage = lazy(() => import("../pages/doctor/DoctorProfilePage").then(m => ({ default: m.DoctorProfilePage })));
 const DoctorAccessStatePage = lazy(() => import("../pages/doctor/DoctorAccessStatePage").then(m => ({ default: m.DoctorAccessStatePage })));
 const DoctorAvailabilityPage = lazy(() => import("../pages/doctor/DoctorAvailabilityPage").then(m => ({ default: m.DoctorAvailabilityPage })));
@@ -90,7 +101,6 @@ const SpecialtyAdminListPage = lazy(() => import("../pages/staff/SpecialtyAdminL
 const SpecialtyAdminDetailPage = lazy(() => import("../pages/staff/SpecialtyAdminDetailPage").then(m => ({ default: m.SpecialtyAdminDetailPage })));
 const AttachmentAdminListPage = lazy(() => import("../pages/staff/AttachmentAdminListPage").then(m => ({ default: m.AttachmentAdminListPage })));
 const AttachmentAdminDetailPage = lazy(() => import("../pages/staff/AttachmentAdminDetailPage").then(m => ({ default: m.AttachmentAdminDetailPage })));
-const PrivacyPage = lazy(() => import("../pages/privacy/PrivacyPage").then(m => ({ default: m.PrivacyPage })));
 const PrivacyExportsPage = lazy(() => import("../pages/privacy/PrivacyExportsPage").then(m => ({ default: m.PrivacyExportsPage })));
 const PrivacyDeletionPage = lazy(() => import("../pages/privacy/PrivacyDeletionPage").then(m => ({ default: m.PrivacyDeletionPage })));
 
@@ -112,11 +122,11 @@ export const router = createBrowserRouter([
         element: <RequireAuth><AppLayout><Outlet /></AppLayout></RequireAuth>,
         children: [
           { index: true, element: <RoleBasedRedirect /> },
-          { path: "profile", element: <LazyLoad><ProfilePage /></LazyLoad> },
-          { path: "notifications", element: <LazyLoad><NotificationsPage /></LazyLoad> },
-          { path: "privacy", element: <LazyLoad><PrivacyPage /></LazyLoad> },
-          { path: "privacy/exports", element: <LazyLoad><PrivacyExportsPage /></LazyLoad> },
-          { path: "privacy/deletion", element: <LazyLoad><PrivacyDeletionPage /></LazyLoad> },
+          { path: "profile", element: <SharedRoleRedirect patient="/app/patient/profile" doctor="/app/doctor/profile" staff="/app/staff" /> },
+          { path: "notifications", element: <SharedRoleRedirect patient="/app/patient/notifications" doctor="/app/doctor/notifications" staff="/app/staff" /> },
+          { path: "privacy", element: <SharedRoleRedirect patient="/app/patient/privacy" doctor="/app/doctor/privacy" staff="/app/staff" /> },
+          { path: "privacy/exports", element: <SharedRoleRedirect patient="/app/patient/privacy/exports" doctor="/app/doctor/privacy/exports" staff="/app/staff" /> },
+          { path: "privacy/deletion", element: <SharedRoleRedirect patient="/app/patient/privacy/deletion" doctor="/app/doctor/privacy/deletion" staff="/app/staff" /> },
           {
             path: "patient",
             element: <RequireRole roles={[UserRole.PATIENT]}><LazyLoad><Outlet /></LazyLoad></RequireRole>,
@@ -155,7 +165,12 @@ export const router = createBrowserRouter([
               { path: "medical-records", element: <DoctorAccessGate><DoctorMedicalRecordListPage /></DoctorAccessGate> },
               { path: "medical-records/:recordId", element: <DoctorAccessGate><DoctorMedicalRecordPage /></DoctorAccessGate> },
               { path: "reviews", element: <DoctorAccessGate><DoctorReviewsPage /></DoctorAccessGate> },
+              { path: "messages", element: <DoctorAccessGate><DoctorMessagesPage /></DoctorAccessGate> },
               { path: "messages/:consultationId", element: <DoctorAccessGate><MessagingPage /></DoctorAccessGate> },
+              { path: "notifications", element: <DoctorAccessGate><DoctorNotificationsPage /></DoctorAccessGate> },
+              { path: "privacy", element: <DoctorAccessGate><DoctorPrivacyPage /></DoctorAccessGate> },
+              { path: "privacy/exports", element: <DoctorAccessGate><DoctorPrivacyExportsPage /></DoctorAccessGate> },
+              { path: "privacy/deletion", element: <DoctorAccessGate><DoctorPrivacyDeletionPage /></DoctorAccessGate> },
             ],
           },
           {

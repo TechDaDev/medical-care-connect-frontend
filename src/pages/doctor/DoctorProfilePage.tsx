@@ -248,7 +248,7 @@ export function DoctorProfilePage() {
         years_of_experience: data.years_of_experience,
         biography: data.biography.trim(),
         qualifications: data.qualifications.trim(),
-        consultation_fee: data.consultation_fee === "" ? "0.00" : data.consultation_fee,
+        consultation_fee: data.consultation_fee === "" ? null : data.consultation_fee,
         languages: data.languages,
         estimated_response_minutes: data.estimated_response_minutes,
       };
@@ -297,6 +297,22 @@ export function DoctorProfilePage() {
       >
         <p className="text-sm font-medium">{t(statusBanner.key)}</p>
       </div>
+
+      {profile?.completeness && (
+        <Card className="mb-6">
+          <h2 className="text-lg font-semibold">{t("doctorD.profile.completeness")}</h2>
+          <div className="mt-2 h-2 overflow-hidden rounded bg-slate-200" role="progressbar" aria-valuenow={profile.completeness.completion_percent} aria-valuemin={0} aria-valuemax={100} aria-label={t("doctorD.profile.completeness")}>
+            <div className="h-full bg-primary-600" style={{ width: `${profile.completeness.completion_percent}%` }} />
+          </div>
+          <p className="mt-2 text-sm">{profile.completeness.completion_percent}%</p>
+          {!profile.public_preview?.eligible && <p className="text-sm text-amber-700">{t("doctorD.profile.notPublic")}</p>}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {profile.public_preview?.path && <Button variant="secondary" onClick={() => navigate(profile.public_preview!.path!)}>{t("doctorD.profile.preview")}</Button>}
+            <Button variant="secondary" onClick={() => navigate(profile.links?.availability || "/app/doctor/availability")}>{t("nav.availability")}</Button>
+            <Button variant="secondary" onClick={() => navigate(profile.links?.privacy || "/app/doctor/privacy")}>{t("nav.privacy")}</Button>
+          </div>
+        </Card>
+      )}
 
       {/* Personal information */}
       <Card className="mb-6">

@@ -333,11 +333,13 @@ describe("Patient navigation", () => {
     ).toEqual([
       "/app/doctor",
       "/app/doctor/consultations",
+      "/app/doctor/messages",
       "/app/doctor/medical-records",
-      "/app/doctor/availability",
       "/app/doctor/reviews",
-      "/app/notifications",
+      "/app/doctor/availability",
+      "/app/doctor/notifications",
       "/app/doctor/profile",
+      "/app/doctor/privacy",
     ]);
     expect(
       buildNavigationItems(UserRole.COORDINATOR, translate).map(

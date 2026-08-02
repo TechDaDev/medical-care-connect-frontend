@@ -44,7 +44,7 @@ test.describe("Doctor Phase B queue and workspace", () => {
     await expect(page.getByRole("heading", { name: "Consultation workspace" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Patient intake" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Consultation timeline" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Messages" })).toHaveAttribute("href", `/app/doctor/messages/${consultation.id}`);
+    await expect(page.locator(`a[href="/app/doctor/messages/${consultation.id}"]`)).toHaveCount(1);
     await expect(page.locator('a[href*="medical-record"]')).toHaveCount(1);
     await page.getByRole("button", { name: "View", exact: true }).click();
     await expect(page.getByText(/synthetic completed intake response/i)).toBeVisible();

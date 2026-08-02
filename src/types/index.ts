@@ -103,6 +103,9 @@ export interface DoctorProfile {
   license_document_verified?: boolean;
   created_at?: string;
   updated_at?: string;
+  completeness?: { completion_percent: number; missing_fields: string[] };
+  public_preview?: { eligible: boolean; path: string | null };
+  links?: { availability: string; privacy: string };
 }
 
 /** Strict update shape — only fields a doctor is allowed to edit. */
@@ -113,7 +116,7 @@ export interface DoctorProfileUpdateInput {
   qualifications?: string;
   biography?: string;
   years_of_experience?: number;
-  consultation_fee?: string | number;
+  consultation_fee?: string | number | null;
   languages?: string[];
   estimated_response_minutes?: number;
 }
@@ -666,9 +669,82 @@ export interface Notification {
   read_at: string | null;
   created_at: string;
   link: {
-    type: "consultation" | "message" | "medical_record" | "privacy" | "profile" | "none";
+    type: "consultation" | "message" | "medical_record" | "review" | "privacy" | "profile" | "none";
     path: string | null;
   };
+}
+
+export interface DoctorMessageThread {
+  consultation_id: string;
+  patient: { id: string; display_name: string };
+  specialty: { id: string; name: string } | null;
+  consultation_status: string;
+  priority: string;
+  unread_count: number;
+  last_message_at: string | null;
+  last_message_sender_role: string | null;
+  last_message_preview: string | null;
+  patient_awaiting_response: boolean;
+  messaging_available: boolean;
+  unavailable_reason: string | null;
+  action_path: string;
+}
+
+export interface DoctorReviewItem {
+  id: string;
+  rating: number;
+  title: string;
+  body: string;
+  is_anonymous: boolean;
+  reviewer_display_name: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  has_response: boolean;
+  response: { id: string; body: string; created_at: string; updated_at: string } | null;
+  can_respond: boolean;
+  can_edit_response: boolean;
+  response_unavailable_reason: string | null;
+}
+
+export interface DoctorReviewPage extends PaginatedResponse<DoctorReviewItem> {
+  summary: {
+    average_rating: number;
+    total_published: number;
+    awaiting_response: number;
+    responded: number;
+    rating_distribution: Record<string, number>;
+  };
+}
+
+export interface DoctorDataExport {
+  id: string;
+  status: "pending" | "processing" | "completed" | "failed" | "expired";
+  requested_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  expires_at: string | null;
+  size_bytes: number | null;
+  failure_code: string;
+}
+
+export interface DoctorDeletionRequest {
+  id: string;
+  status: string;
+  reason: string;
+  requested_at: string;
+  reviewed_at: string | null;
+  rejection_reason: string;
+  can_cancel: boolean;
+}
+
+export interface DoctorPrivacyOverview {
+  profile_visibility: "public" | "private";
+  profile_completion: { completion_percent: number; missing_fields: string[] };
+  active_export: boolean;
+  active_deletion_request: DoctorDeletionRequest | null;
+  retention: { clinical_records_may_be_retained: boolean; audit_records_may_be_retained: boolean };
+  links: { exports: string; deletion: string; profile: string };
 }
 
 export interface ConsultationReview {

@@ -1,165 +1,34 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSearchParams } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { doctorPhaseDApi } from "../../api/doctorPhaseD";
+import type { DoctorReviewItem } from "../../types";
+import { Button, Card, EmptyState, ErrorState, Input, PageHeader, Spinner, Textarea } from "../../components/common";
 import { useI18n } from "../../i18n";
-import { useAuth } from "../../auth";
-import { reviewsApi } from "../../api/reviews";
-import { doctorsApi } from "../../api/doctors";
-import { Card } from "../../components/common/Card";
-import { Spinner } from "../../components/common/Spinner";
-import { ErrorState } from "../../components/common/ErrorState";
-import { EmptyState } from "../../components/common/EmptyState";
-import { Button } from "../../components/common/Button";
-import { StarRating } from "../../components/reviews/StarRating";
-import { DoctorReputationCard } from "../../components/reviews/DoctorReputationCard";
 import { getErrorMessage } from "../../utils/errors";
-import { MessageSquare } from "lucide-react";
-import type { ConsultationReview } from "../../types";
+
+function uuid() { return globalThis.crypto?.randomUUID?.() || `${Date.now()}-0000-4000-8000-${Math.random().toString(16).slice(2).padEnd(12, "0").slice(0, 12)}`; }
 
 export function DoctorReviewsPage() {
-  const { t, formatDate } = useI18n();
-  const { user } = useAuth();
-  const qc = useQueryClient();
-  const [respondingTo, setRespondingTo] = useState<string | null>(null);
-  const [responseText, setResponseText] = useState("");
-
-  const {
-    data: profile,
-    isLoading: profileLoading,
-    error: profileError,
-    refetch: refetchProfile,
-  } = useQuery({
-    queryKey: ["my-doctor-profile"],
-    queryFn: doctorsApi.getProfile,
-    enabled: user?.role === "doctor",
+  const { t, formatDate } = useI18n(); const qc = useQueryClient(); const [params, setParams] = useSearchParams();
+  const [editing, setEditing] = useState<DoctorReviewItem | null>(null); const [body, setBody] = useState(""); const [notice, setNotice] = useState("");
+  const filters = { page: Number(params.get("page") || 1), responded: params.get("responded") || undefined, awaiting_response: params.get("awaiting") || undefined, rating: params.get("rating") || undefined, ordering: params.get("ordering") || "priority" };
+  const query = useQuery({ queryKey: ["doctor-reviews", filters], queryFn: () => doctorPhaseDApi.reviews(filters) });
+  const mutation = useMutation({
+    mutationFn: () => editing?.response
+      ? doctorPhaseDApi.updateReviewResponse(editing.id, body, editing.response.updated_at, uuid())
+      : doctorPhaseDApi.createReviewResponse(editing!.id, body, uuid()),
+    onSuccess: async () => { setNotice(t("doctorD.reviews.saved")); setEditing(null); setBody(""); await Promise.all([qc.invalidateQueries({ queryKey: ["doctor-reviews"] }), qc.invalidateQueries({ queryKey: ["doctor-dashboard"] }), qc.invalidateQueries({ queryKey: ["doctors"] })]); },
   });
-
-  const { data: reputation, isLoading: repLoading } = useQuery({
-    queryKey: ["doctor-reputation", profile?.id],
-    queryFn: () => reviewsApi.getDoctorReputation(profile?.id || ""),
-    enabled: !!profile?.id,
-  });
-
-  const { data: reviewsData, isLoading, error, refetch } = useQuery({
-    queryKey: ["doctor-reviews", profile?.id],
-    queryFn: () => reviewsApi.getDoctorReviews(profile?.id || ""),
-    enabled: !!profile?.id,
-  });
-
-  const respondMut = useMutation({
-    mutationFn: (params: { reviewId: string; body: string }) =>
-      reviewsApi.respondToReview(params.reviewId, params.body),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["doctor-reviews"] });
-      qc.invalidateQueries({ queryKey: ["doctor-reputation"] });
-      setRespondingTo(null);
-      setResponseText("");
-    },
-  });
-
-  if (profileLoading || isLoading || repLoading) return <Spinner />;
-  if (profileError) {
-    return <ErrorState message={getErrorMessage(profileError)} onRetry={refetchProfile} />;
-  }
-  if (error) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
-
-  const reviews = reviewsData?.results || [];
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-slate-900">{t("review.reputation")}</h1>
-      </div>
-
-      {/* Reputation Summary */}
-      <div className="mb-8">
-        <DoctorReputationCard reputation={reputation ?? null} loading={repLoading} />
-      </div>
-
-      {/* Reviews List */}
-      <h2 className="text-lg font-semibold text-slate-900 mb-4">
-        {t("review.reviews")} ({reviews.length})
-      </h2>
-
-      {reviews.length === 0 ? (
-        <EmptyState message={t("review.noReviews")} />
-      ) : (
-        <div className="space-y-4">
-          {reviews.map((review: ConsultationReview) => (
-            <Card key={review.id} className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm text-slate-500">
-                      {review.is_anonymous ? t("review.anonymous") : review.reviewer_name}
-                    </span>
-                    <StarRating rating={review.rating} size="sm" />
-                  </div>
-                  {review.title && (
-                    <h4 className="font-medium text-slate-900">{review.title}</h4>
-                  )}
-                </div>
-                <span className="text-xs text-slate-400">
-                  {formatDate(review.created_at)}
-                </span>
-              </div>
-
-              {review.body && (
-                <p className="text-sm text-slate-600 mb-3">{review.body}</p>
-              )}
-
-              {/* Existing response */}
-              {review.response && (
-                <div className="p-3 bg-primary-50 rounded-lg border border-primary-100 mb-3">
-                  <p className="text-xs font-medium text-primary-700 mb-1">
-                    {t("review.doctorResponse")}
-                  </p>
-                  <p className="text-sm text-primary-800">{review.response.body}</p>
-                </div>
-              )}
-
-              {/* Respond button / form */}
-              {!review.has_response && respondingTo !== review.id && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setRespondingTo(review.id)}
-                >
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  {t("review.respond")}
-                </Button>
-              )}
-
-              {respondingTo === review.id && (
-                <div className="space-y-3">
-                  <textarea
-                    value={responseText}
-                    onChange={(e) => setResponseText(e.target.value)}
-                    placeholder={t("review.responsePlaceholder")}
-                    className="w-full rounded-lg border border-slate-300 p-2 text-sm"
-                    rows={3}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      onClick={() => respondMut.mutate({ reviewId: review.id, body: responseText })}
-                      disabled={!responseText.trim() || respondMut.isPending}
-                    >
-                      {t("review.submitResponse")}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => { setRespondingTo(null); setResponseText(""); }}
-                    >
-                      {t("common.cancel")}
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+  const set = (key: string, value: string) => { const next = new URLSearchParams(params); if (value) next.set(key, value); else next.delete(key); if (key !== "page") next.delete("page"); setParams(next); };
+  const start = (review: DoctorReviewItem) => { setEditing(review); setBody(review.response?.body || ""); setNotice(""); };
+  return <div aria-busy={query.isLoading}>
+    <PageHeader title={t("doctorD.reviews.title")} actions={<Button size="sm" variant="secondary" onClick={() => query.refetch()}>{t("common.refresh")}</Button>} />
+    <p role="status" aria-live="polite" className="text-sm text-green-700">{notice}</p>
+    {query.data && <Card className="mb-4"><div className="grid gap-3 sm:grid-cols-4"><div><span className="text-sm text-slate-500">{t("doctorD.reviews.average")}</span><p className="text-2xl font-bold">{query.data.summary.average_rating.toFixed(1)}</p></div><div><span className="text-sm text-slate-500">{t("doctorD.reviews.total")}</span><p className="text-2xl font-bold">{query.data.summary.total_published}</p></div><div><span className="text-sm text-slate-500">{t("doctorD.reviews.awaiting")}</span><p className="text-2xl font-bold">{query.data.summary.awaiting_response}</p></div><div aria-label={t("doctorD.reviews.distribution")}>{Object.entries(query.data.summary.rating_distribution).map(([rating, count]) => <span key={rating} className="me-2 text-sm"><span>{rating}★</span> <span>{count}</span></span>)}</div></div></Card>}
+    <Card className="mb-4"><div className="grid gap-3 md:grid-cols-3"><label className="text-sm font-medium">{t("common.status")}<select className="mt-1 w-full rounded-lg border p-2" value={params.get("responded") || ""} onChange={e => set("responded", e.target.value)}><option value="">{t("common.all")}</option><option value="false">{t("doctorD.reviews.awaiting")}</option><option value="true">{t("doctorD.reviews.responded")}</option></select></label><Input type="number" min="1" max="5" label={t("doctorD.reviews.rating")} value={params.get("rating") || ""} onChange={e => set("rating", e.target.value)} /><Input label={t("doctorD.reviews.ordering")} value={params.get("ordering") || ""} onChange={e => set("ordering", e.target.value)} /></div></Card>
+    {query.isLoading && <Spinner />}{query.isError && <ErrorState message={getErrorMessage(query.error)} onRetry={() => query.refetch()} />}{query.data?.results.length === 0 && <EmptyState message={t("doctorD.reviews.empty")} />}
+    <div className="space-y-4">{query.data?.results.map(review => <Card key={review.id}><div className="flex justify-between gap-3"><div><h2 className="font-semibold">{review.rating}★ · {review.is_anonymous ? t("doctorD.reviews.anonymous") : review.reviewer_display_name}</h2><p className="text-xs text-slate-500">{formatDate(review.created_at)}</p></div><span className="text-xs">{review.status}</span></div>{review.title && <h3 className="mt-3 font-medium">{review.title}</h3>}<p className="mt-1 text-sm" dir="auto">{review.body}</p>{review.response && <div className="mt-3 rounded-lg bg-primary-50 p-3"><h3 className="text-sm font-semibold">{t("doctorD.reviews.response")}</h3><p dir="auto">{review.response.body}</p></div>}{(review.can_respond || review.can_edit_response) && <Button className="mt-3" size="sm" variant="secondary" onClick={() => start(review)}>{review.response ? t("doctorD.reviews.edit") : t("doctorD.reviews.respond")}</Button>}{review.response_unavailable_reason && <p className="mt-2 text-xs text-slate-500">{t(`doctorD.reviews.reason.${review.response_unavailable_reason}`)}</p>}</Card>)}</div>
+    {editing && <Card className="mt-4"><h2 className="font-semibold">{editing.response ? t("doctorD.reviews.edit") : t("doctorD.reviews.respond")}</h2><Textarea label={t("doctorD.reviews.responseLabel")} value={body} maxLength={2000} onChange={e => setBody(e.target.value)} /><p className="mt-1 text-xs text-slate-600">{t("doctorD.reviews.confidentialityWarning")}</p><p className="text-end text-xs">{body.length}/2000</p>{mutation.isError && <p role="alert" className="text-sm text-red-700">{getErrorMessage(mutation.error)}</p>}<div className="mt-2 flex gap-2"><Button disabled={body.trim().length < 10} loading={mutation.isPending} onClick={() => mutation.mutate()}>{t("common.submit")}</Button><Button variant="secondary" onClick={() => setEditing(null)}>{t("common.cancel")}</Button></div></Card>}
+  </div>;
 }

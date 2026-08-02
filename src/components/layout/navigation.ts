@@ -19,11 +19,13 @@ export function buildNavigationItems(role: UserRole, t: Translate) {
     return [
       { label: t("nav.dashboard"), path: "/app/doctor" },
       { label: t("nav.consultations"), path: "/app/doctor/consultations" },
+      { label: t("nav.messages"), path: "/app/doctor/messages" },
       { label: t("nav.medicalRecords"), path: "/app/doctor/medical-records" },
-      { label: t("nav.availability"), path: "/app/doctor/availability" },
       { label: t("nav.reviews"), path: "/app/doctor/reviews" },
-      { label: t("nav.notifications"), path: "/app/notifications" },
+      { label: t("nav.availability"), path: "/app/doctor/availability" },
+      { label: t("nav.notifications"), path: "/app/doctor/notifications" },
       { label: t("nav.profile"), path: "/app/doctor/profile" },
+      { label: t("nav.privacy"), path: "/app/doctor/privacy" },
     ];
   }
   if (role === UserRole.ADMINISTRATOR) {
