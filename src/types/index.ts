@@ -433,14 +433,31 @@ export interface DoctorIntakeDetail {
   session_id: string;
   consultation_id: string;
   status: string;
-  started_at: string;
+  started_at: string | null;
   completed_at: string | null;
+  confirmed_at: string | null;
+  submitted_at: string | null;
   question_count: number;
   answered_count: number;
+  language: string;
+  prompt_version: string;
+  schema_version: string;
   emergency_detected: boolean;
+  emergency_level: string;
+  patient_confirmed: boolean;
+  ai_assisted: boolean;
   patient_answers: Array<{ id: string; question_label: string; answer: string; created_at: string }>;
   doctor_safe_summary: Record<string, unknown> | null;
+  field_projection: Record<string, {
+    value: unknown;
+    status: string;
+    source: string;
+    confirmed_by_patient: boolean;
+    evidence_message_ids: string[];
+  }>;
   missing_fields: string[];
+  uncertainty_fields: string[];
+  missing_non_blocking: string[];
   can_begin_review: boolean;
 }
 
@@ -540,20 +557,84 @@ export interface AIIntakeSession {
   id: string;
   consultation: string;
   status: string;
-  messages: AIIntakeMessage[];
+  language: string;
+  current_question: string;
   question_count: number;
+  answered_count: number;
   is_complete: boolean;
   ready_for_review: boolean;
+  can_send_message: boolean;
+  can_complete: boolean;
+  can_confirm: boolean;
+  can_submit: boolean;
   emergency_detected: boolean;
-  emergency_keyword: string;
+  emergency_level: string;
   emergency_instruction: string;
+  started_at: string | null;
+  completed_at: string | null;
+  confirmed_at: string | null;
+  submitted_at: string | null;
+  updated_at: string;
+  messages: AIIntakeMessage[];
+  progress_percent: number;
+  missing_blocking_fields: string[];
 }
 
 export interface AIIntakeMessage {
   id: string;
   role: "assistant" | "patient" | "system";
   content: string;
+  sequence_number: number;
   created_at: string;
+}
+
+export interface IntakeAnswerResponse {
+  conversation_status?: string;
+  session_status: string;
+  patient_facing_message: string;
+  next_question: string | null;
+  next_question_field?: string | null;
+  question_count: number;
+  emergency_detected: boolean;
+  emergency_level: string;
+  emergency_reasons?: string[];
+  record_ready: boolean;
+  submitted_to_doctor?: boolean;
+  error_code?: string;
+  retryable?: boolean;
+  replayed?: boolean;
+  completeness?: {
+    missing_blocking_fields: string[];
+    can_generate_review_summary: boolean;
+    reason_code: string;
+    questions_remaining: number;
+  } | null;
+}
+
+export interface IntakeReviewField {
+  value: unknown;
+  status: "answered" | "unknown" | "declined" | "uncertain" | "not_applicable" | "missing";
+  source: string;
+  evidence_message_ids: string[];
+  confirmed_by_patient: boolean;
+}
+
+export interface IntakeReview {
+  session_id: string;
+  session_status: string;
+  consultation_id?: string;
+  review: {
+    sections: Record<string, IntakeReviewField>;
+    ai_generated_summary: string | null;
+    generated_at: string;
+    prompt_version: string;
+    schema_version: string;
+  };
+  can_confirm: boolean;
+  can_correct: boolean;
+  can_submit: boolean;
+  updated_at: string;
+  missing_blocking_fields?: string[];
 }
 
 export interface MedicalRecordDraft {
